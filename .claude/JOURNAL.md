@@ -436,3 +436,11 @@ Typecheck passing = the v6/Supabase/Zod4 patterns Sonnet will copy are VERIFIED 
 processCapture) + Settings UI (keys) + auth + the other two experiences (Reconcile, Planning) +
 conference seeding (T2) + QA. App won't RUN until a Supabase project + env (.env) are set up and
 screens exist — that's the next phase. Core patterns are all in place.
+- [22:10] Git + public repo set up (pre-Sonnet-handoff; next session loses chat history, so the
+  durable docs ARE the handoff). Committed everything incl. plans/ + .claude/JOURNAL.md + CLAUDE.md
+  (user chose to make the full AI decision-trail public — a differentiator the role grades). Created
+  public repo **github.com/shaiaviv/lanyard** + pushed. Safety-verified: .env gitignored (added
+  !.env.example so the template is tracked), no node_modules, no hardcoded secrets. `.env` scaffolded
+  locally with a generated SETTINGS_ENCRYPTION_SECRET + blank Supabase placeholders. Reviewer-facing
+  README written. NOTE: user renamed the project folder grain→lanyard (use /Users/shaiaviv/Projects/
+  lanyard now). Next session (Sonnet) bootstraps from CLAUDE.md + plans/ + JOURNAL.md.
