@@ -102,14 +102,14 @@ export async function getPendingCount(repId: string): Promise<number> {
 
 export async function getContactWithEncounters(
   contactId: string,
-): Promise<{ contact: Contact; encounters: Encounter[] } | null> {
+): Promise<{ contact: Contact; encounters: (Encounter & { conferenceName: string | null })[] } | null> {
   const supa = await createSupabaseServerClient();
 
   const [{ data: contact }, { data: encounters }] = await Promise.all([
     supa.from('contacts').select('*').eq('id', contactId).maybeSingle(),
     supa
       .from('encounters')
-      .select('*')
+      .select('*, conferences(name)')
       .eq('contact_id', contactId)
       .order('occurred_at', { ascending: false }),
   ]);
@@ -117,7 +117,11 @@ export async function getContactWithEncounters(
   if (!contact) return null;
   return {
     contact: mapContact(contact),
-    encounters: (encounters ?? []).map(mapEncounter),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    encounters: (encounters ?? []).map((row: any) => ({
+      ...mapEncounter(row),
+      conferenceName: (row.conferences?.name ?? null) as string | null,
+    })),
   };
 }
 

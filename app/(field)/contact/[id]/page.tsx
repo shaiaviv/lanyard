@@ -150,13 +150,18 @@ export default async function ContactPage({ params }: Props) {
                 className="rounded-xl p-4 space-y-2"
                 style={{ border: '1px solid rgba(255,255,255,0.07)', background: '#161E2E' }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1 text-xs text-text3">
-                    <Clock size={11} />
-                    {new Date(enc.occurredAt).toLocaleDateString('en-GB', {
-                      day: 'numeric', month: 'short', year: 'numeric',
-                    })}
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    {enc.conferenceName && (
+                      <p className="text-[11px] font-semibold text-accent truncate mb-0.5">{enc.conferenceName}</p>
+                    )}
+                    <span className="flex items-center gap-1 text-xs text-text3">
+                      <Clock size={11} />
+                      {new Date(enc.occurredAt).toLocaleDateString('en-GB', {
+                        day: 'numeric', month: 'short', year: 'numeric',
+                      })}
+                    </span>
+                  </div>
                   <TemperatureChip value={enc.temperature} />
                 </div>
                 {enc.note && <p className="text-sm text-text2 leading-relaxed">{enc.note}</p>}
