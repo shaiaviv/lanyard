@@ -110,6 +110,11 @@ export async function commitEncounter(input: CommitEncounterInput): Promise<Comm
 
   if (encErr) return { error: encErr.message };
 
+  // Bust the cached relationship arc so the next profile view recomputes from all encounters
+  if (contactId) {
+    await admin.from('contacts').update({ arc_cache: null }).eq('id', contactId);
+  }
+
   revalidatePath('/leads');
   revalidatePath('/capture');
   if (contactId) revalidatePath(`/contact/${contactId}`);
