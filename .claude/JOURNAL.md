@@ -792,3 +792,35 @@ other editions; conference names in the list link here. **Overview tab** (new de
 C1 dashboard) aggregates existing data into "what needs your attention": warming-no-followup,
 under-invested, next up, follow-up queue, region coverage — each card deep-links to its tab.
 All tsc/eslint/build clean. Routes now include /planning/conference/[id].
+
+## Entry 021 — 2026-06-06 — P8 + full end-to-end validation: PLAN COMPLETE
+
+**P8 scope call:** scoring weights already live in the Conferences-tab slider panel (the right home —
+live recompute next to the list), so a duplicate Settings control would be redundant scope (same
+discipline as cutting P3). P8 became the full QA/validation pass.
+
+**Validated in a real browser** (dev server + Playwright, signed in as the demo rep):
+- Overview dashboard aggregates + deep-links to each tab.
+- **Relationships (signature):** verdict badges, **job-change** flags (Elena Director→VP, Raj
+  Trustly→Mollie), conference trail, filters, "1 warming relationship with no follow-up" nudge.
+- **Live weight sliders (marquee):** cranking Scale 15→50 instantly re-scored with NO AI call —
+  Web Summit 48→61, Singapore 66→73, Sibos 80→78. Confirms the AI-once / formula-live split.
+- **Coverage map:** leaflet renders, 10 tier-colored markers, green rings = committed; gap bars.
+- **AI discovery:** real Sonnet call returned 6 on-ICP events (EBAday, MPE, SWIFT Forum…), each
+  auto-scored with rationale. Was 77s sequential → **parallelized scoring** (Promise.all).
+- **Conference detail:** factor-override slider recomputed ICP 85→67 live (then restored seed data);
+  team coverage assignment; leads captured; other editions.
+- **HubSpot:** bulk "Push all" → "Pushed 8 (demo)" via the mock path (no key configured).
+
+**Demo-data tweak:** un-flagged Marcus (nurturing) so the warming-no-followup signal is non-empty.
+
+**Known minor (pre-existing, out of scope):** `manifest.json` console error in dev (middleware
+serves HTML for it) — unrelated to Planning.
+
+**Side-effects on the live dev DB during validation** (all intentional): set a demo password +
+confirmed email for demo@grain.com; added the cross-conference seed (Entry 018); coords + scores
+(P1/P4); mock HubSpot provenance on 8 follow-up encounters.
+
+**MILESTONE: PLANNING REMEDIATION COMPLETE** — P0,P1,P2,P4,P5,P6,P7,P8 shipped (P3 cut). /planning
+is now a company-wide team hub with a real AI scoring engine, cross-conference intelligence, map +
+gaps, hardened HubSpot, AI discovery, detail + dashboard. All commits pushed (auto-deploys on main).
