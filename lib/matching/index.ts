@@ -5,7 +5,7 @@ import { generateText, Output } from 'ai';
 import { createAdminClient } from '@/lib/db/admin';
 import { anthropicModel, MODELS } from '@/lib/ai/models';
 import { matchSchema } from '@/lib/ai/schemas';
-import type { IdentitySnapshot, MatchCandidate } from '@/lib/types';
+import type { IdentitySnapshot, MatchCandidate, MatchResolution } from '@/lib/types';
 
 interface CandidateContact {
   id: string;
@@ -72,8 +72,6 @@ export async function adjudicateMatch(
   // crossRep is resolved by the caller (it knows each candidate's encounter reps vs the current rep).
   return output.results.map((r) => ({ ...r, crossRep: false }));
 }
-
-export type MatchResolution = 'auto-match' | 'prompt' | 'new' | 'pending';
 
 /** Step 3 — map the best candidate's confidence to the three-way field resolution (foundation §7). */
 export function resolveMatch(

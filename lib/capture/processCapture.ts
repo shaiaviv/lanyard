@@ -4,21 +4,12 @@
 import 'server-only';
 import { transcribeAudio } from '@/lib/ai/transcribe';
 import { parseCapture } from '@/lib/ai/parseCapture';
-import { retrieveCandidates, adjudicateMatch, resolveMatch, type MatchResolution } from '@/lib/matching';
+import { retrieveCandidates, adjudicateMatch, resolveMatch } from '@/lib/matching';
 import { getServiceKey } from '@/lib/config/getServiceKey';
 import { getEnrichmentProvider } from '@/lib/enrichment';
-import type { ParseCaptureOutput } from '@/lib/ai/schemas';
-import type { IdentitySnapshot, MatchCandidate, PersonCandidate } from '@/lib/types';
+import type { IdentitySnapshot, MatchCandidate, PersonCandidate, CaptureDraft } from '@/lib/types';
 
-export interface CaptureDraft {
-  transcript: string;
-  parsed: ParseCaptureOutput;
-  identity: IdentitySnapshot;
-  matchCandidates: MatchCandidate[];
-  resolution: MatchResolution;
-  bestMatchId: string | null;
-  linkedinCandidates: PersonCandidate[]; // for the F2 LinkedIn-verify step (empty ⇒ manual)
-}
+export type { CaptureDraft };
 
 /**
  * Stages 4-7 of the pipeline: transcribe → parse(+fit) → enrich (LinkedIn) → match.

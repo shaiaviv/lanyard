@@ -117,6 +117,35 @@ export interface ArcSummary {
   suggestedMove: string;
 }
 
+// Matching engine resolution output (split out here so client components can reference it)
+export type MatchResolution = 'auto-match' | 'prompt' | 'new' | 'pending';
+
+// Flat parse output — mirrors ParseCaptureOutput from lib/ai/schemas without the Zod dep
+export interface ParsedCapture {
+  name: string | null;
+  company: string | null;
+  title: string | null;
+  email: string | null;
+  topics: string[];
+  suggestedTemperature: Temperature;
+  followUp: boolean;
+  reminder: string | null;
+  note: string;
+  fit: LeadFit;
+  confidencePerField: Record<string, number>;
+}
+
+// Voice-capture pipeline output — needs to cross the server→client boundary via state
+export interface CaptureDraft {
+  transcript: string;
+  parsed: ParsedCapture;
+  identity: IdentitySnapshot;
+  matchCandidates: MatchCandidate[];
+  resolution: MatchResolution;
+  bestMatchId: string | null;
+  linkedinCandidates: PersonCandidate[];
+}
+
 export interface Coverage {
   id: string;
   repId: string;
