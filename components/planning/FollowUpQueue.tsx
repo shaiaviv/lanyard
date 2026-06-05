@@ -1,7 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { ExternalLink, Loader2, Check, AlertCircle, Send } from 'lucide-react';
-import { pushToHubSpot } from '@/app/actions/planning';
+import { pushToHubSpot, bulkPushToHubSpot } from '@/app/actions/planning';
 import { TemperatureChip } from '@/components/field/TemperaturePicker';
 import type { FollowUpRow } from '@/lib/db/queries';
 import type { Temperature } from '@/lib/types';
@@ -9,28 +9,19 @@ import type { Temperature } from '@/lib/types';
 function HubSpotButton({ row }: { row: FollowUpRow }) {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<
-    { type: 'ok'; url: string } | { type: 'err'; msg: string } | null
+    { type: 'ok'; url: string; mock: boolean; action: string } | { type: 'err'; msg: string } | null
   >(null);
 
   function push() {
     startTransition(async () => {
-      const res = await pushToHubSpot({
-        encounterId: row.encounterId,
-        name: row.contactName,
-        company: row.company,
-        email: row.email,
-        linkedinUrl: row.linkedinUrl,
-        note: row.note,
-      });
-      if ('error' in res) {
-        setResult({ type: 'err', msg: res.error });
-      } else {
-        setResult({ type: 'ok', url: res.contactUrl });
-      }
+      const res = await pushToHubSpot(row.encounterId);
+      if ('error' in res) setResult({ type: 'err', msg: res.error });
+      else setResult({ type: 'ok', url: res.contactUrl, mock: res.mock, action: res.action });
     });
   }
 
   if (result?.type === 'ok') {
+    const label = result.mock ? 'Pushed (demo)' : result.action === 'updated' ? 'Updated in HubSpot' : 'In HubSpot';
     return (
       <a
         href={result.url}
@@ -38,8 +29,8 @@ function HubSpotButton({ row }: { row: FollowUpRow }) {
         rel="noopener noreferrer"
         className="flex items-center gap-1.5 text-xs text-success font-semibold hover:underline"
       >
-        <Check size={12} /> In HubSpot
-        <ExternalLink size={11} />
+        <Check size={12} /> {label}
+        {!result.mock && <ExternalLink size={11} />}
       </a>
     );
   }
@@ -61,6 +52,38 @@ function HubSpotButton({ row }: { row: FollowUpRow }) {
         </p>
       )}
     </div>
+  );
+}
+
+function BulkPushButton({ encounterIds }: { encounterIds: string[] }) {
+  const [isPending, startTransition] = useTransition();
+  const [done, setDone] = useState<{ pushed: number; failed: number; mock: boolean } | null>(null);
+
+  function pushAll() {
+    setDone(null);
+    startTransition(async () => {
+      const res = await bulkPushToHubSpot(encounterIds);
+      setDone(res);
+    });
+  }
+
+  if (done) {
+    return (
+      <span className="flex items-center gap-1.5 text-xs text-success font-semibold">
+        <Check size={12} /> Pushed {done.pushed}{done.mock ? ' (demo)' : ''}{done.failed ? ` · ${done.failed} failed` : ''}
+      </span>
+    );
+  }
+
+  return (
+    <button
+      onClick={pushAll}
+      disabled={isPending || encounterIds.length === 0}
+      className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-accent hover:bg-accent/15 transition-colors disabled:opacity-40"
+    >
+      {isPending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+      Push all ({encounterIds.length})
+    </button>
   );
 }
 
@@ -100,6 +123,14 @@ export function FollowUpQueue({ followUps, repId }: { followUps: FollowUpRow[]; 
 
   return (
     <div className="space-y-5">
+      {/* Curated bulk handoff */}
+      <div className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-accent/[0.05] border border-accent/12">
+        <p className="text-xs text-text2 leading-relaxed">
+          Curated handoff — pushes the relationship arc + ICP fit as a note, deduped by email.
+        </p>
+        <BulkPushButton encounterIds={sorted.map((r) => r.encounterId)} />
+      </div>
+
       <div className="flex items-center justify-between gap-3 flex-wrap">
         {/* Scope: whole team vs just mine */}
         <div className="flex gap-1">

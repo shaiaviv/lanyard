@@ -2,9 +2,10 @@
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/db/admin';
 import { getCurrentRep, getScoringWeights } from '@/lib/db/queries';
-import { getServiceKey, MissingServiceKeyError } from '@/lib/config/getServiceKey';
+import { MissingServiceKeyError } from '@/lib/config/getServiceKey';
 import { scoreConference } from '@/lib/ai/scoreConference';
 import { computeIcpScore, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
+import { pushContact } from '@/lib/hubspot';
 
 export type CoverageStatus = 'considering' | 'committed' | 'attended' | 'declined';
 
@@ -117,62 +118,81 @@ export async function rescoreConference(
   return { success: true, score, tier };
 }
 
-export interface HubSpotPushInput {
-  encounterId: string;
-  name: string;
-  company: string | null;
-  email: string | null;
-  linkedinUrl: string | null;
-  note: string | null;
+// Build the curated note pushed to HubSpot: the relationship ARC + qualification context.
+// This is what makes the push a curated handoff, not a dumb export (foundation §4b).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildArcNote(enc: any): { name: string; email: string | null; company: string | null; title: string | null; linkedinUrl: string | null; noteBody: string } {
+  const c = enc.contacts;
+  const snap = (enc.identity_snapshot ?? {}) as { name?: string; company?: string; title?: string };
+  const arc = c?.arc_cache as { glance?: { verdict?: string; meetings?: number }; lastTime?: string; openThreads?: string[]; suggestedMove?: string } | null;
+  const fit = enc.fit as { tier?: string } | null;
+  const confName = enc.conferences?.name as string | undefined;
+
+  const lines: string[] = ['— Pushed from Lanyard (conference intelligence) —'];
+  if (arc?.glance?.verdict) lines.push(`Relationship: ${arc.glance.verdict}${arc.glance.meetings ? ` (${arc.glance.meetings} meetings)` : ''}`);
+  if (confName) lines.push(`Met at: ${confName}`);
+  if (fit?.tier) lines.push(`ICP fit: ${fit.tier}`);
+  if (enc.temperature) lines.push(`Temperature: ${enc.temperature}`);
+  if (arc?.lastTime) lines.push(`Last touch: ${arc.lastTime}`);
+  if (arc?.openThreads?.length) lines.push(`Open threads: ${arc.openThreads.join('; ')}`);
+  if (arc?.suggestedMove) lines.push(`Suggested next move: ${arc.suggestedMove}`);
+  if (!arc && enc.note) lines.push(`Notes: ${enc.note}`);
+
+  return {
+    name: (c?.canonical_name ?? snap.name ?? 'Unknown') as string,
+    email: (c?.email ?? null) as string | null,
+    company: (c?.current_company ?? snap.company ?? null) as string | null,
+    title: (c?.current_title ?? snap.title ?? null) as string | null,
+    linkedinUrl: (c?.linkedin_url ?? null) as string | null,
+    noteBody: lines.join('\n'),
+  };
 }
 
-export async function pushToHubSpot(
-  input: HubSpotPushInput,
-): Promise<{ success: true; contactUrl: string } | { error: string }> {
-  const apiKey = await getServiceKey('hubspot');
-  if (!apiKey) {
-    return { error: 'HubSpot API key not configured. Add it in Settings.' };
-  }
+const PUSH_SELECT =
+  'id, temperature, note, fit, identity_snapshot, contact_id, provenance, ' +
+  'contacts(canonical_name, current_company, current_title, email, linkedin_url, arc_cache), conferences(name)';
 
-  const [first, ...rest] = (input.name ?? 'Unknown').split(' ');
-  const last = rest.join(' ');
+export type PushOutcome = { success: true; contactUrl: string; action: 'created' | 'updated' | 'mock'; mock: boolean } | { error: string };
 
-  const properties: Record<string, string> = {
-    firstname: first,
-    lastname: last,
-  };
-  if (input.email) properties.email = input.email;
-  if (input.company) properties.company = input.company;
-  if (input.note) properties.hs_note_body = input.note.slice(0, 65_535);
+// Push ONE encounter's contact to HubSpot: dedupe by email, arc summary as a note, qualification
+// context. Enriches server-side from the encounter + contact + conference.
+export async function pushToHubSpot(encounterId: string): Promise<PushOutcome> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
 
-  try {
-    const res = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ properties }),
-    });
+  const admin = createAdminClient();
+  const { data: enc } = await admin.from('encounters').select(PUSH_SELECT).eq('id', encounterId).maybeSingle();
+  if (!enc) return { error: 'Encounter not found' };
 
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({})) as { message?: string };
-      return { error: body.message ?? `HubSpot error ${res.status}` };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const encAny = enc as any;
+  const input = buildArcNote(encAny);
+  const res = await pushContact(input);
+  if (!res.ok) return { error: res.error };
+
+  await admin
+    .from('encounters')
+    .update({ provenance: { ...(encAny.provenance ?? {}), hubspot: { action: res.result.action, pushed_at: new Date().toISOString() } } })
+    .eq('id', encounterId);
+
+  revalidatePath('/planning');
+  return { success: true, contactUrl: res.result.contactUrl, action: res.result.action, mock: res.result.mock };
+}
+
+// Bulk: push several flagged contacts at once (the curated team handoff).
+export async function bulkPushToHubSpot(
+  encounterIds: string[],
+): Promise<{ pushed: number; failed: number; mock: boolean }> {
+  let pushed = 0;
+  let failed = 0;
+  let mock = false;
+  for (const id of encounterIds) {
+    const r = await pushToHubSpot(id);
+    if ('error' in r) failed += 1;
+    else {
+      pushed += 1;
+      mock = mock || r.mock;
     }
-
-    const data = await res.json() as { id?: string };
-    const contactUrl = `https://app.hubspot.com/contacts/${data.id ?? ''}`;
-
-    // Mark encounter as pushed
-    const admin = createAdminClient();
-    await admin
-      .from('encounters')
-      .update({ provenance: { hubspot_id: data.id, pushed_at: new Date().toISOString() } })
-      .eq('id', input.encounterId);
-
-    revalidatePath('/planning');
-    return { success: true, contactUrl };
-  } catch (err) {
-    return { error: err instanceof Error ? err.message : 'Network error' };
   }
+  return { pushed, failed, mock };
 }
