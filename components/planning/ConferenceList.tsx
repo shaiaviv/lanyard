@@ -3,6 +3,7 @@ import { useState, useTransition } from 'react';
 import { MapPin, Users, ChevronDown, ChevronUp, Check, UserPlus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { ScoringWeightsPanel } from '@/components/planning/ScoringWeightsPanel';
+import { DiscoverPanel } from '@/components/planning/DiscoverPanel';
 import { assignCoverage, rescoreConference, type CoverageStatus } from '@/app/actions/planning';
 import { computeIcpScore, type ScoringWeights, type Tier } from '@/lib/scoring/computeIcpScore';
 import type { Conference, Rep } from '@/lib/types';
@@ -311,6 +312,7 @@ export function ConferenceList({ conferences, coverage, reps, repId, weights: in
   const [coverageState, setCoverageState] = useState<CoverageRow[]>(coverage);
   // Live weights — drives instant client-side recompute of every score/tier (no AI call).
   const [weights, setWeights] = useState<ScoringWeights>(initialWeights);
+  const [showDiscover, setShowDiscover] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -365,6 +367,21 @@ export function ConferenceList({ conferences, coverage, reps, repId, weights: in
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-end">
+        <button
+          onClick={() => setShowDiscover((v) => !v)}
+          className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+            showDiscover
+              ? 'bg-accent/15 border-accent/30 text-accent'
+              : 'bg-accent/8 border-accent/20 text-accent hover:bg-accent/12'
+          }`}
+        >
+          <Sparkles size={12} /> Discover events with AI
+        </button>
+      </div>
+
+      {showDiscover && <DiscoverPanel />}
+
       <ScoringWeightsPanel weights={weights} onChange={setWeights} />
 
       {uncoveredT1.length > 0 && (

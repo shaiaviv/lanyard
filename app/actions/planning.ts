@@ -1,11 +1,13 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/db/admin';
-import { getCurrentRep, getScoringWeights } from '@/lib/db/queries';
+import { getCurrentRep, getScoringWeights, getConferences } from '@/lib/db/queries';
 import { MissingServiceKeyError } from '@/lib/config/getServiceKey';
 import { scoreConference } from '@/lib/ai/scoreConference';
-import { computeIcpScore, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
+import { discoverConferences } from '@/lib/ai/discoverConferences';
+import { computeIcpScore, DEFAULT_WEIGHTS, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
 import { pushContact } from '@/lib/hubspot';
+import type { DiscoveredCandidate } from '@/lib/types';
 
 export type CoverageStatus = 'considering' | 'committed' | 'attended' | 'declined';
 
@@ -177,6 +179,131 @@ export async function pushToHubSpot(encounterId: string): Promise<PushOutcome> {
 
   revalidatePath('/planning');
   return { success: true, contactUrl: res.result.contactUrl, action: res.result.action, mock: res.result.mock };
+}
+
+// ── C5 AI conference discovery ────────────────────────────────────────────────
+
+// Mock candidates for when no Anthropic key is set — real events not in the seed, with pre-baked
+// factor breakdowns so discovery is fully demoable offline (labeled as a demo in the UI).
+const MOCK_CANDIDATES: Omit<DiscoveredCandidate, 'icpScore' | 'tier'>[] = [
+  {
+    name: 'MPE (Merchant Payments Ecosystem) 2026', startDate: '2026-02-24', endDate: '2026-02-26',
+    location: 'Berlin', country: 'Germany', region: 'Europe', verticals: ['payments', 'fintech'], estAudience: 1800,
+    whyRelevant: 'Europe’s top merchant-payments event — dense with PSPs and acquirers, Grain’s core ICP.',
+    scoreBreakdown: { factors: {
+      icpDensity: { score: 80, rationale: 'Heavily PSP/acquirer/merchant-payments — high ICP density' },
+      topicFit: { score: 85, rationale: 'Merchant payments, cross-border, FX are central themes' },
+      scale: { score: 45, rationale: '~1,800 attendees — focused, not mass-market' },
+      geoRelevance: { score: 88, rationale: 'Berlin, EU core market' },
+      historicalPerf: null } },
+  },
+  {
+    name: 'EBAday 2026', startDate: '2026-06-16', endDate: '2026-06-17',
+    location: 'Paris', country: 'France', region: 'Europe', verticals: ['payments', 'treasury', 'banking'], estAudience: 1600,
+    whyRelevant: 'Euro Banking Association’s payments/treasury event — senior treasury and FX buyers.',
+    scoreBreakdown: { factors: {
+      icpDensity: { score: 82, rationale: 'Banks and treasury desks — FX-adjacent decision-makers' },
+      topicFit: { score: 84, rationale: 'Payments + treasury + cross-border settlement' },
+      scale: { score: 44, rationale: '~1,600 attendees — high seniority' },
+      geoRelevance: { score: 88, rationale: 'Paris, EU core' },
+      historicalPerf: null } },
+  },
+  {
+    name: 'Seamless Middle East 2026', startDate: '2026-05-12', endDate: '2026-05-14',
+    location: 'Dubai', country: 'UAE', region: 'MEA', verticals: ['payments', 'fintech', 'retail'], estAudience: 20000,
+    whyRelevant: 'Large MEA payments/fintech expo — emerging market with growing cross-border flows.',
+    scoreBreakdown: { factors: {
+      icpDensity: { score: 58, rationale: 'Broad payments/retail; ICP buyers a minority of a large crowd' },
+      topicFit: { score: 70, rationale: 'Payments and fintech tracks relevant; retail dilutes' },
+      scale: { score: 80, rationale: '~20,000 attendees — large reach' },
+      geoRelevance: { score: 55, rationale: 'MEA is an emerging, secondary market for Grain' },
+      historicalPerf: null } },
+  },
+  {
+    name: 'Fintech Meetup 2026', startDate: '2026-03-09', endDate: '2026-03-12',
+    location: 'Las Vegas', country: 'USA', region: 'Americas', verticals: ['fintech', 'payments', 'banking'], estAudience: 6000,
+    whyRelevant: 'US fintech networking event built around double-opt-in meetings — efficient for targeted ICP outreach.',
+    scoreBreakdown: { factors: {
+      icpDensity: { score: 66, rationale: 'Solid US fintech/payments mix' },
+      topicFit: { score: 72, rationale: 'Payments and banking well represented' },
+      scale: { score: 70, rationale: '~6,000 attendees with structured meetings' },
+      geoRelevance: { score: 72, rationale: 'US is a secondary but growing market' },
+      historicalPerf: null } },
+  },
+];
+
+export async function discoverConferencesAction(
+  query: string,
+): Promise<{ candidates: DiscoveredCandidate[]; mock: boolean } | { error: string }> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
+
+  const existing = await getConferences();
+  const existingNames = existing.map((c) => c.name);
+  const existingLower = new Set(existingNames.map((n) => n.toLowerCase()));
+
+  // AI discovery; fall back to mock candidates if no key.
+  let raw: Omit<DiscoveredCandidate, 'scoreBreakdown' | 'icpScore' | 'tier'>[] | null = null;
+  try {
+    const out = await discoverConferences(query || 'fintech, payments, treasury and travel events', existingNames);
+    raw = out.candidates;
+  } catch (err) {
+    if (!(err instanceof MissingServiceKeyError)) {
+      return { error: err instanceof Error ? err.message : 'Discovery failed' };
+    }
+  }
+
+  if (raw === null) {
+    const candidates = MOCK_CANDIDATES
+      .filter((c) => !existingLower.has(c.name.toLowerCase()))
+      .map((c) => {
+        const { score, tier } = computeIcpScore(c.scoreBreakdown!, DEFAULT_WEIGHTS);
+        return { ...c, icpScore: score, tier };
+      });
+    return { candidates, mock: true };
+  }
+
+  // Score each AI candidate (cap to keep it fast/cheap).
+  const sliced = raw.filter((c) => !existingLower.has(c.name.toLowerCase())).slice(0, 6);
+  const candidates: DiscoveredCandidate[] = [];
+  for (const c of sliced) {
+    let scoreBreakdown = null;
+    let icpScore: number | null = null;
+    let tier: 'T1' | 'T2' | 'T3' | null = null;
+    try {
+      scoreBreakdown = await scoreConference({
+        name: c.name, location: c.location, country: c.country, region: c.region,
+        verticals: c.verticals, estAudience: c.estAudience, startDate: c.startDate,
+      });
+      const r = computeIcpScore(scoreBreakdown, DEFAULT_WEIGHTS);
+      icpScore = r.score;
+      tier = r.tier;
+    } catch {
+      /* leave unscored */
+    }
+    candidates.push({ ...c, scoreBreakdown, icpScore, tier });
+  }
+  return { candidates, mock: false };
+}
+
+export async function addDiscoveredConference(
+  c: DiscoveredCandidate,
+): Promise<{ success: true } | { error: string }> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
+
+  const admin = createAdminClient();
+  const { data: dupe } = await admin.from('conferences').select('id').ilike('name', c.name).limit(1).maybeSingle();
+  if (dupe) return { error: 'Already in the database' };
+
+  const { error } = await admin.from('conferences').insert({
+    name: c.name, start_date: c.startDate, end_date: c.endDate, location: c.location,
+    country: c.country, region: c.region, verticals: c.verticals, est_audience: c.estAudience,
+    icp_score: c.icpScore, tier: c.tier, score_breakdown: c.scoreBreakdown, source: 'discovery',
+  });
+  if (error) return { error: error.message };
+  revalidatePath('/planning');
+  return { success: true };
 }
 
 // Bulk: push several flagged contacts at once (the curated team handoff).

@@ -37,6 +37,22 @@ export interface Conference {
   source: 'seed' | 'discovery';
 }
 
+// C5 — a discovered event candidate, auto-scored, not yet added to the DB.
+export interface DiscoveredCandidate {
+  name: string;
+  startDate: string | null;
+  endDate: string | null;
+  location: string | null;
+  country: string | null;
+  region: string | null;
+  verticals: string[];
+  estAudience: number | null;
+  whyRelevant: string;
+  scoreBreakdown: ConferenceScoreBreakdown | null;
+  icpScore: number | null;
+  tier: ConfTier | null;
+}
+
 // C4 — AI-estimated factors (each 0..100 + rationale); combined by the tunable formula.
 export interface ConferenceScoreBreakdown {
   factors: {

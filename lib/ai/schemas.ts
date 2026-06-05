@@ -67,3 +67,21 @@ export const conferenceFactorsSchema = z.object({
   }),
 });
 export type ConferenceFactorsOutput = z.infer<typeof conferenceFactorsSchema>;
+
+// C5 AI conference discovery (Sonnet). Surfaces real events not already in the DB.
+export const discoverConferencesSchema = z.object({
+  candidates: z.array(
+    z.object({
+      name: z.string(),
+      startDate: z.string().nullable(),  // ISO date, best estimate
+      endDate: z.string().nullable(),
+      location: z.string().nullable(),   // city
+      country: z.string().nullable(),
+      region: z.string().nullable(),     // Europe | Americas | APAC | MEA
+      verticals: z.array(z.string()),
+      estAudience: z.number().nullable(),
+      whyRelevant: z.string(),           // why it fits Grain's ICP
+    }),
+  ),
+});
+export type DiscoverConferencesOutput = z.infer<typeof discoverConferencesSchema>;

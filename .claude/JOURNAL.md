@@ -761,3 +761,18 @@ absent from Planning. Built it:
   one meaningful AI feature and we already ship several (P1 scoring, P2 arc intel, P6 discovery).
   Follow-ups tab keeps list + HubSpot push (hardened in P5). Phase numbers left stable (P4–P8
   unchanged) to keep journal/commit references intact. Remaining: 6 phases (P2, P4, P5, P6, P7, P8).
+
+## Entry 019 — 2026-06-06 — P4 coverage map + P5 HubSpot hardening
+
+**P4 (Skew 5):** geographic clustering was text-only. Added react-leaflet + Carto dark OSM tiles
+(keyless), CircleMarkers colored by tier / sized by ICP score / green ring = committed coverage,
+tooltips; `conferences.latitude/longitude` columns + seeded coords for all 10 cities; `getGapAnalysis`
+(uncovered high-value events + coverage rate by region and quarter); `CoverageView` with a
+Timeline/Map toggle (map dynamically imported, ssr:false, since leaflet needs `window`).
+
+**P5 (Skew 6):** push was a dumb export — always POST (409 on re-push), raw note, no bulk. Built
+`lib/hubspot` behind an interface: dedupe by email (search → update or create), the relationship ARC
++ ICP fit/temperature/"met at" as an associated note (the curated handoff, foundation §4b), and a
+labeled **mock** when no key so the flow demos without a HubSpot account. `pushToHubSpot(encounterId)`
+enriches server-side from arc_cache + fit + conference; `bulkPushToHubSpot` for the team handoff.
+FollowUpQueue shows created/updated/demo per row + a "Push all" button. tsc/eslint/build clean.
