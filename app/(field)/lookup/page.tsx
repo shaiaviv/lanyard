@@ -138,7 +138,8 @@ export default function LookupPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Name or company…"
-              className="input-dark pl-9"
+              className="input-dark"
+              style={{ paddingLeft: '2.25rem' }}
             />
           </div>
           <button
@@ -189,7 +190,6 @@ export default function LookupPage() {
           <div className="flex flex-col items-center justify-center py-16 text-center gap-2">
             <Search size={28} strokeWidth={1.25} className="text-text3 mb-2" />
             <p className="text-sm font-medium text-text2">Search your team&apos;s contact history</p>
-            <p className="text-xs text-text3">Combined with LinkedIn candidate lookup</p>
           </div>
         )}
       </div>
