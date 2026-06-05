@@ -323,26 +323,28 @@ export async function discoverConferencesAction(
     return { candidates, mock: true };
   }
 
-  // Score each AI candidate (cap to keep it fast/cheap).
+  // Score each AI candidate IN PARALLEL (cap to keep it fast/cheap) — sequential scoring made
+  // discovery take ~1 call per candidate; parallelizing collapses it to roughly one call's latency.
   const sliced = raw.filter((c) => !existingLower.has(c.name.toLowerCase())).slice(0, 6);
-  const candidates: DiscoveredCandidate[] = [];
-  for (const c of sliced) {
-    let scoreBreakdown = null;
-    let icpScore: number | null = null;
-    let tier: 'T1' | 'T2' | 'T3' | null = null;
-    try {
-      scoreBreakdown = await scoreConference({
-        name: c.name, location: c.location, country: c.country, region: c.region,
-        verticals: c.verticals, estAudience: c.estAudience, startDate: c.startDate,
-      });
-      const r = computeIcpScore(scoreBreakdown, DEFAULT_WEIGHTS);
-      icpScore = r.score;
-      tier = r.tier;
-    } catch {
-      /* leave unscored */
-    }
-    candidates.push({ ...c, scoreBreakdown, icpScore, tier });
-  }
+  const candidates: DiscoveredCandidate[] = await Promise.all(
+    sliced.map(async (c) => {
+      let scoreBreakdown = null;
+      let icpScore: number | null = null;
+      let tier: 'T1' | 'T2' | 'T3' | null = null;
+      try {
+        scoreBreakdown = await scoreConference({
+          name: c.name, location: c.location, country: c.country, region: c.region,
+          verticals: c.verticals, estAudience: c.estAudience, startDate: c.startDate,
+        });
+        const r = computeIcpScore(scoreBreakdown, DEFAULT_WEIGHTS);
+        icpScore = r.score;
+        tier = r.tier;
+      } catch {
+        /* leave unscored */
+      }
+      return { ...c, scoreBreakdown, icpScore, tier };
+    }),
+  );
   return { candidates, mock: false };
 }
 

@@ -776,3 +776,19 @@ Timeline/Map toggle (map dynamically imported, ssr:false, since leaflet needs `w
 labeled **mock** when no key so the flow demos without a HubSpot account. `pushToHubSpot(encounterId)`
 enriches server-side from arc_cache + fit + conference; `bulkPushToHubSpot` for the team handoff.
 FollowUpQueue shows created/updated/demo per row + a "Push all" button. tsc/eslint/build clean.
+
+## Entry 020 — 2026-06-06 — P6 discovery + P7 detail/dashboard
+
+**P6 (C5 AI discovery):** `lib/ai/discoverConferences` (Sonnet, GRAIN_ICP-aware, excludes events
+already in the DB) → `discoverConferencesAction` auto-scores each candidate via the C4 engine →
+`addDiscoveredConference` (source='discovery', dedupe by name). Labeled **mock** fallback (4 real
+events with pre-baked scores) when no key, so discovery demos offline. `DiscoverPanel` + a "Discover
+events with AI" toggle in the Conferences tab. This is the brief's named example AI feature.
+
+**P7 (C3 + C1):** `/planning/conference/[id]` detail — score breakdown with **per-factor override
+sliders** (recompute + persist; P1 "the AI estimate is a guess"), team coverage assignment, leads
+captured here + "push qualified to HubSpot" (`bulkPushQualified` = hot/warm or strong/moderate fit),
+other editions; conference names in the list link here. **Overview tab** (new default landing,
+C1 dashboard) aggregates existing data into "what needs your attention": warming-no-followup,
+under-invested, next up, follow-up queue, region coverage — each card deep-links to its tab.
+All tsc/eslint/build clean. Routes now include /planning/conference/[id].
