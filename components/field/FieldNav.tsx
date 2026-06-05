@@ -33,18 +33,18 @@ export function FieldNav({ pendingCount }: FieldNavProps) {
                 href={href}
                 className="flex-1 flex flex-col items-center justify-center py-3.5 gap-1 transition-all"
               >
-                <div
-                  className={`flex items-center justify-center w-10 h-8 rounded-xl transition-all duration-200 relative ${
-                    active ? 'bg-accent/10' : 'hover:bg-white/5'
-                  }`}
-                >
+                <div className="relative flex items-center justify-center w-11 h-8 rounded-xl transition-all duration-200">
+                  {/* Filled pill for active state */}
+                  {active && (
+                    <span className="absolute inset-0 rounded-xl bg-accent/15 border border-accent/25" />
+                  )}
                   <Icon
-                    size={19}
+                    size={18}
                     strokeWidth={active ? 2.5 : 1.75}
-                    className={`transition-colors duration-200 ${active ? 'text-accent' : 'text-text3'}`}
+                    className={`relative z-10 transition-colors duration-200 ${active ? 'text-accent' : 'text-text3'}`}
                   />
                   {href === '/leads' && pendingCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] bg-accent text-[#07090F] text-[9px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                    <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] bg-accent text-[#07090F] text-[9px] font-bold rounded-full flex items-center justify-center px-1 leading-none z-20">
                       {pendingCount > 9 ? '9+' : pendingCount}
                     </span>
                   )}

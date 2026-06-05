@@ -9,13 +9,6 @@ import type { CoverageRow } from '@/lib/db/queries';
 const VERTICALS = ['All', 'Fintech', 'Payments', 'Travel', 'SaaS', 'Banking'];
 const TIERS: Array<'All' | 'T1' | 'T2' | 'T3'> = ['All', 'T1', 'T2', 'T3'];
 
-/* Tier visual system */
-const TIER_BORDER: Record<string, string> = {
-  T1: 'border-amber-400/20',
-  T2: 'border-blue-400/15',
-  T3: 'border-white/7',
-};
-
 const FACTOR_LABELS: Record<string, string> = {
   icpDensity:     'ICP Density',
   topicFit:       'Topic Fit',
@@ -31,13 +24,14 @@ const STATUS_OPTIONS = [
 ] as const;
 
 function ScoreBar({ score }: { score: number }) {
-  const barWidth = `${score}%`;
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-        <div className="h-full rounded-full score-bar-fill" style={{ width: barWidth }} />
+    <div className="flex items-center gap-2.5">
+      <div className="flex-1 h-1 rounded-full overflow-hidden bg-white/6">
+        <div className="h-full rounded-full score-bar-fill" style={{ width: `${score}%` }} />
       </div>
-      <span className="text-xs font-mono text-text3 w-6 text-right tabular-nums">{score}</span>
+      <span className={`text-sm font-bold tabular-nums w-6 text-right leading-none ${
+        score >= 75 ? 'text-accent' : score >= 55 ? 'text-text2' : 'text-text3'
+      }`}>{score}</span>
     </div>
   );
 }
@@ -69,36 +63,28 @@ function CoverageButton({
   const label = STATUS_OPTIONS.find((o) => o.value === status)?.label ?? 'Add to plan';
   const isCommitted = status === 'committed';
 
-  let btnStyle: React.CSSProperties;
   let btnClass: string;
   if (isCommitted) {
-    btnStyle = { background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' };
-    btnClass = 'text-success';
+    btnClass = 'bg-success/8 border-success/20 text-success';
   } else if (status) {
-    btnStyle = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' };
-    btnClass = 'text-text2';
+    btnClass = 'bg-white/4 border-white/10 text-text2';
   } else {
-    btnStyle = { background: 'rgba(244,168,37,0.06)', border: '1px solid rgba(244,168,37,0.14)' };
-    btnClass = 'text-accent';
+    btnClass = 'bg-accent/8 border-accent/20 text-accent hover:bg-accent/12';
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex-shrink-0">
       <button
         onClick={() => setOpen(!open)}
         disabled={isPending}
-        style={btnStyle}
-        className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-40 ${btnClass}`}
+        className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all disabled:opacity-40 ${btnClass}`}
       >
         {isCommitted && <Check size={11} />}
         {label}
         <ChevronDown size={11} />
       </button>
       {open && (
-        <div
-          className="absolute right-0 top-full mt-1 z-10 bg-card rounded-xl py-1 min-w-[140px]"
-          style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
-        >
+        <div className="absolute right-0 top-full mt-1 z-10 bg-card rounded-xl py-1 min-w-[140px] border border-white/10 shadow-2xl">
           {STATUS_OPTIONS.map((o) => (
             <button
               key={o.value}
@@ -137,69 +123,64 @@ function ConferenceCard({
     ? new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
 
-  const tierBorder = TIER_BORDER[conf.tier ?? 'T3'];
-
   return (
     <div
-      className={`bg-card rounded-2xl border transition-all ${tierBorder} ${
-        isPast ? 'opacity-50' : 'hover:-translate-y-px'
+      className={`relative bg-card rounded-2xl border border-white/7 overflow-hidden transition-all ${
+        isPast ? 'opacity-50' : 'hover:-translate-y-px hover:border-white/12'
       }`}
-      style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.3)' }}
+      style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.35)' }}
     >
-      <div className="px-4 pt-4 pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            {/* Badges row */}
-            <div className="flex items-center gap-1.5 flex-wrap mb-2">
-              {isActive && <Badge variant="live" dot pulse>Live</Badge>}
-              {conf.tier && (
-                <Badge variant={conf.tier as 'T1' | 'T2' | 'T3'}>{conf.tier}</Badge>
-              )}
-            </div>
-            {/* Name */}
-            <h3 className="text-[15px] font-semibold text-text1 leading-snug">{conf.name}</h3>
+      {/* Tier accent stripe — top only, not a side stripe */}
+      {conf.tier === 'T1' && (
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-amber-400/90 via-amber-400/60 to-transparent" />
+      )}
+      {conf.tier === 'T2' && (
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-400/70 via-blue-400/40 to-transparent" />
+      )}
 
-            {/* Meta row */}
-            <div className="flex items-center gap-3 mt-1.5 text-xs text-text3 flex-wrap">
-              {start && end && <span>{start} – {end}</span>}
-              {conf.location && (
-                <span className="flex items-center gap-1">
-                  <MapPin size={10} /> {conf.location}
-                </span>
-              )}
-              {conf.estAudience && (
-                <span className="flex items-center gap-1">
-                  <Users size={10} /> {conf.estAudience.toLocaleString()}
-                </span>
-              )}
-            </div>
-
-            {/* ICP score bar */}
-            {conf.icpScore != null && (
-              <div className="mt-2.5">
-                <ScoreBar score={conf.icpScore} />
-              </div>
-            )}
-
-            {/* Vertical tags */}
-            {conf.verticals.length > 0 && (
-              <div className="flex gap-1 mt-2 flex-wrap">
-                {conf.verticals.map((v) => (
-                  <span
-                    key={v}
-                    className="text-[11px] text-text3 rounded-md px-1.5 py-0.5 bg-white/4"
-                  >
-                    {v}
-                  </span>
-                ))}
-              </div>
-            )}
+      <div className="px-4 pt-4 pb-4">
+        {/* Top row: badges + action button */}
+        <div className="flex items-start justify-between gap-2 mb-2.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {isActive && <Badge variant="live" dot pulse>Live</Badge>}
+            {conf.tier && <Badge variant={conf.tier as 'T1' | 'T2' | 'T3'}>{conf.tier}</Badge>}
           </div>
-
           <CoverageButton conference={conf} currentStatus={myStatus} repId={repId} />
         </div>
 
-        {/* Score breakdown toggle */}
+        {/* Name */}
+        <h3 className="text-base font-bold text-text1 leading-snug mb-1.5">{conf.name}</h3>
+
+        {/* Meta row */}
+        <div className="flex items-center gap-3 text-xs text-text3 flex-wrap">
+          {start && end && <span>{start} – {end}</span>}
+          {conf.location && (
+            <span className="flex items-center gap-1"><MapPin size={10} /> {conf.location}</span>
+          )}
+          {conf.estAudience && (
+            <span className="flex items-center gap-1"><Users size={10} /> {conf.estAudience.toLocaleString()}</span>
+          )}
+        </div>
+
+        {/* ICP score */}
+        {conf.icpScore != null && (
+          <div className="mt-3">
+            <ScoreBar score={conf.icpScore} />
+          </div>
+        )}
+
+        {/* Vertical tags */}
+        {conf.verticals.length > 0 && (
+          <div className="flex gap-1 mt-2.5 flex-wrap">
+            {conf.verticals.map((v) => (
+              <span key={v} className="text-[11px] text-text3 rounded-md px-1.5 py-0.5 bg-white/4">
+                {v}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* AI breakdown toggle */}
         {conf.scoreBreakdown && (
           <button
             onClick={() => setExpanded(!expanded)}
@@ -225,7 +206,7 @@ function ConferenceCard({
                     </span>
                   </div>
                   <ScoreBar score={f.score} />
-                  <p className="text-[11px] text-text3 mt-0.5 leading-snug">{f.rationale}</p>
+                  <p className="text-[11px] text-text3 mt-1 leading-snug">{f.rationale}</p>
                 </div>
               );
             })}
@@ -260,18 +241,18 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
     })
     .sort((a, b) => (b.icpScore ?? 0) - (a.icpScore ?? 0));
 
-  const t1Count = conferences.filter((c) => c.tier === 'T1').length;
   const uncommittedT1 = conferences.filter(
     (c) => c.tier === 'T1' && !myStatusMap[c.id] && (!c.endDate || c.endDate >= today),
   );
+  const committedCount = Object.values(myStatusMap).filter((s) => s === 'committed').length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Under-invested banner */}
       {uncommittedT1.length > 0 && (
-        <div className="rounded-xl px-4 py-3 space-y-1 bg-warn/[0.06] border border-warn/15">
+        <div className="rounded-xl px-4 py-3 space-y-0.5 bg-warn/[0.06] border border-warn/15">
           <p className="text-sm font-semibold text-warn">
-            {uncommittedT1.length} T1 conference{uncommittedT1.length !== 1 ? 's' : ''} without coverage
+            {uncommittedT1.length} T1 event{uncommittedT1.length !== 1 ? 's' : ''} without coverage
           </p>
           <p className="text-xs text-warn/60">
             {uncommittedT1.slice(0, 2).map((c) => c.name).join(', ')}
@@ -280,59 +261,54 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
         </div>
       )}
 
-      {/* Tier filters */}
-      <div className="space-y-2">
-        <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          {TIERS.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTier(t)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                tier === t
-                  ? 'bg-accent text-[#07090F]'
-                  : 'text-text2 hover:text-text1 bg-white/4 border border-white/8'
-              }`}
-            >
-              {t === 'All' ? `All (${conferences.length})` : `${t} · ${conferences.filter((c) => c.tier === t).length}`}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          {VERTICALS.map((v) => (
-            <button
-              key={v}
-              onClick={() => setVertical(v)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                vertical === v
-                  ? 'bg-elevated text-text1 border border-white/12'
-                  : 'text-text3 hover:text-text2 bg-white/3 border border-white/6'
-              }`}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
+      {/* Single-row combined filters */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+        {TIERS.map((t) => (
+          <button
+            key={t}
+            onClick={() => setTier(t)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              tier === t
+                ? 'bg-accent text-[#07090F]'
+                : 'text-text2 hover:text-text1 bg-white/4 border border-white/8'
+            }`}
+          >
+            {t === 'All' ? `All (${conferences.length})` : `${t} · ${conferences.filter((c) => c.tier === t).length}`}
+          </button>
+        ))}
+        <div className="w-px bg-white/10 flex-shrink-0 self-stretch mx-0.5" />
+        {VERTICALS.filter((v) => v !== 'All').map((v) => (
+          <button
+            key={v}
+            onClick={() => setVertical(vertical === v ? 'All' : v)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              vertical === v
+                ? 'bg-elevated text-text1 border border-white/15'
+                : 'text-text3 hover:text-text2 bg-white/3 border border-white/6'
+            }`}
+          >
+            {v}
+          </button>
+        ))}
       </div>
 
-      {/* Conference list */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-text3">
-            {filtered.length} conference{filtered.length !== 1 ? 's' : ''}
-            <span className="text-text3/40 mx-1.5">·</span>
-            <span className="font-semibold text-text1 tabular-nums">{t1Count}</span> T1
-            <span className="text-text3/40 mx-1.5">·</span>
-            <span className="font-semibold text-text1 tabular-nums">{Object.values(myStatusMap).filter((s) => s === 'committed').length}</span> committed
-          </p>
-          <button
-            onClick={() => setShowPast(!showPast)}
-            className="text-xs text-text3 hover:text-text2 transition-colors"
-          >
-            {showPast ? 'Hide past' : 'Show past'}
-          </button>
-        </div>
+      {/* Stats + show past */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-text3">
+          {filtered.length} shown
+          <span className="text-text3/30 mx-2">·</span>
+          <span className="text-text1 font-semibold">{committedCount}</span> committed
+        </p>
+        <button
+          onClick={() => setShowPast(!showPast)}
+          className="text-xs text-text3 hover:text-text2 transition-colors"
+        >
+          {showPast ? 'Hide past' : 'Show past'}
+        </button>
+      </div>
 
+      {/* 2-column grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {filtered.map((conf) => (
           <ConferenceCard
             key={conf.id}
@@ -341,13 +317,13 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
             repId={repId}
           />
         ))}
-
-        {filtered.length === 0 && (
-          <div className="text-center py-12 text-sm text-text3">
-            No conferences match the current filters.
-          </div>
-        )}
       </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center py-16 text-sm text-text3">
+          No conferences match the current filters.
+        </div>
+      )}
     </div>
   );
 }

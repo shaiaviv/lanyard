@@ -21,21 +21,28 @@ interface Props {
 export function PlanningHub({ conferences, coverage, followUps, repId, repName }: Props) {
   const [tab, setTab] = useState<Tab>('Conferences');
 
-  const t1Count = conferences.filter((c) => c.tier === 'T1').length;
-
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-6 pt-10 pb-0 border-b border-[rgba(255,255,255,0.06)]">
-        {/* Wordmark row */}
-        <div className="flex items-center gap-2.5 mb-1">
-          <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
-          <h1 className="text-xl font-bold tracking-tight text-text1">
-            Conference Hub
-          </h1>
+      {/* Compact top bar: logo + nav tabs on one line */}
+      <header className="border-b border-white/6 px-6 pt-5 pb-0">
+        <div className="flex items-center justify-between mb-4">
+          {/* Logo mark */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center flex-shrink-0">
+              <Fingerprint size={14} className="text-accent" strokeWidth={1.75} />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xs font-medium text-text3">Lanyard</span>
+              <span className="text-white/20 text-xs">/</span>
+              <span className="text-base font-bold text-text1">Conference Hub</span>
+            </div>
+          </div>
+
+          {/* Conference count */}
+          <span className="text-xs text-text3 hidden sm:block">
+            {conferences.length} conferences
+          </span>
         </div>
-        <p className="text-xs text-text3 mb-5">
-          {conferences.length} conferences · {t1Count} T1 targets
-        </p>
 
         {/* Tab bar */}
         <div className="flex gap-0">
@@ -43,7 +50,7 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+              className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
                 tab === t
                   ? 'border-accent text-accent'
                   : 'border-transparent text-text3 hover:text-text2'
@@ -51,10 +58,7 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
             >
               {t}
               {t === 'Follow-ups' && followUps.length > 0 && (
-                <span
-                  className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-accent text-[9px] font-bold"
-                  style={{ background: 'rgba(244,168,37,0.1)', border: '1px solid rgba(244,168,37,0.2)' }}
-                >
+                <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold bg-accent/10 border border-accent/20 text-accent">
                   {followUps.length}
                 </span>
               )}

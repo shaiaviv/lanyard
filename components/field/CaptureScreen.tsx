@@ -125,9 +125,9 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
   return (
     <div className="flex flex-col min-h-full animate-fade-in">
       {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-12 pb-4">
+      <header className="flex items-center justify-between px-5 pt-10 pb-3">
         <div className="flex items-center gap-2">
-          <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
+          <Fingerprint size={17} className="text-accent" strokeWidth={1.5} />
           <span className="text-[13px] font-semibold text-text2">Lanyard</span>
         </div>
         <Link
@@ -138,72 +138,52 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </Link>
       </header>
 
-      {/* Conference pill */}
-      <div className="px-5 pb-2">
+      {/* Conference pill — more prominent */}
+      <div className="px-5 pb-0">
         <button
           onClick={() => { setLocalConferenceId(null); setVoiceError(null); setCurrentConference(null); }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium text-text2 hover:text-text1 transition-all hover:bg-elevated"
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.09)',
-          }}
+          className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium text-text1 hover:text-white transition-all bg-white/5 border border-white/9 hover:bg-white/8"
         >
-          <MapPin size={11} className="text-accent flex-shrink-0" />
-          <span className="truncate max-w-[220px]">
+          <MapPin size={12} className="text-accent flex-shrink-0" />
+          <span className="truncate max-w-[240px]">
             {selectedConference?.name ?? 'Unknown conference'}
           </span>
-          <X size={11} className="text-text3 flex-shrink-0 ml-0.5" />
+          <X size={12} className="text-text3 flex-shrink-0 ml-auto" />
         </button>
       </div>
 
-      {/* Record hero — centered in remaining visible viewport space.
-          dvh minus header (~120px) and nav clearance pb-28 (112px). */}
+      {/* Record hero */}
       <div
-        className="flex flex-col items-center px-6"
-        style={{ minHeight: 'calc(100dvh - 240px)' }}
+        className="flex flex-col items-center justify-between px-6"
+        style={{ minHeight: 'calc(100dvh - 180px)' }}
       >
-        {/* Top spacer */}
-        <div className="flex-1 min-h-6" />
-
-        {/* Record button + instructions */}
-        <div className="flex flex-col items-center gap-6">
+        {/* Record button centered */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-5">
           <div className="animate-scale-in">
             <RecordButton onCapture={handleCapture} />
           </div>
 
-          <div className="text-center max-w-[260px] space-y-1.5 animate-fade-up delay-150">
-            <p className="text-sm text-text2 tracking-wide">
+          <div className="text-center animate-fade-up delay-150">
+            <p className="text-sm text-text2">
               Name · company · role · interest level
             </p>
-            <p className="text-xs text-text3 italic">
+            <p className="text-xs text-text3 italic mt-1">
               &ldquo;Sarah, Stripe, Head of Payments — very warm&rdquo;
             </p>
           </div>
 
           {voiceError && (
-            <div
-              className="w-full rounded-xl px-4 py-3 animate-fade-up"
-              style={{
-                background: 'rgba(239,68,68,0.07)',
-                border: '1px solid rgba(239,68,68,0.14)',
-              }}
-            >
+            <div className="w-full rounded-xl px-4 py-3 animate-fade-up bg-error/7 border border-error/14">
               <p className="text-sm font-semibold text-red-400">Voice capture failed</p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(239,68,68,0.6)' }}>
+              <p className="text-xs mt-1 text-red-400/60">
                 {voiceError} · Add your Anthropic key in{' '}
-                <Link href="/settings" className="underline" style={{ color: 'rgba(239,68,68,0.75)' }}>
-                  Settings
-                </Link>
-                .
+                <Link href="/settings" className="underline text-red-400/75">Settings</Link>.
               </p>
             </div>
           )}
         </div>
 
-        {/* Bottom spacer — pushes "fill manually" to viewport bottom */}
-        <div className="flex-1 min-h-6" />
-
-        {/* Fill manually — sits at the bottom */}
+        {/* Fill manually — anchored to bottom */}
         <div className="w-full pb-6 animate-fade-up delay-300">
           <button
             onClick={() => setStage('manual')}
