@@ -9,7 +9,7 @@ export default async function FieldLayout({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-screen bg-base" style={{ background: '#07090F' }}>
-      <div className="max-w-[430px] mx-auto min-h-screen flex flex-col bg-surface relative" style={{ background: '#0C1220' }}>
+      <div className="max-w-[430px] mx-auto h-dvh flex flex-col bg-surface relative" style={{ background: '#0C1220' }}>
         <main className="flex-1 overflow-y-auto pb-28">{children}</main>
         <FieldNav pendingCount={pendingCount} />
       </div>

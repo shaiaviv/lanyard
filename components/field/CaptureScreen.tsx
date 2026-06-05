@@ -123,9 +123,9 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
 
   /* ── Record screen (idle) ── */
   return (
-    <div className="flex flex-col min-h-full animate-fade-in">
+    <div className="flex flex-col h-full animate-fade-in">
       {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-10 pb-3">
+      <header className="flex items-center justify-between px-5 pt-10 pb-3 shrink-0">
         <div className="flex items-center gap-2">
           <Fingerprint size={17} className="text-accent" strokeWidth={1.5} />
           <span className="text-[13px] font-semibold text-text2">Lanyard</span>
@@ -138,8 +138,8 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </Link>
       </header>
 
-      {/* Conference pill — more prominent */}
-      <div className="px-5 pb-0">
+      {/* Conference pill */}
+      <div className="px-5 shrink-0">
         <button
           onClick={() => { setLocalConferenceId(null); setVoiceError(null); setCurrentConference(null); }}
           className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium text-text1 hover:text-white transition-all bg-white/5 border border-white/9 hover:bg-white/8"
@@ -152,11 +152,8 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </button>
       </div>
 
-      {/* Record hero */}
-      <div
-        className="flex flex-col items-center justify-between px-6"
-        style={{ minHeight: 'calc(100dvh - 180px)' }}
-      >
+      {/* Record hero — fills remaining space */}
+      <div className="flex-1 flex flex-col items-center justify-between px-6 py-4 min-h-0">
         {/* Record button centered */}
         <div className="flex-1 flex flex-col items-center justify-center gap-5">
           <div className="animate-scale-in">
@@ -184,7 +181,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </div>
 
         {/* Fill manually — anchored to bottom */}
-        <div className="w-full pb-6 animate-fade-up delay-300">
+        <div className="w-full pb-2 shrink-0 animate-fade-up delay-300">
           <button
             onClick={() => setStage('manual')}
             className="w-full flex items-center justify-center gap-2 py-3 text-sm text-text3 hover:text-text2 transition-colors rounded-xl hover:bg-elevated"

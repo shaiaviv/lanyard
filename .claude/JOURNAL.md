@@ -636,3 +636,23 @@ Full visual quality pass triggered by user feedback: contrast was unreadable, ca
 
 - [19:58] Confirmed: planning hub, conference gate, record screen all look significantly sharper. Nav is readable, badges are legible, Conference Hub no longer shouts in caps.
 
+
+## Entry 011 — 2026-06-05 — Second-pass structural overhaul (Sonnet)
+
+**What:** User rejected Entry 010's output ("it pretty much looks the same as before"). Diagnosed that micro-fixes (font sizes, uppercase removal, token cleanup) are invisible — the real problems were structural and chromatic.
+
+**Root causes of "still vibe-coded" feel:**
+1. **Single-column conference card dump** — even with good cards, one column on desktop wastes 50% of space and reads as a scrollable list, not a planning tool.
+2. **No tier visual differentiation** — T1 and T3 cards looked identical; only the text badge differed.
+3. **Faint active nav state** — `bg-accent/10` filled pill was nearly invisible; active icon barely distinguishable from inactive.
+4. **Excess dead space on capture screen** — two paired `flex-1` spacers split remaining height equally, pushing record button to vertical center while leaving ~40% dead zone above it.
+5. **Stacked planning header** — three stacked lines wasted 80px+ of vertical space on a content-dense page.
+
+**Changes made:**
+- `ConferenceList`: 2-column responsive grid (`grid-cols-1 sm:grid-cols-2`). T1 cards get amber top-stripe (`h-[3px] bg-gradient-to-r from-amber-400/90 via-amber-400/60 to-transparent`), T2 get blue. Top stripe is ALLOWED (not a side stripe). Combined single-row filter: tier chips + visual separator (`w-px bg-white/10`) + vertical chips — replaces two stacked filter rows. Score numbers color-keyed: amber ≥75, text2 ≥55, text3 below.
+- `PlanningHub`: Compact breadcrumb header — logo mark box (7×7 rounded-lg bg-accent/10 border) + "Lanyard / Conference Hub" on one line. Conference count top-right. Saves ~60px vs old stacked layout.
+- `FieldNav`: Filled amber pill active state — `absolute inset-0 rounded-xl bg-accent/15 border border-accent/25` as a positioned child, icon sits `relative z-10` above it. Strong enough to read at a glance on a show floor.
+- `CaptureScreen`: Removed top `flex-1` spacer. Outer container uses `justify-between`. Record button sits in a `flex-1 justify-center` middle region. "Fill manually" pinned to bottom. Conference pill upgraded to `rounded-xl text-sm font-medium` (was rounded-full text-xs).
+
+**Commit:** db378ec
+- [20:20] Screenshots confirmed: planning shows tier-accented 2-column cards, capture has properly centered record button, nav tab active state clearly visible.

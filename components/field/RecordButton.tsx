@@ -11,6 +11,7 @@ type SR = new () => {
   continuous: boolean;
   interimResults: boolean;
   lang: string;
+  onstart: () => void;
   onresult: (e: SREvent) => void;
   onend: () => void;
   onerror: (e: SRError) => void;
@@ -28,6 +29,7 @@ function getSR(): SR | null {
 
 export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
   const [recording, setRecording] = useState(false);
+  const [initializing, setInitializing] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
   const [interimText, setInterimText] = useState('');
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
@@ -39,6 +41,7 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
   }, []);
 
   function startRecording() {
+    if (initializing || recording) return;
     const SR = getSR();
     if (!SR) { setUnsupported(true); return; }
 
@@ -58,8 +61,14 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
       setInterimText(finalRef.current + interim);
     };
 
+    recognition.onstart = () => {
+      setInitializing(false);
+      setRecording(true);
+    };
+
     recognition.onend = () => {
       setRecording(false);
+      setInitializing(false);
       setInterimText('');
       const transcript = finalRef.current.trim();
       if (transcript) onCapture(transcript);
@@ -68,12 +77,13 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
     recognition.onerror = (event) => {
       if (event.error === 'not-allowed') setUnsupported(true);
       setRecording(false);
+      setInitializing(false);
       setInterimText('');
     };
 
     recognition.start();
     recognitionRef.current = recognition;
-    setRecording(true);
+    setInitializing(true);
   }
 
   function stopRecording() {
@@ -130,7 +140,7 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
           className={`relative w-44 h-44 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-95 hover:scale-[1.03] disabled:opacity-40 disabled:cursor-not-allowed ${
             recording ? 'record-active' : 'record-idle'
           }`}
-          title={recording ? 'Tap to stop' : 'Tap to start voice capture'}
+          title={recording ? 'Tap to stop' : initializing ? 'Warming up…' : 'Tap to start voice capture'}
         >
           {recording ? (
             <Square size={38} strokeWidth={1.5} fill="white" className="text-white" />
@@ -140,7 +150,12 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
         </button>
       </div>
 
-      {recording ? (
+      {initializing ? (
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+          <span className="text-sm font-semibold text-yellow-400 tracking-wide">Get ready…</span>
+        </div>
+      ) : recording ? (
         <div className="flex flex-col items-center gap-2 max-w-[280px]">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
