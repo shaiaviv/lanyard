@@ -1,15 +1,26 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, User, Building, Calendar, Loader2 } from 'lucide-react';
+import { RefreshCw, User, Building, Calendar, Loader2, CheckCircle2 } from 'lucide-react';
 import { resolveEncounter, reanalyzeEncounter, skipEncounter } from '@/app/actions/reconcile';
 import { TemperatureChip } from '@/components/field/TemperaturePicker';
-import type { Encounter, MatchCandidate } from '@/lib/types';
-import type { Temperature } from '@/lib/types';
+import type { Encounter, MatchCandidate, Temperature } from '@/lib/types';
 
 interface ContactSummary {
-  contact: { id: string; canonicalName: string; currentCompany: string | null; currentTitle: string | null; email: string | null };
-  encounters: { id: string; occurredAt: string; note: string | null; temperature: string | null; conferenceId: string | null }[];
+  contact: {
+    id: string;
+    canonicalName: string;
+    currentCompany: string | null;
+    currentTitle: string | null;
+    email: string | null;
+  };
+  encounters: {
+    id: string;
+    occurredAt: string;
+    note: string | null;
+    temperature: string | null;
+    conferenceId: string | null;
+  }[];
 }
 
 interface Props {
@@ -35,7 +46,6 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
     setError(null);
     startTransition(async () => {
       let result: { success?: true; error?: string };
-
       if (action === 'skip') {
         result = await skipEncounter(encounter.id);
       } else {
@@ -49,7 +59,6 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
           email: snap?.email ?? null,
         });
       }
-
       if ('error' in result && result.error) {
         setError(result.error);
       } else {
@@ -74,8 +83,13 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-xl">✓</div>
-        <p className="font-semibold text-zinc-900">Resolved!</p>
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}
+        >
+          <CheckCircle2 size={22} className="text-success" />
+        </div>
+        <p className="font-semibold text-text1">Resolved!</p>
       </div>
     );
   }
@@ -83,76 +97,106 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
   return (
     <div className="space-y-5">
       {/* This capture */}
-      <div className="bg-zinc-50 rounded-xl p-4 space-y-2">
-        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">New capture</p>
-        <div className="flex items-center gap-2">
-          <p className="text-base font-bold text-zinc-900">{displayName}</p>
+      <div
+        className="bg-elevated rounded-xl p-4 space-y-2"
+        style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">New capture</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-base font-bold text-text1">{displayName}</p>
           {encounter.temperature && (
             <TemperatureChip value={encounter.temperature as Temperature} />
           )}
         </div>
         {snap?.company && (
-          <div className="flex items-center gap-1.5 text-sm text-zinc-600">
-            <Building size={13} className="text-zinc-400" />
+          <div className="flex items-center gap-1.5 text-sm text-text2">
+            <Building size={13} className="text-text3" />
             {snap.company}{snap.title ? ` · ${snap.title}` : ''}
           </div>
         )}
         {encounter.note && (
-          <p className="text-sm text-zinc-500 italic leading-relaxed">&ldquo;{encounter.note}&rdquo;</p>
+          <p className="text-sm text-text2 italic leading-relaxed">&ldquo;{encounter.note}&rdquo;</p>
         )}
-        <p className="text-xs text-zinc-400">
-          <Calendar size={11} className="inline mr-1" />
-          {new Date(encounter.occurredAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+        <p className="text-xs text-text3 flex items-center gap-1">
+          <Calendar size={11} />
+          {new Date(encounter.occurredAt).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          })}
         </p>
       </div>
 
-      {/* Best match */}
+      {/* Best match card */}
       {best && bestContact ? (
-        <div className="border-2 border-orange-200 rounded-xl overflow-hidden">
-          <div className="bg-orange-50 px-4 py-2.5 flex items-center justify-between">
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ border: '2px solid rgba(244,168,37,0.2)' }}
+        >
+          <div
+            className="px-4 py-2.5 flex items-center justify-between"
+            style={{ background: 'rgba(244,168,37,0.06)' }}
+          >
             <div className="flex items-center gap-2">
-              <RefreshCw size={14} className="text-orange-500" />
-              <p className="text-sm font-semibold text-orange-900">
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(244,168,37,0.1)' }}
+              >
+                <RefreshCw size={12} className="text-accent" />
+              </div>
+              <p className="text-sm font-semibold text-text1">
                 Possible repeat · {Math.round(best.confidence * 100)}% confident
               </p>
             </div>
             {best.jobChange && (
-              <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full">
+              <span
+                className="text-xs text-warn font-semibold px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}
+              >
                 Job change?
               </span>
             )}
           </div>
-          <div className="p-4 space-y-3">
-            <p className="text-xs text-zinc-500 italic">{best.reasoning}</p>
+          <div className="p-4 space-y-3" style={{ background: '#161E2E' }}>
+            <p className="text-xs text-text3 italic leading-relaxed">{best.reasoning}</p>
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <User size={13} className="text-zinc-400" />
-                <p className="text-sm font-semibold text-zinc-900">{bestContact.contact.canonicalName}</p>
+                <User size={13} className="text-text3" />
+                <p className="text-sm font-semibold text-text1">{bestContact.contact.canonicalName}</p>
               </div>
               {bestContact.contact.currentCompany && (
                 <div className="flex items-center gap-1.5">
-                  <Building size={13} className="text-zinc-400" />
-                  <p className="text-sm text-zinc-600">
-                    {bestContact.contact.currentTitle ? `${bestContact.contact.currentTitle} · ` : ''}{bestContact.contact.currentCompany}
+                  <Building size={13} className="text-text3" />
+                  <p className="text-sm text-text2">
+                    {bestContact.contact.currentTitle
+                      ? `${bestContact.contact.currentTitle} · `
+                      : ''}
+                    {bestContact.contact.currentCompany}
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Prior encounters */}
             {bestContact.encounters.length > 0 && (
-              <div className="border-t border-zinc-100 pt-3 space-y-2">
-                <p className="text-xs font-medium text-zinc-500">
+              <div className="space-y-2 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">
                   {bestContact.encounters.length} prior meeting{bestContact.encounters.length !== 1 ? 's' : ''}
                 </p>
                 {bestContact.encounters.slice(0, 3).map((e) => (
-                  <div key={e.id} className="text-xs text-zinc-400 flex items-start gap-2">
-                    <span className="text-zinc-300 mt-0.5">·</span>
+                  <div key={e.id} className="flex items-start gap-2 text-xs">
+                    <span className="text-text3 mt-0.5">·</span>
                     <div>
-                      <span className="text-zinc-500">
-                        {new Date(e.occurredAt).toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}
+                      <span className="text-text2 font-medium">
+                        {new Date(e.occurredAt).toLocaleDateString('en-GB', {
+                          month: 'short',
+                          year: '2-digit',
+                        })}
                       </span>
-                      {e.note && <span className="ml-1 italic truncate"> — {e.note.slice(0, 60)}</span>}
+                      {e.note && (
+                        <span className="ml-1 text-text3 italic truncate">
+                          — {e.note.slice(0, 60)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -161,9 +205,12 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
           </div>
         </div>
       ) : (
-        <div className="border border-zinc-200 rounded-xl p-4 text-center space-y-2">
-          <p className="text-sm font-medium text-zinc-600">No confident match found</p>
-          <p className="text-xs text-zinc-400">
+        <div
+          className="rounded-xl p-4 text-center space-y-1.5"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <p className="text-sm font-medium text-text2">No confident match found</p>
+          <p className="text-xs text-text3">
             {liveCandidates.length > 0
               ? 'Candidates exist but confidence is low'
               : 'No existing contacts match this person'}
@@ -177,15 +224,21 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
           <button
             onClick={() => handleAction('link')}
             disabled={isPending}
-            className="w-full h-12 rounded-xl bg-orange-500 text-white font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-xl bg-accent text-[#07090F] font-bold text-sm disabled:opacity-40 flex items-center justify-center gap-2 transition-opacity hover:opacity-90"
+            style={{ boxShadow: '0 4px 20px rgba(244,168,37,0.22)' }}
           >
-            {isPending ? <Loader2 size={16} className="animate-spin" /> : '✓ Same person — link records'}
+            {isPending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              '✓ Same person — link records'
+            )}
           </button>
         )}
         <button
           onClick={() => handleAction('new')}
           disabled={isPending}
-          className="w-full h-11 rounded-xl border border-zinc-300 text-zinc-700 font-medium text-sm disabled:opacity-40 hover:bg-zinc-50"
+          className="w-full h-11 rounded-xl text-text1 font-medium text-sm disabled:opacity-40 hover:bg-elevated transition-colors"
+          style={{ border: '1px solid rgba(255,255,255,0.1)' }}
         >
           Create new contact
         </button>
@@ -193,15 +246,21 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
           <button
             onClick={handleReanalyze}
             disabled={isReanalyzing || isPending}
-            className="flex-1 h-9 rounded-xl border border-zinc-200 text-zinc-500 text-xs flex items-center justify-center gap-1.5 hover:bg-zinc-50 disabled:opacity-40"
+            className="flex-1 h-9 rounded-xl text-text3 text-xs flex items-center justify-center gap-1.5 hover:text-text2 transition-colors disabled:opacity-40"
+            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            {isReanalyzing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+            {isReanalyzing ? (
+              <Loader2 size={13} className="animate-spin" />
+            ) : (
+              <RefreshCw size={13} />
+            )}
             Re-analyze (Sonnet)
           </button>
           <button
             onClick={() => handleAction('skip')}
             disabled={isPending}
-            className="flex-1 h-9 rounded-xl border border-zinc-200 text-zinc-400 text-xs hover:bg-zinc-50 disabled:opacity-40"
+            className="flex-1 h-9 rounded-xl text-text3 text-xs hover:text-text2 transition-colors disabled:opacity-40"
+            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
           >
             Skip for now
           </button>
@@ -209,7 +268,12 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        <div
+          className="rounded-xl px-3 py-2.5"
+          style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)' }}
+        >
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
       )}
     </div>
   );

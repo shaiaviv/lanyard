@@ -7,20 +7,30 @@ interface RecordButtonProps {
   disabled?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getSR(): any {
+type SR = new () => {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (e: SREvent) => void;
+  onend: () => void;
+  onerror: (e: SRError) => void;
+  start: () => void;
+  stop: () => void;
+};
+type SREvent = { resultIndex: number; results: { isFinal: boolean; 0: { transcript: string } }[] };
+type SRError = { error: string };
+
+function getSR(): SR | null {
   if (typeof window === 'undefined') return null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const w = window as any;
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+  const w = window as unknown as Record<string, unknown>;
+  return (w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null) as SR | null;
 }
 
 export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
   const [recording, setRecording] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
   const [interimText, setInterimText] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<{ stop: () => void } | null>(null);
   const finalRef = useRef('');
 
   useEffect(() => {
@@ -38,16 +48,12 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
     recognition.lang = 'en-US';
     finalRef.current = '';
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const text = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalRef.current += text + ' ';
-        } else {
-          interim += text;
-        }
+        if (event.results[i].isFinal) finalRef.current += text + ' ';
+        else interim += text;
       }
       setInterimText(finalRef.current + interim);
     };
@@ -59,8 +65,7 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
       if (transcript) onCapture(transcript);
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event) => {
       if (event.error === 'not-allowed') setUnsupported(true);
       setRecording(false);
       setInterimText('');
@@ -78,52 +83,73 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
 
   if (unsupported) {
     return (
-      <div className="flex flex-col items-center gap-3 text-center">
-        <div className="w-20 h-20 rounded-full bg-zinc-100 flex items-center justify-center">
-          <MicOff size={28} className="text-zinc-400" />
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div
+          className="w-24 h-24 rounded-full bg-elevated flex items-center justify-center"
+          style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <MicOff size={28} className="text-text3" />
         </div>
-        <p className="text-xs text-zinc-500 max-w-[220px]">
-          Voice capture requires Chrome, Edge, or Safari. Use the manual form below.
+        <p className="text-xs text-text2 max-w-[200px] leading-relaxed">
+          Voice capture requires Chrome, Edge, or Safari. Use the form below.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={recording ? stopRecording : startRecording}
-        className={`w-20 h-20 rounded-full text-white flex items-center justify-center shadow-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
-          recording
-            ? 'bg-red-500 shadow-red-200'
-            : 'bg-orange-500 shadow-orange-200 hover:bg-orange-600'
-        }`}
-        title={recording ? 'Tap to stop' : 'Tap to start voice capture'}
-      >
-        {recording ? (
-          <Square size={26} strokeWidth={1.5} fill="white" />
-        ) : (
-          <Mic size={32} strokeWidth={1.5} />
+    <div className="flex flex-col items-center gap-5">
+      {/* Button + rings container */}
+      <div className="relative flex items-center justify-center w-36 h-36">
+        {/* Ambient rings (idle) */}
+        {!recording && (
+          <>
+            <div className="absolute inset-[-4px] rounded-full bg-accent/[0.04]" />
+            <div className="absolute inset-[-14px] rounded-full bg-accent/[0.025]" />
+          </>
         )}
-      </button>
+        {/* Expanding ring (recording) */}
+        {recording && (
+          <div
+            className="absolute inset-0 rounded-full border-2 border-red-500/30 ring-out"
+            style={{ transformOrigin: 'center' }}
+          />
+        )}
+
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={recording ? stopRecording : startRecording}
+          className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
+            recording ? 'record-active' : 'record-idle'
+          }`}
+          title={recording ? 'Tap to stop' : 'Tap to start voice capture'}
+        >
+          {recording ? (
+            <Square size={26} strokeWidth={1.5} fill="white" className="text-white" />
+          ) : (
+            <Mic size={32} strokeWidth={1.5} className="text-[#07090F]" />
+          )}
+        </button>
+      </div>
 
       {recording ? (
-        <div className="flex flex-col items-center gap-1.5 max-w-[260px]">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-sm font-medium text-red-600">Listening… tap to stop</span>
+        <div className="flex flex-col items-center gap-2 max-w-[260px]">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+            <span className="text-sm font-semibold text-red-400">Recording · tap to finish</span>
           </div>
           {interimText && (
-            <p className="text-xs text-zinc-400 text-center leading-relaxed line-clamp-3">
+            <p className="text-xs text-text2 text-center leading-relaxed line-clamp-3">
               {interimText}
             </p>
           )}
         </div>
       ) : (
-        <p className="text-xs text-zinc-400 text-center">
-          Tap to record · or use<br />the manual form below
+        <p className="text-xs text-text3 text-center leading-relaxed">
+          Tap to record a voice note
+          <br />
+          or use the form below
         </p>
       )}
     </div>

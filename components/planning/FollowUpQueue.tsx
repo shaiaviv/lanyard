@@ -36,7 +36,7 @@ function HubSpotButton({ row }: { row: FollowUpRow }) {
         href={result.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-xs text-green-700 font-medium hover:underline"
+        className="flex items-center gap-1.5 text-xs text-success font-semibold hover:underline"
       >
         <Check size={12} /> In HubSpot
         <ExternalLink size={11} />
@@ -49,17 +49,14 @@ function HubSpotButton({ row }: { row: FollowUpRow }) {
       <button
         onClick={push}
         disabled={isPending}
-        className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-orange-600 font-medium border border-zinc-200 rounded-lg px-2.5 py-1.5 hover:border-orange-300 transition-colors disabled:opacity-40"
+        className="flex items-center gap-1.5 text-xs text-text2 hover:text-accent font-semibold rounded-lg px-2.5 py-1.5 transition-colors disabled:opacity-40"
+        style={{ border: '1px solid rgba(255,255,255,0.08)' }}
       >
-        {isPending ? (
-          <Loader2 size={12} className="animate-spin" />
-        ) : (
-          <Send size={12} />
-        )}
+        {isPending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
         Push to HubSpot
       </button>
       {result?.type === 'err' && (
-        <p className="text-[10px] text-red-500 flex items-center gap-1">
+        <p className="text-[10px] text-red-400 flex items-center gap-1">
           <AlertCircle size={10} /> {result.msg}
         </p>
       )}
@@ -80,12 +77,19 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
 
   if (followUps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-        <div className="text-4xl">📬</div>
-        <h3 className="font-semibold text-zinc-700">No follow-ups pending</h3>
-        <p className="text-sm text-zinc-400 max-w-xs">
-          Flag contacts for follow-up during capture and they&apos;ll queue here for HubSpot push.
-        </p>
+      <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+        <div
+          className="w-14 h-14 rounded-2xl bg-elevated flex items-center justify-center"
+          style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <Send size={22} className="text-text3" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-text2">No follow-ups pending</h3>
+          <p className="text-sm text-text3 mt-1 max-w-xs leading-relaxed">
+            Flag contacts for follow-up during capture and they&apos;ll queue here for HubSpot push.
+          </p>
+        </div>
       </div>
     );
   }
@@ -93,19 +97,22 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-zinc-500">
-          {followUps.length} contact{followUps.length !== 1 ? 's' : ''} flagged for follow-up
+        <p className="text-xs text-text3 font-semibold">
+          {followUps.length} contact{followUps.length !== 1 ? 's' : ''} flagged
         </p>
         <div className="flex gap-1">
           {(['date', 'temp'] as const).map((s) => (
             <button
               key={s}
               onClick={() => setSortBy(s)}
-              className={`px-2.5 py-1 text-xs rounded-lg border transition-colors ${
-                sortBy === s
-                  ? 'bg-zinc-800 text-white border-zinc-800'
-                  : 'border-zinc-200 text-zinc-500 hover:border-zinc-300'
+              className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition-colors ${
+                sortBy === s ? 'bg-elevated text-text1' : 'text-text3 hover:text-text2'
               }`}
+              style={
+                sortBy === s
+                  ? { border: '1px solid rgba(255,255,255,0.12)' }
+                  : { border: '1px solid rgba(255,255,255,0.06)' }
+              }
             >
               {s === 'date' ? 'By date' : 'By heat'}
             </button>
@@ -115,27 +122,36 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
 
       <div className="space-y-3">
         {sorted.map((row) => (
-          <div key={row.encounterId} className="border border-zinc-200 rounded-xl p-4 space-y-3">
+          <div
+            key={row.encounterId}
+            className="bg-card rounded-2xl p-4 space-y-3"
+            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-zinc-900 truncate">{row.contactName}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-semibold text-text1 truncate">{row.contactName}</p>
                   {row.temperature && (
                     <TemperatureChip value={row.temperature as Temperature} />
                   )}
                 </div>
                 {row.company && (
-                  <p className="text-sm text-zinc-500 truncate mt-0.5">{row.company}</p>
+                  <p className="text-sm text-text2 truncate mt-0.5">{row.company}</p>
                 )}
                 {row.conferenceName && (
-                  <p className="text-xs text-zinc-400 mt-1">
-                    met at <span className="font-medium">{row.conferenceName}</span>
+                  <p className="text-xs text-text3 mt-1">
+                    met at <span className="font-medium text-text2">{row.conferenceName}</span>
                     {' · '}
-                    {new Date(row.occurredAt).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
+                    {new Date(row.occurredAt).toLocaleDateString('en-GB', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </p>
                 )}
                 {row.note && (
-                  <p className="text-xs text-zinc-400 mt-1.5 italic line-clamp-2">&ldquo;{row.note}&rdquo;</p>
+                  <p className="text-xs text-text3 mt-1.5 italic line-clamp-2 leading-relaxed">
+                    &ldquo;{row.note}&rdquo;
+                  </p>
                 )}
               </div>
 
@@ -145,7 +161,7 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
                     href={row.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+                    className="flex items-center gap-1 text-xs text-info hover:text-info/80 transition-colors"
                   >
                     LinkedIn <ExternalLink size={10} />
                   </a>
@@ -153,7 +169,7 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
               </div>
             </div>
 
-            <div className="border-t border-zinc-100 pt-3">
+            <div className="pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <HubSpotButton row={row} />
             </div>
           </div>
