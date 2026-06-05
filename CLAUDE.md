@@ -26,15 +26,28 @@ plans/
 **Pipeline:** all product plans → all tech plans → build each (Field → Reconcile → Planning).
 All product + tech plans are **COMPLETE**. Keep product (what/why) separate from tech (how).
 
-**Currently in: BUILD phase (HYBRID model split).**
-- **Opus (now):** scaffold + the hardest core / pattern-setting skeleton — data layer (schema),
-  shared `lib/` (AI module structure + Zod contracts, `EnrichmentProvider` + mock, matching engine,
-  offline IndexedDB queue + sync, `getServiceKey`), and the async capture-pipeline orchestration.
-- **Sonnet (after):** high-volume screens/CRUD/wiring (F1–F8 UI), the other two experiences
-  (Reconcile, Planning), and ALL QA/refinement.
-- Rationale: spend Opus where a decision is made once but copied many times; Sonnet for volume.
-- Build order per `plans/tech/1-field.md` §9. **Verify current library APIs against official docs
-  before coding** (Next.js App Router, Supabase, Vercel AI SDK) — the plans note this repeatedly.
+**Currently in: BUILD phase — Opus core COMPLETE, now on Sonnet (high-volume build + QA).**
+
+✅ **DONE (Opus core, `npx tsc --noEmit` clean):** scaffold (Next 16 App Router + Tailwind 4),
+full schema (`supabase/migrations/0001_init.sql`), and the type-checked engine in `lib/`:
+`types.ts` · `db/{admin,server,browser}` · `config/{crypto,getServiceKey}` ·
+`ai/{models,icp,schemas,parseCapture,summarizeArc,transcribe}` · `matching/` · `capture/processCapture`
+· `offline/queue` · `enrichment/`. Stack: Supabase + Claude/Whisper via **AI SDK v6** (use
+`generateText` + `Output.object`; `generateObject` is deprecated) + Zod 4. `parseCapture` is the
+AI-module EXEMPLAR — copy its pattern for new AI calls.
+
+⏭️ **SONNET — build from here** (verify library APIs vs official docs as you go):
+1. **Supabase setup:** create a project; put URL + anon + service-role keys in `.env` (template in
+   `.env.example`); apply `supabase/migrations/0001_init.sql`; create a private `recordings` storage
+   bucket; wire Supabase Auth + seed a rep/team row.
+2. **Field screens F1–F8** + server actions (`commitEncounter`, `searchPeople`, `getBriefing`,
+   `runMatch`) + the offline **sync manager** (drain `lib/offline/queue` → `lib/capture/processCapture`).
+   Build the **manual capture path FIRST**, then layer voice → AI → offline (`plans/tech/1-field.md` §9).
+3. **Settings UI** (encrypted service keys, masked). Then **Reconcile** + **Planning** experiences.
+   **Conference seed data** (T2, `plans/tech/3-planning.md` §2). Then **QA**.
+
+Build order per `plans/tech/1-field.md` §9. **Repo:** github.com/shaiaviv/lanyard (public).
+Note: project folder is `lanyard` (renamed from `grain`).
 
 ---
 
