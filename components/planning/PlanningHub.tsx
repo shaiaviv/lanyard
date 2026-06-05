@@ -4,7 +4,7 @@ import { Fingerprint } from 'lucide-react';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageTimeline } from '@/components/planning/CoverageTimeline';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
-import type { Conference } from '@/lib/types';
+import type { Conference, Rep } from '@/lib/types';
 import type { CoverageRow, FollowUpRow } from '@/lib/db/queries';
 
 const TABS = ['Conferences', 'Coverage', 'Follow-ups'] as const;
@@ -14,11 +14,12 @@ interface Props {
   conferences: Conference[];
   coverage: CoverageRow[];
   followUps: FollowUpRow[];
+  reps: Rep[];
   repId: string;
   repName: string;
 }
 
-export function PlanningHub({ conferences, coverage, followUps, repId, repName }: Props) {
+export function PlanningHub({ conferences, coverage, followUps, reps, repId, repName }: Props) {
   const [tab, setTab] = useState<Tab>('Conferences');
 
   return (
@@ -69,7 +70,12 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
 
       <div className="flex-1 px-6 py-6">
         {tab === 'Conferences' && (
-          <ConferenceList conferences={conferences} coverage={coverage} repId={repId} />
+          <ConferenceList
+            conferences={conferences}
+            coverage={coverage}
+            reps={reps}
+            repId={repId}
+          />
         )}
         {tab === 'Coverage' && (
           <CoverageTimeline
@@ -79,7 +85,7 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
             repName={repName}
           />
         )}
-        {tab === 'Follow-ups' && <FollowUpQueue followUps={followUps} />}
+        {tab === 'Follow-ups' && <FollowUpQueue followUps={followUps} repId={repId} />}
       </div>
     </div>
   );

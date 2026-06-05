@@ -1,9 +1,9 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { MapPin, Users, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { MapPin, Users, ChevronDown, ChevronUp, Check, UserPlus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
-import { upsertCoverage } from '@/app/actions/planning';
-import type { Conference } from '@/lib/types';
+import { assignCoverage, type CoverageStatus } from '@/app/actions/planning';
+import type { Conference, Rep } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
 
 const VERTICALS = ['All', 'Fintech', 'Payments', 'Travel', 'SaaS', 'Banking'];
@@ -17,11 +17,15 @@ const FACTOR_LABELS: Record<string, string> = {
   historicalPerf: 'Historical Perf',
 };
 
-const STATUS_OPTIONS = [
-  { value: 'considering', label: 'Considering' },
-  { value: 'committed',   label: 'Committed ✓' },
-  { value: 'declined',    label: 'Declined' },
-] as const;
+const STATUS_CYCLE: { value: CoverageStatus; label: string; chip: string }[] = [
+  { value: 'considering', label: 'Considering', chip: 'text-blue-300 bg-blue-400/10 border-blue-400/20' },
+  { value: 'committed',   label: 'Committed',   chip: 'text-success bg-success/10 border-success/20' },
+  { value: 'declined',    label: 'Declined',    chip: 'text-text3 bg-white/5 border-white/10' },
+];
+
+function firstName(name: string) {
+  return name.split(' ')[0];
+}
 
 function ScoreBar({ score }: { score: number }) {
   return (
@@ -36,67 +40,117 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
-function CoverageButton({
-  conference,
-  currentStatus,
-  repId,
+/**
+ * Team coverage control. Summarizes who's covering a conference and lets the lead
+ * assign ANY teammate a status. This is the heart of company-wide planning — coverage
+ * is "who covers what" across the team, not just the current rep's personal plan.
+ */
+function CoverageControl({
+  coverageForConf,
+  reps,
+  currentRepId,
+  onAssign,
 }: {
-  conference: Conference;
-  currentStatus: string | undefined;
-  repId: string;
+  coverageForConf: CoverageRow[];
+  reps: Rep[];
+  currentRepId: string;
+  onAssign: (repId: string, status: CoverageStatus) => void;
 }) {
-  const [status, setStatus] = useState(currentStatus);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [pendingRepId, setPendingRepId] = useState<string | null>(null);
 
-  function select(val: string) {
-    setOpen(false);
+  const statusByRep = new Map(coverageForConf.map((c) => [c.repId, c.status]));
+  const committed = coverageForConf.filter((c) => c.status === 'committed');
+  const considering = coverageForConf.filter((c) => c.status === 'considering');
+
+  function set(repId: string, status: CoverageStatus) {
+    setPendingRepId(repId);
     startTransition(async () => {
-      const result = await upsertCoverage(
-        conference.id,
-        val as 'considering' | 'committed' | 'attended' | 'declined',
-      );
-      if (!('error' in result)) setStatus(val);
+      await onAssign(repId, status);
+      setPendingRepId(null);
     });
   }
 
-  const label = STATUS_OPTIONS.find((o) => o.value === status)?.label ?? 'Add to plan';
-  const isCommitted = status === 'committed';
-
-  let btnClass: string;
-  if (isCommitted) {
-    btnClass = 'bg-success/8 border-success/20 text-success';
-  } else if (status) {
-    btnClass = 'bg-white/4 border-white/10 text-text2';
+  // Summary pill: green if anyone committed, blue if only considering, amber "Uncovered" otherwise.
+  let summary: React.ReactNode;
+  if (committed.length > 0) {
+    summary = (
+      <span className="flex items-center gap-1 text-success">
+        <Check size={11} />
+        {committed.map((c) => firstName(c.repName)).join(', ')}
+      </span>
+    );
+  } else if (considering.length > 0) {
+    summary = (
+      <span className="text-blue-300">{considering.map((c) => firstName(c.repName)).join(', ')} considering</span>
+    );
   } else {
-    btnClass = 'bg-accent/8 border-accent/20 text-accent hover:bg-accent/12';
+    summary = <span className="text-warn">Uncovered</span>;
   }
+
+  const summaryClass =
+    committed.length > 0
+      ? 'border-success/20 bg-success/8'
+      : considering.length > 0
+        ? 'border-blue-400/20 bg-blue-400/8'
+        : 'border-warn/25 bg-warn/8';
 
   return (
     <div className="relative flex-shrink-0">
       <button
         onClick={() => setOpen(!open)}
-        disabled={isPending}
-        className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all disabled:opacity-40 ${btnClass}`}
+        className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all ${summaryClass}`}
       >
-        {isCommitted && <Check size={11} />}
-        {label}
-        <ChevronDown size={11} />
+        {summary}
+        <ChevronDown size={11} className="opacity-60" />
       </button>
+
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-10 bg-card rounded-xl py-1 min-w-[140px] border border-white/10 shadow-2xl">
-          {STATUS_OPTIONS.map((o) => (
-            <button
-              key={o.value}
-              onClick={() => select(o.value)}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-elevated transition-colors ${
-                status === o.value ? 'text-accent font-semibold' : 'text-text2'
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
+        <>
+          {/* click-away */}
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-1 z-20 bg-card rounded-xl py-2 min-w-[240px] border border-white/10 shadow-2xl">
+            <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-white/6">
+              <span className="text-[11px] font-semibold text-text3 flex items-center gap-1.5">
+                <UserPlus size={12} /> Team coverage
+              </span>
+              <button onClick={() => setOpen(false)} className="text-text3 hover:text-text1">
+                <X size={13} />
+              </button>
+            </div>
+            {reps.map((rep) => {
+              const cur = statusByRep.get(rep.id) as CoverageStatus | undefined;
+              const rowPending = isPending && pendingRepId === rep.id;
+              return (
+                <div key={rep.id} className="px-3 py-1.5">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs text-text1 font-medium truncate">
+                      {rep.name}
+                      {rep.id === currentRepId && <span className="text-text3 font-normal"> (You)</span>}
+                    </span>
+                  </div>
+                  <div className={`flex gap-1 ${rowPending ? 'opacity-40 pointer-events-none' : ''}`}>
+                    {STATUS_CYCLE.map((s) => {
+                      const active = cur === s.value;
+                      return (
+                        <button
+                          key={s.value}
+                          onClick={() => set(rep.id, active ? 'declined' : s.value)}
+                          className={`flex-1 text-[11px] font-semibold px-1.5 py-1 rounded-md border transition-all ${
+                            active ? s.chip : 'text-text3 bg-white/3 border-white/6 hover:border-white/12'
+                          }`}
+                        >
+                          {s.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
@@ -104,12 +158,16 @@ function CoverageButton({
 
 function ConferenceCard({
   conf,
-  myStatus,
-  repId,
+  coverageForConf,
+  reps,
+  currentRepId,
+  onAssign,
 }: {
   conf: Conference;
-  myStatus: string | undefined;
-  repId: string;
+  coverageForConf: CoverageRow[];
+  reps: Rep[];
+  currentRepId: string;
+  onAssign: (repId: string, confId: string, status: CoverageStatus) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const today = new Date().toISOString().split('T')[0];
@@ -139,13 +197,20 @@ function ConferenceCard({
       )}
 
       <div className="px-4 pt-4 pb-4">
-        {/* Top row: badges + action button */}
+        {/* Top row: badges + coverage control */}
         <div className="flex items-start justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-1.5 flex-wrap">
             {isActive && <Badge variant="live" dot pulse>Live</Badge>}
             {conf.tier && <Badge variant={conf.tier as 'T1' | 'T2' | 'T3'}>{conf.tier}</Badge>}
           </div>
-          <CoverageButton conference={conf} currentStatus={myStatus} repId={repId} />
+          {!isPast && (
+            <CoverageControl
+              coverageForConf={coverageForConf}
+              reps={reps}
+              currentRepId={currentRepId}
+              onAssign={(repId, status) => onAssign(repId, conf.id, status)}
+            />
+          )}
         </div>
 
         {/* Name */}
@@ -219,18 +284,40 @@ function ConferenceCard({
 interface Props {
   conferences: Conference[];
   coverage: CoverageRow[];
+  reps: Rep[];
   repId: string;
 }
 
-export function ConferenceList({ conferences, coverage, repId }: Props) {
+export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
   const [vertical, setVertical] = useState('All');
   const [tier, setTier] = useState<'All' | 'T1' | 'T2' | 'T3'>('All');
   const [showPast, setShowPast] = useState(false);
+  // Coverage is interactive — lift it into state so assignments reflect instantly
+  // in the cards AND the under-invested banner without a full reload.
+  const [coverageState, setCoverageState] = useState<CoverageRow[]>(coverage);
 
   const today = new Date().toISOString().split('T')[0];
-  const myStatusMap = Object.fromEntries(
-    coverage.filter((c) => c.repId === repId).map((c) => [c.conferenceId, c.status]),
-  );
+
+  function handleAssign(repIdArg: string, confId: string, status: CoverageStatus) {
+    // optimistic upsert into local state
+    setCoverageState((prev) => {
+      const idx = prev.findIndex((c) => c.repId === repIdArg && c.conferenceId === confId);
+      const repName = reps.find((r) => r.id === repIdArg)?.name ?? 'Unknown';
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], status };
+        return next;
+      }
+      return [...prev, { id: `${repIdArg}-${confId}`, repId: repIdArg, repName, conferenceId: confId, status }];
+    });
+    void assignCoverage(repIdArg, confId, status);
+  }
+
+  const coverageByConf = new Map<string, CoverageRow[]>();
+  for (const c of coverageState) {
+    if (!coverageByConf.has(c.conferenceId)) coverageByConf.set(c.conferenceId, []);
+    coverageByConf.get(c.conferenceId)!.push(c);
+  }
 
   const filtered = conferences
     .filter((c) => {
@@ -241,22 +328,28 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
     })
     .sort((a, b) => (b.icpScore ?? 0) - (a.icpScore ?? 0));
 
-  const uncommittedT1 = conferences.filter(
-    (c) => c.tier === 'T1' && !myStatusMap[c.id] && (!c.endDate || c.endDate >= today),
+  // Team-wide: a conference is "covered" when ANY rep has committed.
+  const committedConfIds = new Set(
+    coverageState.filter((c) => c.status === 'committed').map((c) => c.conferenceId),
   );
-  const committedCount = Object.values(myStatusMap).filter((s) => s === 'committed').length;
+  const uncoveredT1 = conferences.filter(
+    (c) => c.tier === 'T1' && !committedConfIds.has(c.id) && (!c.endDate || c.endDate >= today),
+  );
+  const coveredUpcoming = conferences.filter(
+    (c) => committedConfIds.has(c.id) && (!c.endDate || c.endDate >= today),
+  ).length;
 
   return (
     <div className="space-y-4">
-      {/* Under-invested banner */}
-      {uncommittedT1.length > 0 && (
+      {/* Under-invested banner (team-wide) */}
+      {uncoveredT1.length > 0 && (
         <div className="rounded-xl px-4 py-3 space-y-0.5 bg-warn/[0.06] border border-warn/15">
           <p className="text-sm font-semibold text-warn">
-            {uncommittedT1.length} T1 event{uncommittedT1.length !== 1 ? 's' : ''} without coverage
+            {uncoveredT1.length} T1 event{uncoveredT1.length !== 1 ? 's' : ''} with no committed rep
           </p>
           <p className="text-xs text-warn/60">
-            {uncommittedT1.slice(0, 2).map((c) => c.name).join(', ')}
-            {uncommittedT1.length > 2 ? ` +${uncommittedT1.length - 2} more` : ''}
+            {uncoveredT1.slice(0, 2).map((c) => c.name).join(', ')}
+            {uncoveredT1.length > 2 ? ` +${uncoveredT1.length - 2} more` : ''}
           </p>
         </div>
       )}
@@ -297,7 +390,7 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
         <p className="text-xs text-text3">
           {filtered.length} shown
           <span className="text-text3/30 mx-2">·</span>
-          <span className="text-text1 font-semibold">{committedCount}</span> committed
+          <span className="text-text1 font-semibold">{coveredUpcoming}</span> covered by the team
         </p>
         <button
           onClick={() => setShowPast(!showPast)}
@@ -313,8 +406,10 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
           <ConferenceCard
             key={conf.id}
             conf={conf}
-            myStatus={myStatusMap[conf.id]}
-            repId={repId}
+            coverageForConf={coverageByConf.get(conf.id) ?? []}
+            reps={reps}
+            currentRepId={repId}
+            onAssign={handleAssign}
           />
         ))}
       </div>

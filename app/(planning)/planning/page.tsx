@@ -1,15 +1,22 @@
 import { Suspense } from 'react';
-import { getCurrentRep, getConferences, getConferenceCoverage, getFollowUps } from '@/lib/db/queries';
+import {
+  getCurrentRep,
+  getConferences,
+  getConferenceCoverage,
+  getTeamFollowUps,
+  getReps,
+} from '@/lib/db/queries';
 import { PlanningHub } from '@/components/planning/PlanningHub';
 
 export default async function PlanningPage() {
   const rep = await getCurrentRep();
   if (!rep) return null;
 
-  const [conferences, coverage, followUps] = await Promise.all([
+  const [conferences, coverage, followUps, reps] = await Promise.all([
     getConferences(),
     getConferenceCoverage(rep.teamId),
-    getFollowUps(rep.id),
+    getTeamFollowUps(rep.teamId),
+    getReps(rep.teamId),
   ]);
 
   return (
@@ -18,6 +25,7 @@ export default async function PlanningPage() {
         conferences={conferences}
         coverage={coverage}
         followUps={followUps}
+        reps={reps}
         repId={rep.id}
         repName={rep.name}
       />

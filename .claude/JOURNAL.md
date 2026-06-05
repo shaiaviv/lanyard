@@ -656,3 +656,60 @@ Full visual quality pass triggered by user feedback: contrast was unreadable, ca
 
 **Commit:** db378ec
 - [20:20] Screenshots confirmed: planning shows tier-accented 2-column cards, capture has properly centered record button, nav tab active state clearly visible.
+
+## Entry 015 — 2026-06-06 — Planning take-stock: found major drift, wrote remediation plan (Opus)
+
+**Trigger:** User reviewed `/planning` live and felt it was "wildly off" from the plans — specifically
+that it plans *my* conferences, not **the whole company's** attendance. Did a thorough audit:
+re-read foundation + product/3-planning + tech/3-planning + the brief (CLAUDE.md), then every line of
+the built hub (`PlanningHub`, `ConferenceList`, `CoverageTimeline`, `FollowUpQueue`, `app/actions/
+planning.ts`, the queries, the seed).
+
+**Verdict:** the build is a competent but **shrunken** Planning — three tabs (Conferences/Coverage/
+Follow-ups ≈ C2+C6+stripped-C9) out of a planned C1–C11. Seven skews, in grading-impact order:
+1. **"My" not the company's** (user's #1, confirmed): `getFollowUps(rep.id)`; coverage self-only
+   (`upsertCoverage` hardcodes `rep.id`); **no assign-other-reps UI**; seed has 1 rep + 0 coverage so
+   the team story can't even be demoed. Data layer is *partly* team-aware (coverage reads by team_id)
+   but the experience + seed are personal.
+2. **Scoring faked** (the marquee we "defend on video"): scores/tier/`score_breakdown` are hardcoded
+   JSON in `setup.sql`. No `lib/ai/scoreConference`, no `computeIcpScore`, **no weight sliders / live
+   recompute / override** — the entire C4 architecture (AI-estimates-factors ↔ formula-recomputes) is
+   absent. Breakdown is a read-only expander.
+3. **Cross-conference intelligence ABSENT from Planning** — C7, the "Planning-side signature feature"
+   and the brief's most-weighted criterion, isn't in the hub at all. Lives only in Field briefing +
+   an unlinked `/contact/[id]`.
+4. **Planning AI missing** — no C9 `draftFollowup` (Follow-ups tab is just list+push), no C5
+   `discoverConferences`. The "judgment & overview" hub has ~zero working AI.
+5. **Geo clustering text-only** — no react-leaflet map (brief explicitly wants geographic clustering).
+6. **HubSpot = the dumb export §4b warned against** — `pushToHubSpot` always POSTs (409 on re-push),
+   sends raw capture note not the arc summary, no bulk push, no email dedupe.
+7. **No C1 dashboard / C3 detail page.**
+
+**Decision (user, via scoping Qs):** **full plan parity** · **real AI scoring + live sliders** ·
+**seed a 3–4 rep team + coverage** so company-wide demos on first run. Wrote
+`plans/PLANNING-REMEDIATION.md` — 9 phases (P0 company-wide foundation → P1 real scoring engine →
+P2 cross-conf intel C7/C8 → P3 AI follow-up emails → P4 map+gaps → P5 HubSpot hardening → P6 discovery
+→ P7 detail+dashboard → P8 settings+QA), ordered by **grading leverage** so the grade-movers (P0–P2)
+land first even under full-parity intent. Reuses existing `summarizeArc`/`parseCapture` exemplar/`icp`.
+**Next:** switch Opus→Sonnet for the high-volume build (model strategy); start P0.
+
+## Entry 016 — 2026-06-06 — P0: Planning reframed to company-wide team coverage
+
+First phase of `plans/PLANNING-REMEDIATION.md` — fix Skew 1 (the hub planned *my* conferences,
+not the team's). Shipped:
+- **Team roster + coverage seed** (`supabase/setup.sql`): 3 teammate reps (Maya/Tom/Priya, no auth
+  account, shared team_id) + coverage rows with **deliberate gaps** (Singapore APAC only
+  "considering", Money20/20 Europe uncommitted) so under-invested/clustering have something to show.
+- **`assignCoverage(repId, confId, status)`** action (`app/actions/planning.ts`) — assign ANY
+  teammate, guarded to same team; `upsertCoverage` now delegates (assign self).
+- **Queries** (`lib/db/queries.ts`): `getReps(teamId)` roster; `getTeamFollowUps(teamId)` (whole
+  team's flagged contacts, with owning rep) replacing the rep-only feed on the page; `FollowUpRow`
+  gained `repId`/`repName` via a shared `mapFollowUpRow` + `reps!inner` join.
+- **ConferenceList**: replaced the self-only "Add to plan" button with a **team CoverageControl**
+  popover (per-rep considering/committed/declined). Coverage lifted into client state for optimistic
+  updates that also drive the **team-wide** under-invested banner (covered = ANY rep committed,
+  fixing the old `!myStatusMap` personal-to-do logic). Stat line now "covered by the team".
+- **FollowUpQueue**: Team/Mine scope toggle + owning-rep attribution per card.
+- tsc + eslint clean. **DB note:** the teammate/coverage seed block must be run against the live
+  Supabase for the team story to appear (existing DBs predate it).
+**Next:** P1 — the real ICP scoring engine (AI factor estimation + live weight sliders).

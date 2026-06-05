@@ -64,10 +64,14 @@ function HubSpotButton({ row }: { row: FollowUpRow }) {
   );
 }
 
-export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
+export function FollowUpQueue({ followUps, repId }: { followUps: FollowUpRow[]; repId: string }) {
   const [sortBy, setSortBy] = useState<'date' | 'temp'>('date');
+  const [scope, setScope] = useState<'all' | 'mine'>('all');
 
-  const sorted = [...followUps].sort((a, b) => {
+  const mineCount = followUps.filter((f) => f.repId === repId).length;
+
+  const scoped = scope === 'mine' ? followUps.filter((f) => f.repId === repId) : followUps;
+  const sorted = [...scoped].sort((a, b) => {
     if (sortBy === 'temp') {
       const order = ['hot', 'warm', 'lukewarm', 'cool', 'cold'];
       return order.indexOf(a.temperature ?? 'cold') - order.indexOf(b.temperature ?? 'cold');
@@ -96,10 +100,29 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-text3 font-semibold">
-          {followUps.length} contact{followUps.length !== 1 ? 's' : ''} flagged
-        </p>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        {/* Scope: whole team vs just mine */}
+        <div className="flex gap-1">
+          {([
+            { key: 'all', label: `Team (${followUps.length})` },
+            { key: 'mine', label: `Mine (${mineCount})` },
+          ] as const).map((o) => (
+            <button
+              key={o.key}
+              onClick={() => setScope(o.key)}
+              className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition-colors ${
+                scope === o.key ? 'bg-elevated text-text1' : 'text-text3 hover:text-text2'
+              }`}
+              style={
+                scope === o.key
+                  ? { border: '1px solid rgba(255,255,255,0.12)' }
+                  : { border: '1px solid rgba(255,255,255,0.06)' }
+              }
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-1">
           {(['date', 'temp'] as const).map((s) => (
             <button
@@ -138,16 +161,22 @@ export function FollowUpQueue({ followUps }: { followUps: FollowUpRow[] }) {
                 {row.company && (
                   <p className="text-sm text-text2 truncate mt-0.5">{row.company}</p>
                 )}
-                {row.conferenceName && (
-                  <p className="text-xs text-text3 mt-1">
-                    met at <span className="font-medium text-text2">{row.conferenceName}</span>
-                    {' · '}
-                    {new Date(row.occurredAt).toLocaleDateString('en-GB', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </p>
-                )}
+                <p className="text-xs text-text3 mt-1">
+                  <span className="font-medium text-text2">
+                    {row.repId === repId ? 'You' : row.repName}
+                  </span>
+                  {row.conferenceName && (
+                    <>
+                      {' · met at '}
+                      <span className="font-medium text-text2">{row.conferenceName}</span>
+                    </>
+                  )}
+                  {' · '}
+                  {new Date(row.occurredAt).toLocaleDateString('en-GB', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </p>
                 {row.note && (
                   <p className="text-xs text-text3 mt-1.5 italic line-clamp-2 leading-relaxed">
                     &ldquo;{row.note}&rdquo;

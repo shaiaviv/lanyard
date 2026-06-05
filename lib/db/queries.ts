@@ -25,6 +25,26 @@ export async function getCurrentRep(): Promise<Rep | null> {
   };
 }
 
+// All reps on a team — the roster a sales lead assigns coverage across.
+export async function getReps(teamId: string): Promise<Rep[]> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('reps')
+    .select('*')
+    .eq('team_id', teamId)
+    .order('name', { ascending: true });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((d: any) => ({
+    id: d.id as string,
+    authUserId: d.auth_user_id as string | null,
+    teamId: d.team_id as string,
+    name: d.name as string,
+    email: d.email as string | null,
+    currentConferenceId: (d.current_conference_id as string | null) ?? null,
+  }));
+}
+
 // ── Conferences ───────────────────────────────────────────────────────────────
 
 export async function getActiveConference(): Promise<Conference | null> {
@@ -186,34 +206,58 @@ export interface FollowUpRow {
   note: string | null;
   linkedinUrl: string | null;
   email: string | null;
+  repId: string;
+  repName: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapFollowUpRow(row: any): FollowUpRow {
+  const snap = row.identity_snapshot as { name?: string; company?: string } | null;
+  return {
+    encounterId: row.id as string,
+    contactId: row.contact_id as string | null,
+    contactName: (row.contacts?.canonical_name ?? snap?.name ?? 'Unknown') as string,
+    company: (row.contacts?.current_company ?? snap?.company ?? null) as string | null,
+    conferenceId: row.conference_id as string | null,
+    conferenceName: (row.conferences?.name ?? null) as string | null,
+    temperature: row.temperature as string | null,
+    occurredAt: row.occurred_at as string,
+    note: row.note as string | null,
+    linkedinUrl: (row.contacts?.linkedin_url ?? null) as string | null,
+    email: (row.contacts?.email ?? null) as string | null,
+    repId: row.rep_id as string,
+    repName: (row.reps?.name ?? 'Unknown') as string,
+  };
+}
+
+const FOLLOWUP_SELECT =
+  'id, rep_id, contact_id, conference_id, temperature, occurred_at, note, identity_snapshot, ' +
+  'contacts(canonical_name, current_company, linkedin_url, email), conferences(name), reps!inner(id, name, team_id)';
+
+// Team-wide follow-up queue — every flagged contact across the team, with the owning rep.
+// Planning is a company-wide hub, so the lead sees the whole team's follow-ups, not just their own.
+export async function getTeamFollowUps(teamId: string): Promise<FollowUpRow[]> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('encounters')
+    .select(FOLLOWUP_SELECT)
+    .eq('reps.team_id', teamId)
+    .eq('follow_up', true)
+    .order('occurred_at', { ascending: false });
+
+  return (data ?? []).map(mapFollowUpRow);
 }
 
 export async function getFollowUps(repId: string): Promise<FollowUpRow[]> {
   const supa = await createSupabaseServerClient();
   const { data } = await supa
     .from('encounters')
-    .select('id, contact_id, conference_id, temperature, occurred_at, note, identity_snapshot, contacts(canonical_name, current_company, linkedin_url, email), conferences(name)')
+    .select(FOLLOWUP_SELECT)
     .eq('rep_id', repId)
     .eq('follow_up', true)
     .order('occurred_at', { ascending: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((row: any) => {
-    const snap = row.identity_snapshot as { name?: string; company?: string } | null;
-    return {
-      encounterId: row.id as string,
-      contactId: row.contact_id as string | null,
-      contactName: (row.contacts?.canonical_name ?? snap?.name ?? 'Unknown') as string,
-      company: (row.contacts?.current_company ?? snap?.company ?? null) as string | null,
-      conferenceId: row.conference_id as string | null,
-      conferenceName: (row.conferences?.name ?? null) as string | null,
-      temperature: row.temperature as string | null,
-      occurredAt: row.occurred_at as string,
-      note: row.note as string | null,
-      linkedinUrl: (row.contacts?.linkedin_url ?? null) as string | null,
-      email: (row.contacts?.email ?? null) as string | null,
-    };
-  });
+  return (data ?? []).map(mapFollowUpRow);
 }
 
 export async function searchContacts(q: string): Promise<Contact[]> {

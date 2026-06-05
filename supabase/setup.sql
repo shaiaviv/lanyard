@@ -40,3 +40,29 @@ values (
   '00000000-0000-0000-0000-000000000001'
 )
 on conflict (auth_user_id) do nothing;
+
+-- ── 4. Teammate reps (company-wide coverage demo) ──────────────────────────────
+-- Planning is a team hub: a sales lead assigns coverage across the whole team. These
+-- teammates have no auth account (auth_user_id = null) — they exist for coverage planning.
+-- Fixed UUIDs so the coverage rows below can reference them. Same team_id as your rep.
+insert into reps (id, auth_user_id, name, email, team_id) values
+  ('00000000-0000-0000-0000-0000000000a1', null, 'Maya Rodriguez', 'maya@grain.example',  '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0000-0000000000a2', null, 'Tom Becker',     'tom@grain.example',   '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0000-0000000000a3', null, 'Priya Nair',     'priya@grain.example', '00000000-0000-0000-0000-000000000001')
+on conflict (id) do nothing;
+
+-- ── 5. Coverage assignments ────────────────────────────────────────────────────
+-- Deliberate gaps: Singapore FinTech Festival (APAC) is only "considering", and Money20/20
+-- Europe 2026 has no committed rep — so the under-invested + clustering views have something
+-- to surface on first run. Referenced by conference NAME (ids are generated).
+insert into coverage (rep_id, conference_id, status)
+select v.rep_id::uuid, c.id, v.status::coverage_status
+from (values
+  ('00000000-0000-0000-0000-0000000000a1', 'Sibos 2026',                 'committed'),
+  ('00000000-0000-0000-0000-0000000000a1', 'Web Summit 2026',            'considering'),
+  ('00000000-0000-0000-0000-0000000000a2', 'Money20/20 USA 2026',        'committed'),
+  ('00000000-0000-0000-0000-0000000000a2', 'Money20/20 Europe 2025',     'attended'),
+  ('00000000-0000-0000-0000-0000000000a3', 'Singapore FinTech Festival', 'considering')
+) as v(rep_id, conf_name, status)
+join conferences c on c.name = v.conf_name
+on conflict (rep_id, conference_id) do nothing;

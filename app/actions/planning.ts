@@ -4,21 +4,45 @@ import { createAdminClient } from '@/lib/db/admin';
 import { getCurrentRep } from '@/lib/db/queries';
 import { getServiceKey } from '@/lib/config/getServiceKey';
 
-export async function upsertCoverage(
+export type CoverageStatus = 'considering' | 'committed' | 'attended' | 'declined';
+
+// Assign ANY teammate to a conference — the core company-wide planning action ("who covers what").
+// Guarded so a rep can only assign within their own team.
+export async function assignCoverage(
+  repId: string,
   conferenceId: string,
-  status: 'considering' | 'committed' | 'attended' | 'declined',
+  status: CoverageStatus,
 ): Promise<{ success: true } | { error: string }> {
-  const rep = await getCurrentRep();
-  if (!rep) return { error: 'Not authenticated' };
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
 
   const admin = createAdminClient();
+  const { data: target } = await admin
+    .from('reps')
+    .select('team_id')
+    .eq('id', repId)
+    .maybeSingle();
+  if (!target || target.team_id !== me.teamId) {
+    return { error: 'That rep is not on your team' };
+  }
+
   const { error } = await admin
     .from('coverage')
-    .upsert({ rep_id: rep.id, conference_id: conferenceId, status }, { onConflict: 'rep_id,conference_id' });
+    .upsert({ rep_id: repId, conference_id: conferenceId, status }, { onConflict: 'rep_id,conference_id' });
 
   if (error) return { error: error.message };
   revalidatePath('/planning');
   return { success: true };
+}
+
+// Convenience wrapper: assign the signed-in rep to a conference.
+export async function upsertCoverage(
+  conferenceId: string,
+  status: CoverageStatus,
+): Promise<{ success: true } | { error: string }> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
+  return assignCoverage(me.id, conferenceId, status);
 }
 
 export interface HubSpotPushInput {
