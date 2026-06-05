@@ -97,11 +97,8 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
   return (
     <div className="space-y-5">
       {/* This capture */}
-      <div
-        className="bg-elevated rounded-xl p-4 space-y-2"
-        style={{ border: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <p className="text-[11px] font-semibold text-text3">New capture</p>
+      <div className="bg-elevated rounded-xl p-4 space-y-2 border border-white/7">
+        <p className="text-xs font-semibold text-text3">New capture</p>
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-base font-bold text-text1">{displayName}</p>
           {encounter.temperature && (
@@ -129,19 +126,10 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
 
       {/* Best match card */}
       {best && bestContact ? (
-        <div
-          className="rounded-xl overflow-hidden"
-          style={{ border: '2px solid rgba(244,168,37,0.2)' }}
-        >
-          <div
-            className="px-4 py-2.5 flex items-center justify-between"
-            style={{ background: 'rgba(244,168,37,0.06)' }}
-          >
+        <div className="rounded-xl overflow-hidden border-2 border-accent/20">
+          <div className="px-4 py-2.5 flex items-center justify-between bg-accent/[0.06]">
             <div className="flex items-center gap-2">
-              <div
-                className="w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ background: 'rgba(244,168,37,0.1)' }}
-              >
+              <div className="w-6 h-6 rounded-full flex items-center justify-center bg-accent/10">
                 <RefreshCw size={12} className="text-accent" />
               </div>
               <p className="text-sm font-semibold text-text1">
@@ -149,15 +137,12 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
               </p>
             </div>
             {best.jobChange && (
-              <span
-                className="text-xs text-warn font-semibold px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}
-              >
+              <span className="text-xs text-warn font-semibold px-2 py-0.5 rounded-full bg-warn/10 border border-warn/20">
                 Job change?
               </span>
             )}
           </div>
-          <div className="p-4 space-y-3" style={{ background: '#161E2E' }}>
+          <div className="p-4 space-y-3 bg-card">
             <p className="text-xs text-text3 italic leading-relaxed">{best.reasoning}</p>
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
@@ -178,8 +163,8 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
             </div>
 
             {bestContact.encounters.length > 0 && (
-              <div className="space-y-2 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                <p className="text-[11px] font-semibold text-text3">
+              <div className="space-y-2 pt-3 border-t border-white/7">
+                <p className="text-xs font-semibold text-text3">
                   {bestContact.encounters.length} prior meeting{bestContact.encounters.length !== 1 ? 's' : ''}
                 </p>
                 {bestContact.encounters.slice(0, 3).map((e) => (
@@ -205,10 +190,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
           </div>
         </div>
       ) : (
-        <div
-          className="rounded-xl p-4 text-center space-y-1.5"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-        >
+        <div className="rounded-xl p-4 text-center space-y-1.5 bg-white/3 border border-white/7">
           <p className="text-sm font-medium text-text2">No confident match found</p>
           <p className="text-xs text-text3">
             {liveCandidates.length > 0
@@ -237,8 +219,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
         <button
           onClick={() => handleAction('new')}
           disabled={isPending}
-          className="w-full h-11 rounded-xl text-text1 font-medium text-sm disabled:opacity-40 hover:bg-elevated transition-colors"
-          style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+          className="w-full h-11 rounded-xl text-text1 font-medium text-sm disabled:opacity-40 hover:bg-elevated transition-colors border border-white/10"
         >
           Create new contact
         </button>
@@ -246,21 +227,19 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
           <button
             onClick={handleReanalyze}
             disabled={isReanalyzing || isPending}
-            className="flex-1 h-9 rounded-xl text-text3 text-xs flex items-center justify-center gap-1.5 hover:text-text2 transition-colors disabled:opacity-40"
-            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+            className="flex-1 h-9 rounded-xl text-text3 text-xs flex items-center justify-center gap-1.5 hover:text-text2 transition-colors disabled:opacity-40 border border-white/8"
           >
             {isReanalyzing ? (
               <Loader2 size={13} className="animate-spin" />
             ) : (
               <RefreshCw size={13} />
             )}
-            Re-analyze (Sonnet)
+            Re-analyze
           </button>
           <button
             onClick={() => handleAction('skip')}
             disabled={isPending}
-            className="flex-1 h-9 rounded-xl text-text3 text-xs hover:text-text2 transition-colors disabled:opacity-40"
-            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+            className="flex-1 h-9 rounded-xl text-text3 text-xs hover:text-text2 transition-colors disabled:opacity-40 border border-white/7"
           >
             Skip for now
           </button>
@@ -268,10 +247,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
       </div>
 
       {error && (
-        <div
-          className="rounded-xl px-3 py-2.5"
-          style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)' }}
-        >
+        <div className="rounded-xl px-3 py-2.5 bg-error/7 border border-error/15">
           <p className="text-sm text-red-400">{error}</p>
         </div>
       )}

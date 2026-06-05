@@ -28,13 +28,13 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
       <header className="px-6 pt-10 pb-0 border-b border-[rgba(255,255,255,0.06)]">
         {/* Wordmark row */}
         <div className="flex items-center gap-2.5 mb-1">
-          <Fingerprint size={20} className="text-accent" strokeWidth={1.5} />
-          <h1 className="text-2xl font-bold tracking-tight text-text1 uppercase">
+          <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
+          <h1 className="text-xl font-bold tracking-tight text-text1">
             Conference Hub
           </h1>
         </div>
-        <p className="text-xs text-text3 mb-5 font-medium">
-          {conferences.length} conferences · {t1Count} T1 must-attend targets
+        <p className="text-xs text-text3 mb-5">
+          {conferences.length} conferences · {t1Count} T1 targets
         </p>
 
         {/* Tab bar */}

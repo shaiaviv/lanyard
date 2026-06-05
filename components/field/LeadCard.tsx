@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Clock, Star } from 'lucide-react';
 import { TemperatureChip } from '@/components/field/TemperaturePicker';
+import { Badge } from '@/components/ui/Badge';
 import type { Encounter, Contact } from '@/lib/types';
 
 const TEMP_STRIPE: Record<string, string> = {
@@ -34,10 +35,10 @@ export function LeadCard({ encounter, contact }: LeadCardProps) {
 
   const cardContent = (
     <div
-      className={`bg-card rounded-2xl transition-all hover:translate-y-[-1px] ${
+      className={`bg-card rounded-2xl transition-all hover:-translate-y-px ${
         isPending
-          ? 'border border-[rgba(245,158,11,0.2)]'
-          : 'border border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.12)]'
+          ? 'border border-warn/20'
+          : 'border border-white/7 hover:border-white/12'
       }`}
       style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
     >
@@ -46,19 +47,8 @@ export function LeadCard({ encounter, contact }: LeadCardProps) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-semibold text-text1 truncate">{name}</p>
-              {isPending && (
-                <span
-                  className="flex-shrink-0 text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                  style={{
-                    background: 'rgba(245,158,11,0.1)',
-                    color: '#F59E0B',
-                    border: '1px solid rgba(245,158,11,0.2)',
-                  }}
-                >
-                  Review
-                </span>
-              )}
+              <p className="text-[15px] font-semibold text-text1 truncate">{name}</p>
+              {isPending && <Badge variant="review">Review</Badge>}
             </div>
             {(title || company) && (
               <p className="text-sm text-text2 truncate mt-0.5">
@@ -78,8 +68,7 @@ export function LeadCard({ encounter, contact }: LeadCardProps) {
             {encounter.topics.slice(0, 4).map((t) => (
               <span
                 key={t}
-                className="text-[10px] text-text2 rounded-full px-2 py-0.5"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+                className="text-[11px] text-text2 rounded-full px-2 py-0.5 bg-white/4 border border-white/6"
               >
                 {t}
               </span>

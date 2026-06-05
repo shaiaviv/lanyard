@@ -1,6 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { MapPin, Users, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
 import { upsertCoverage } from '@/app/actions/planning';
 import type { Conference } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
@@ -9,16 +10,10 @@ const VERTICALS = ['All', 'Fintech', 'Payments', 'Travel', 'SaaS', 'Banking'];
 const TIERS: Array<'All' | 'T1' | 'T2' | 'T3'> = ['All', 'T1', 'T2', 'T3'];
 
 /* Tier visual system */
-const TIER_BORDER_COLOR: Record<string, string> = {
-  T1: 'rgba(251,191,36,0.25)',
-  T2: 'rgba(96,165,250,0.2)',
-  T3: 'rgba(255,255,255,0.07)',
-};
-
-const TIER_BADGE: Record<string, { bg: string; text: string }> = {
-  T1: { bg: 'rgba(244,168,37,0.1)', text: 'text-amber-400' },
-  T2: { bg: 'rgba(96,165,250,0.1)', text: 'text-blue-400' },
-  T3: { bg: 'rgba(255,255,255,0.05)', text: 'text-text3' },
+const TIER_BORDER: Record<string, string> = {
+  T1: 'border-amber-400/20',
+  T2: 'border-blue-400/15',
+  T3: 'border-white/7',
 };
 
 const FACTOR_LABELS: Record<string, string> = {
@@ -142,43 +137,27 @@ function ConferenceCard({
     ? new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
 
-  const tierBorderColor = TIER_BORDER_COLOR[conf.tier ?? 'T3'];
-  const tierBadge = TIER_BADGE[conf.tier ?? 'T3'];
+  const tierBorder = TIER_BORDER[conf.tier ?? 'T3'];
 
   return (
     <div
-      className={`rounded-2xl transition-all ${
-        isPast ? 'opacity-50' : 'hover:translate-y-[-1px]'
+      className={`bg-card rounded-2xl border transition-all ${tierBorder} ${
+        isPast ? 'opacity-50' : 'hover:-translate-y-px'
       }`}
-      style={{
-        background: '#161E2E',
-        border: `1px solid ${tierBorderColor}`,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
-      }}
+      style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.3)' }}
     >
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            {/* Name + tier + live badge */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {isActive && (
-                <span
-                  className="flex items-center gap-1 text-[9px] font-bold text-success uppercase tracking-wider px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Live
-                </span>
-              )}
+            {/* Badges row */}
+            <div className="flex items-center gap-1.5 flex-wrap mb-2">
+              {isActive && <Badge variant="live" dot pulse>Live</Badge>}
               {conf.tier && (
-                <span
-                  className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${tierBadge.text}`}
-                  style={{ background: tierBadge.bg }}
-                >
-                  {conf.tier}
-                </span>
+                <Badge variant={conf.tier as 'T1' | 'T2' | 'T3'}>{conf.tier}</Badge>
               )}
-              <h3 className="text-sm font-semibold text-text1">{conf.name}</h3>
             </div>
+            {/* Name */}
+            <h3 className="text-[15px] font-semibold text-text1 leading-snug">{conf.name}</h3>
 
             {/* Meta row */}
             <div className="flex items-center gap-3 mt-1.5 text-xs text-text3 flex-wrap">
@@ -208,8 +187,7 @@ function ConferenceCard({
                 {conf.verticals.map((v) => (
                   <span
                     key={v}
-                    className="text-[9px] text-text3 rounded px-1.5 py-0.5"
-                    style={{ background: 'rgba(255,255,255,0.04)' }}
+                    className="text-[11px] text-text3 rounded-md px-1.5 py-0.5 bg-white/4"
                   >
                     {v}
                   </span>
@@ -234,10 +212,7 @@ function ConferenceCard({
       </div>
 
       {expanded && conf.scoreBreakdown && (
-        <div
-          className="px-5 py-3 space-y-2.5"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
-        >
+        <div className="px-5 py-3 space-y-2.5 border-t border-white/6 bg-white/[0.015]">
           {Object.entries(conf.scoreBreakdown.factors)
             .filter(([, v]) => v !== null)
             .map(([key, factor]) => {
@@ -294,14 +269,11 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
     <div className="space-y-5">
       {/* Under-invested banner */}
       {uncommittedT1.length > 0 && (
-        <div
-          className="rounded-xl px-4 py-3 space-y-1"
-          style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.14)' }}
-        >
+        <div className="rounded-xl px-4 py-3 space-y-1 bg-warn/[0.06] border border-warn/15">
           <p className="text-sm font-semibold text-warn">
             {uncommittedT1.length} T1 conference{uncommittedT1.length !== 1 ? 's' : ''} without coverage
           </p>
-          <p className="text-xs" style={{ color: 'rgba(245,158,11,0.6)' }}>
+          <p className="text-xs text-warn/60">
             {uncommittedT1.slice(0, 2).map((c) => c.name).join(', ')}
             {uncommittedT1.length > 2 ? ` +${uncommittedT1.length - 2} more` : ''}
           </p>
@@ -318,13 +290,8 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 tier === t
                   ? 'bg-accent text-[#07090F]'
-                  : 'text-text2 hover:text-text1'
+                  : 'text-text2 hover:text-text1 bg-white/4 border border-white/8'
               }`}
-              style={
-                tier !== t
-                  ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }
-                  : { boxShadow: '0 2px 8px rgba(244,168,37,0.2)' }
-              }
             >
               {t === 'All' ? `All (${conferences.length})` : `${t} · ${conferences.filter((c) => c.tier === t).length}`}
             </button>
@@ -337,13 +304,10 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
               key={v}
               onClick={() => setVertical(v)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                vertical === v ? 'bg-elevated text-text1' : 'text-text3 hover:text-text2'
-              }`}
-              style={
                 vertical === v
-                  ? { border: '1px solid rgba(255,255,255,0.12)' }
-                  : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }
-              }
+                  ? 'bg-elevated text-text1 border border-white/12'
+                  : 'text-text3 hover:text-text2 bg-white/3 border border-white/6'
+              }`}
             >
               {v}
             </button>
@@ -351,33 +315,19 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
         </div>
       </div>
 
-      {/* Stats row */}
-      <div
-        className="flex items-center gap-4 px-4 py-2.5 rounded-xl text-sm flex-wrap"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        {[
-          { label: 'T1 targets', value: t1Count },
-          { label: 'committed', value: Object.values(myStatusMap).filter((s) => s === 'committed').length },
-          { label: 'considering', value: Object.values(myStatusMap).filter((s) => s === 'considering').length },
-        ].map(({ label, value }, i) => (
-          <span key={label} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-text3/30 select-none">·</span>}
-            <span className="font-semibold text-text1 tabular-nums">{value}</span>
-            <span className="text-text3 text-xs">{label}</span>
-          </span>
-        ))}
-      </div>
-
       {/* Conference list */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-text3 font-medium">
-            {filtered.length} conference{filtered.length !== 1 ? 's' : ''} · by ICP score
+          <p className="text-xs text-text3">
+            {filtered.length} conference{filtered.length !== 1 ? 's' : ''}
+            <span className="text-text3/40 mx-1.5">·</span>
+            <span className="font-semibold text-text1 tabular-nums">{t1Count}</span> T1
+            <span className="text-text3/40 mx-1.5">·</span>
+            <span className="font-semibold text-text1 tabular-nums">{Object.values(myStatusMap).filter((s) => s === 'committed').length}</span> committed
           </p>
           <button
             onClick={() => setShowPast(!showPast)}
-            className="text-[10px] text-text3 hover:text-text2 font-semibold uppercase tracking-wider underline transition-colors"
+            className="text-xs text-text3 hover:text-text2 transition-colors"
           >
             {showPast ? 'Hide past' : 'Show past'}
           </button>

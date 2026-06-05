@@ -1,13 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { Fingerprint, MapPin, Calendar, ArrowRight, Check } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
 import type { Conference } from '@/lib/types';
 
-const TIER_STYLE: Record<string, { badge: string }> = {
-  T1: { badge: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
-  T2: { badge: 'text-blue-400 bg-blue-400/10 border-blue-400/20' },
-  T3: { badge: 'text-text3 bg-white/5 border-white/10' },
-};
 
 function dateRange(conf: Conference): string | null {
   if (!conf.startDate) return null;
@@ -44,11 +40,9 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
       <div className="px-5 pt-14 pb-6">
         <div className="flex items-center gap-2 mb-5 animate-fade-in">
           <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
-          <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-accent">
-            Lanyard
-          </span>
+          <span className="text-[13px] font-semibold text-text2">Lanyard</span>
         </div>
-        <h1 className="text-[22px] font-bold text-text1 leading-tight whitespace-nowrap animate-fade-up delay-50">
+        <h1 className="text-[22px] font-bold text-text1 leading-tight animate-fade-up delay-50">
           Which conference are you at?
         </h1>
         <p className="text-sm text-text2 mt-2 leading-relaxed animate-fade-up delay-100">
@@ -61,7 +55,6 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
         {sorted.map((conf, index) => {
           const isSelected = selected === conf.id;
           const live = isLive(conf);
-          const ts = TIER_STYLE[conf.tier ?? 'T3'] ?? TIER_STYLE.T3;
           const dates = dateRange(conf);
 
           return (
@@ -82,25 +75,13 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
             >
               <div className="px-4 py-4 flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    {live && (
-                      <span
-                        className="flex items-center gap-1 text-[9px] font-bold text-success uppercase tracking-wider px-2 py-0.5 rounded-full"
-                        style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                        Live now
-                      </span>
-                    )}
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    {live && <Badge variant="live" dot pulse>Live</Badge>}
                     {conf.tier && (
-                      <span
-                        className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${ts.badge}`}
-                      >
-                        {conf.tier}
-                      </span>
+                      <Badge variant={conf.tier as 'T1' | 'T2' | 'T3'}>{conf.tier}</Badge>
                     )}
                   </div>
-                  <p className="text-sm font-semibold text-text1 leading-snug">{conf.name}</p>
+                  <p className="text-[15px] font-semibold text-text1 leading-snug">{conf.name}</p>
                   <div className="flex items-center gap-3 mt-1.5 text-xs text-text3 flex-wrap">
                     {dates && (
                       <span className="flex items-center gap-1">

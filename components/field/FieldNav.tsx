@@ -31,7 +31,7 @@ export function FieldNav({ pendingCount }: FieldNavProps) {
               <Link
                 key={href}
                 href={href}
-                className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 transition-all"
+                className="flex-1 flex flex-col items-center justify-center py-3.5 gap-1 transition-all"
               >
                 <div
                   className={`flex items-center justify-center w-10 h-8 rounded-xl transition-all duration-200 relative ${
@@ -39,18 +39,18 @@ export function FieldNav({ pendingCount }: FieldNavProps) {
                   }`}
                 >
                   <Icon
-                    size={18}
+                    size={19}
                     strokeWidth={active ? 2.5 : 1.75}
                     className={`transition-colors duration-200 ${active ? 'text-accent' : 'text-text3'}`}
                   />
                   {href === '/leads' && pendingCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] bg-accent text-[#07090F] text-[8px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                    <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] bg-accent text-[#07090F] text-[9px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
                       {pendingCount > 9 ? '9+' : pendingCount}
                     </span>
                   )}
                 </div>
                 <span
-                  className={`text-[9px] font-semibold tracking-wide transition-colors duration-200 ${
+                  className={`text-[11px] font-medium transition-colors duration-200 ${
                     active ? 'text-accent' : 'text-text3'
                   }`}
                 >

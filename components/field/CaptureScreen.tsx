@@ -128,9 +128,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
       <header className="flex items-center justify-between px-5 pt-12 pb-4">
         <div className="flex items-center gap-2">
           <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
-          <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-text2">
-            Lanyard
-          </span>
+          <span className="text-[13px] font-semibold text-text2">Lanyard</span>
         </div>
         <Link
           href="/settings"

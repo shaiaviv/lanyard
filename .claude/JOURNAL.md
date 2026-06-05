@@ -611,3 +611,28 @@ Full visual quality pass triggered by user feedback: contrast was unreadable, ca
 - tsc clean throughout.
 - Files changed: PRODUCT.md (new), globals.css, settings/page.tsx, contact/[id]/page.tsx, reconcile/page.tsx, capture/page.tsx, LeadCard.tsx, ConferenceGate.tsx, ConferenceList.tsx, CoverageTimeline.tsx, FieldNav.tsx, CaptureForm.tsx, ReviewDraft.tsx, ReconcileCard.tsx, leads/page.tsx, lookup/page.tsx, CaptureScreen.tsx, login/page.tsx.
 
+## Entry 010 — 2026-06-05 — Comprehensive design overhaul (/impeccable, Sonnet)
+
+**What:** User reported the entire app felt "vibe coded" and requested a complete design overhaul. Ran a systematic audit across all screens.
+
+**Root causes diagnosed:**
+1. **Eyebrow violations:** `text-[10px] uppercase tracking-[0.22em]` "LANYARD" wordmark on CaptureScreen and ConferenceGate — the classic AI kicker pattern. "CONFERENCE HUB" in bold uppercase h1 read as a generic admin panel.
+2. **`text-[9px]` everywhere:** Nav labels, tier badges, temperature picker labels, vertical tags — illegible on a show floor.
+3. **Hero-metric ban remnant:** The planning hub stats still had the big-number+small-label pattern in its `stats row` presentation.
+4. **Conference name hierarchy flat:** Primary identifier was `text-sm font-semibold` — same visual weight as badges.
+5. **Inline `style={{ background: 'rgba(...)' }}` sprawl:** Components bypassed the token system, making every component a one-off.
+
+**Changes made:**
+- Created `components/ui/Badge.tsx` — shared badge for T1/T2/T3/live/review/warn/success. Min text-[11px], proper border+bg via Tailwind opacity modifier syntax. Used across ConferenceGate, ConferenceList, LeadCard, ReconcileCard.
+- `FieldNav`: `text-[9px]` nav labels → `text-[11px] font-medium`. Icon size 18→19. Gap/padding nudge for better touch feel.
+- `PlanningHub`: Removed `uppercase` from h1, font size 2xl→xl. Subtitle shortened. Hero metrics gone from the presentation — replaced with inline summary line in ConferenceList.
+- `ConferenceList`: Stats row redesigned — "4 conferences · 6 T1 · 0 committed" inline text instead of metric cells. Filter pills now use Tailwind `/` opacity syntax instead of inline rgba. "SHOW PAST" → "Show past". All inline border/background styles replaced.
+- `ConferenceCard` (inside ConferenceList): Conference name `text-sm` → `text-[15px]` — finally has visual hierarchy over badges. Tier badge uses Badge component.
+- `CaptureScreen`/`ConferenceGate`: Wordmark "LANYARD" in `tracking-[0.22em] uppercase` → "Lanyard" in `text-[13px] font-semibold text-text2`. Removed `whitespace-nowrap` from gate heading.
+- `TemperaturePicker`: `text-[9px]` labels → `text-[11px] font-semibold`. Border uses Tailwind `border-white/7` instead of inline rgba.
+- `LeadCard`: "Review" badge replaced with `<Badge variant="review">`. Contact name `text-[15px]`. Topic tags use Tailwind opacity syntax.
+- `ReconcileCard`: All inline rgba styles converted to Tailwind. "New capture" label `text-[11px]` → `text-xs`.
+- tsc clean. Verified visually via playwright screenshots.
+
+- [19:58] Confirmed: planning hub, conference gate, record screen all look significantly sharper. Nav is readable, badges are legible, Conference Hub no longer shouts in caps.
+
