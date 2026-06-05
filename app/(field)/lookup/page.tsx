@@ -5,6 +5,18 @@ import { Search, ExternalLink, Building2, User, Loader2 } from 'lucide-react';
 import { searchPeople } from '@/app/actions/field';
 import type { Contact, PersonCandidate } from '@/lib/types';
 
+const VERDICT_LABEL: Record<string, string> = {
+  warming:    'relationship warming',
+  nurturing:  'nurturing',
+  tirekicker: 'tire-kicker signal',
+  cooling:    'going cold',
+  tooearly:   'too early to tell',
+};
+
+function normalize(s: string | null | undefined) {
+  return (s ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 function ContactCard({ c }: { c: Contact }) {
   return (
     <Link href={`/contact/${c.id}`} className="block group">
@@ -29,7 +41,7 @@ function ContactCard({ c }: { c: Contact }) {
             )}
             {c.arcCache && (
               <p className="mt-2.5 text-xs text-text3 italic">
-                {c.arcCache.glance.meetings} meeting{c.arcCache.glance.meetings !== 1 ? 's' : ''} · {c.arcCache.glance.verdict}
+                {c.arcCache.glance.meetings} meeting{c.arcCache.glance.meetings !== 1 ? 's' : ''} · {VERDICT_LABEL[c.arcCache.glance.verdict] ?? c.arcCache.glance.verdict}
               </p>
             )}
           </div>
@@ -97,7 +109,17 @@ export default function LookupPage() {
     });
   }
 
-  const hasResults = contacts.length > 0 || enrichment.length > 0;
+  // Hide enrichment candidates that already exist in the internal database
+  // (same name + same company → already tracked, no need to show twice)
+  const newEnrichment = enrichment.filter(
+    (p) => !contacts.some(
+      (c) =>
+        normalize(c.canonicalName) === normalize(p.name) &&
+        normalize(c.currentCompany) === normalize(p.company),
+    ),
+  );
+
+  const hasResults = contacts.length > 0 || newEnrichment.length > 0;
 
   return (
     <div className="flex flex-col min-h-full animate-fade-in">
@@ -141,12 +163,12 @@ export default function LookupPage() {
               </section>
             )}
 
-            {enrichment.length > 0 && (
+            {newEnrichment.length > 0 && (
               <section className="space-y-2.5">
                 <p className="text-xs font-medium text-text3">
                   LinkedIn candidates
                 </p>
-                {enrichment.map((p) => <EnrichmentCard key={p.linkedinUrl} p={p} />)}
+                {newEnrichment.map((p) => <EnrichmentCard key={p.linkedinUrl} p={p} />)}
               </section>
             )}
           </div>
