@@ -73,11 +73,18 @@ export async function getEncountersForConference(
     .eq('rep_id', repId)
     .order('occurred_at', { ascending: false });
 
+  // Results are ordered newest-first. Deduplicate by contact_id so the same person
+  // doesn't appear multiple times when they were captured more than once at this conference.
+  // Pending encounters (contact_id = null) are kept individually.
+  const seenContactIds = new Set<string>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((row: any) => ({
-    ...mapEncounter(row),
-    contact: row.contacts ? mapContact(row.contacts) : null,
-  }));
+  return (data ?? []).flatMap((row: any) => {
+    const enc = { ...mapEncounter(row), contact: row.contacts ? mapContact(row.contacts) : null };
+    if (!enc.contactId) return [enc]; // pending — always show
+    if (seenContactIds.has(enc.contactId)) return []; // duplicate — skip
+    seenContactIds.add(enc.contactId);
+    return [enc];
+  });
 }
 
 export async function getPendingCount(repId: string): Promise<number> {

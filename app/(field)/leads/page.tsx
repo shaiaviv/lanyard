@@ -22,7 +22,8 @@ export default async function LeadsPage({ searchParams }: Props) {
   ]);
   if (!rep) return null;
 
-  const selectedId = params.conf ?? activeConference?.id ?? null;
+  // Prefer explicit ?conf= param → date-active conference → rep's last selected conference
+  const selectedId = params.conf ?? activeConference?.id ?? rep.currentConferenceId ?? null;
   const selectedConference = conferences.find((c) => c.id === selectedId) ?? activeConference;
 
   const [encounters, pendingCount] = await Promise.all([
