@@ -197,7 +197,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
       </div>
 
       {/* Record hero — fills remaining space */}
-      <div className="flex-1 flex flex-col items-center justify-between px-6 py-4 min-h-0">
+      <div className="flex-1 flex flex-col items-center justify-between px-6 py-4 pt-10 min-h-0">
         {/* Record button centered */}
         <div className="flex-1 flex flex-col items-center justify-center gap-5">
           <div className="animate-scale-in">
