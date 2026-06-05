@@ -6,6 +6,7 @@ import {
   getTeamFollowUps,
   getReps,
   getScoringWeights,
+  getRelationshipList,
 } from '@/lib/db/queries';
 import { PlanningHub } from '@/components/planning/PlanningHub';
 
@@ -13,10 +14,11 @@ export default async function PlanningPage() {
   const rep = await getCurrentRep();
   if (!rep) return null;
 
-  const [conferences, coverage, followUps, reps, weights] = await Promise.all([
+  const [conferences, coverage, followUps, relationships, reps, weights] = await Promise.all([
     getConferences(),
     getConferenceCoverage(rep.teamId),
     getTeamFollowUps(rep.teamId),
+    getRelationshipList(rep.teamId),
     getReps(rep.teamId),
     getScoringWeights(rep.teamId),
   ]);
@@ -27,6 +29,7 @@ export default async function PlanningPage() {
         conferences={conferences}
         coverage={coverage}
         followUps={followUps}
+        relationships={relationships}
         reps={reps}
         weights={weights}
         repId={rep.id}

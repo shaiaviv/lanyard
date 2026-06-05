@@ -4,25 +4,30 @@ import { Fingerprint } from 'lucide-react';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageTimeline } from '@/components/planning/CoverageTimeline';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
+import { RelationshipList } from '@/components/planning/RelationshipList';
 import type { Conference, Rep } from '@/lib/types';
-import type { CoverageRow, FollowUpRow } from '@/lib/db/queries';
+import type { CoverageRow, FollowUpRow, RelationshipRow } from '@/lib/db/queries';
 import type { ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
-const TABS = ['Conferences', 'Coverage', 'Follow-ups'] as const;
+const TABS = ['Conferences', 'Coverage', 'Relationships', 'Follow-ups'] as const;
 type Tab = (typeof TABS)[number];
 
 interface Props {
   conferences: Conference[];
   coverage: CoverageRow[];
   followUps: FollowUpRow[];
+  relationships: RelationshipRow[];
   reps: Rep[];
   weights: ScoringWeights;
   repId: string;
   repName: string;
 }
 
-export function PlanningHub({ conferences, coverage, followUps, reps, weights, repId, repName }: Props) {
+export function PlanningHub({ conferences, coverage, followUps, relationships, reps, weights, repId, repName }: Props) {
   const [tab, setTab] = useState<Tab>('Conferences');
+  const warmingNoFollowUp = relationships.filter(
+    (r) => (r.verdict === 'warming' || r.verdict === 'nurturing') && !r.hasFollowUp,
+  ).length;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -65,6 +70,11 @@ export function PlanningHub({ conferences, coverage, followUps, reps, weights, r
                   {followUps.length}
                 </span>
               )}
+              {t === 'Relationships' && warmingNoFollowUp > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold bg-green-500/15 border border-green-500/25 text-green-400">
+                  {warmingNoFollowUp}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -88,6 +98,7 @@ export function PlanningHub({ conferences, coverage, followUps, reps, weights, r
             repName={repName}
           />
         )}
+        {tab === 'Relationships' && <RelationshipList rows={relationships} />}
         {tab === 'Follow-ups' && <FollowUpQueue followUps={followUps} repId={repId} />}
       </div>
     </div>

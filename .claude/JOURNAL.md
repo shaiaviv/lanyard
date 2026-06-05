@@ -739,3 +739,7 @@ Fixed Skew 2 — scores were hardcoded JSON with no engine. Built the C4 split f
   null-historical events to the formula — ITB 51, Web Summit 48 — so seed == live == DB, no drift).
 - tsc + eslint + `npm run build` all clean.
 **Next:** P2 — cross-conference relationship intelligence (C7 Relationships tab + C8 contact arc).
+- [P3 CUT] Dropped P3 (C9 AI follow-up email drafting) as unnecessary scope — the brief needs only
+  one meaningful AI feature and we already ship several (P1 scoring, P2 arc intel, P6 discovery).
+  Follow-ups tab keeps list + HubSpot push (hardened in P5). Phase numbers left stable (P4–P8
+  unchanged) to keep journal/commit references intact. Remaining: 6 phases (P2, P4, P5, P6, P7, P8).

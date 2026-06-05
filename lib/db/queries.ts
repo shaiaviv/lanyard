@@ -1,7 +1,7 @@
 // Server-side DB query helpers. All functions create a server Supabase client (RLS-scoped).
 import 'server-only';
 import { createSupabaseServerClient } from '@/lib/db/server';
-import type { Contact, Conference, Encounter, Rep } from '@/lib/types';
+import type { Contact, Conference, Encounter, Rep, ArcSummary, ArcVerdict } from '@/lib/types';
 import { DEFAULT_WEIGHTS, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
 // ── Reps ─────────────────────────────────────────────────────────────────────
@@ -281,6 +281,104 @@ export async function getFollowUps(repId: string): Promise<FollowUpRow[]> {
     .order('occurred_at', { ascending: false });
 
   return (data ?? []).map(mapFollowUpRow);
+}
+
+// ── Cross-conference relationship intelligence (C7) ───────────────────────────
+
+export interface RelationshipRow {
+  contactId: string;
+  name: string;
+  company: string | null;
+  title: string | null;
+  linkedinUrl: string | null;
+  verdict: ArcVerdict | null;
+  meetings: number;
+  conferences: number;
+  spanMonths: number | null;
+  lastSeen: string;
+  latestTemperature: string | null;
+  hasFollowUp: boolean;
+  conferenceTrail: string[]; // distinct conference names, chronological
+  jobChange: boolean;        // company or title changed across encounters
+}
+
+// Contacts met ≥2 times across the team, with their relationship arc — the signature
+// cross-conference view. Verdict comes from the cached arc (arc_cache); ranking surfaces the
+// most actionable relationships (warming first, then at-risk cooling).
+export async function getRelationshipList(teamId: string): Promise<RelationshipRow[]> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('encounters')
+    .select(
+      'contact_id, occurred_at, follow_up, temperature, conference_id, identity_snapshot, ' +
+        'contacts!inner(id, canonical_name, current_company, current_title, linkedin_url, arc_cache), ' +
+        'conferences(name), reps!inner(team_id)',
+    )
+    .eq('reps.team_id', teamId)
+    .not('contact_id', 'is', null)
+    .order('occurred_at', { ascending: true });
+
+  // Group encounters by contact, then derive the arc summary fields.
+  // jobChange is computed at the end from the accumulated company/title sets.
+  type Agg = Omit<RelationshipRow, 'jobChange'> & { _companies: Set<string>; _titles: Set<string> };
+  const byContact = new Map<string, Agg>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const row of (data ?? []) as any[]) {
+    const c = row.contacts;
+    if (!c) continue;
+    const id = c.id as string;
+    const snap = row.identity_snapshot as { company?: string | null; title?: string | null } | null;
+    let agg = byContact.get(id);
+    if (!agg) {
+      const arc = c.arc_cache as ArcSummary | null;
+      agg = {
+        contactId: id,
+        name: c.canonical_name as string,
+        company: (c.current_company ?? null) as string | null,
+        title: (c.current_title ?? null) as string | null,
+        linkedinUrl: (c.linkedin_url ?? null) as string | null,
+        verdict: (arc?.glance?.verdict ?? null) as ArcVerdict | null,
+        meetings: 0,
+        conferences: 0,
+        spanMonths: (arc?.glance?.spanMonths ?? null) as number | null,
+        lastSeen: row.occurred_at as string,
+        latestTemperature: null,
+        hasFollowUp: false,
+        conferenceTrail: [],
+        _companies: new Set<string>(),
+        _titles: new Set<string>(),
+      };
+      byContact.set(id, agg);
+    }
+    agg.meetings += 1;
+    agg.lastSeen = row.occurred_at as string; // ascending → last wins
+    agg.latestTemperature = (row.temperature as string | null) ?? agg.latestTemperature;
+    if (row.follow_up) agg.hasFollowUp = true;
+    const confName = row.conferences?.name as string | undefined;
+    if (confName && !agg.conferenceTrail.includes(confName)) agg.conferenceTrail.push(confName);
+    if (snap?.company) agg._companies.add(snap.company);
+    if (snap?.title) agg._titles.add(snap.title);
+  }
+
+  const VERDICT_RANK: Record<string, number> = {
+    warming: 5, cooling: 4, nurturing: 3, tooearly: 2, tirekicker: 1,
+  };
+
+  return [...byContact.values()]
+    .filter((r) => r.meetings >= 2)
+    .map((r) => {
+      const { _companies, _titles, ...rest } = r;
+      return {
+        ...rest,
+        conferences: r.conferenceTrail.length,
+        jobChange: _companies.size > 1 || _titles.size > 1,
+      };
+    })
+    .sort((a, b) => {
+      const rank = (VERDICT_RANK[b.verdict ?? ''] ?? 0) - (VERDICT_RANK[a.verdict ?? ''] ?? 0);
+      if (rank !== 0) return rank;
+      return new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime();
+    });
 }
 
 export async function searchContacts(q: string): Promise<Contact[]> {

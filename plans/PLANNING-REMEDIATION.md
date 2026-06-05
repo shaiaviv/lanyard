@@ -15,7 +15,7 @@
 | 1 | **"My" not the company's** | C3 *assign reps*; coverage = "who covers what" team-wide | `getFollowUps(rep.id)`; coverage self-only; no assign-other-reps; 1 rep, 0 coverage seeded | **P0** |
 | 2 | **Scoring faked** | C4 marquee: AI factor-estimation + sliders + live recompute + override | scores hardcoded in `setup.sql`; no `scoreConference`, no `computeIcpScore`, read-only breakdown | **P1** |
 | 3 | **Cross-conf intel absent** | C7 "Planning-side signature feature" (ranked warming list) + C8 full arc | not in hub at all | **P2** |
-| 4 | **Planning AI missing** | C9 AI email drafting; C5 discovery | Follow-ups tab = list + push; no `draftFollowup`, no `discoverConferences` | **P3 / P6** |
+| 4 | **Planning AI missing** | C5 discovery (C9 email drafting ❌ cut) | no `discoverConferences` | **P6** |
 | 5 | **Geo cluster text-only** | C6 react-leaflet + OSM map | string-match region hint | **P4** |
 | 6 | **HubSpot = dumb export** | dedupe by email, bulk push, arc-summary-as-note | always POST (409 on re-push), raw note, no bulk | **P5** |
 | 7 | **No C1 dashboard / C3 detail page** | at-a-glance home; dedicated detail w/ repeat history | absent | **P7** |
@@ -79,13 +79,12 @@ Bring the signature story into the strategic hub.
   `summarizeArc` output, follow-up history, and actions (draft email, push HubSpot). Add
   `getContactDetail(id)` if the existing page query is thin.
 
-## P3 — AI follow-up email drafting (Skew 4, the C9 AI feature)
+## P3 — AI follow-up email drafting (C9)  ·  ❌ CUT (2026-06-06)
 
-- **`lib/ai/draftFollowup.ts`** (copy exemplar; Sonnet; Zod): input = full arc (last convo, open
-  threads, fit/temp, topics) via `summarizeArc`; output = subject + body in Grain's voice. **Editable,
-  never auto-sent.** v1 = draft + copy / `mailto:`.
-- Wire into `FollowUpQueue` (a "Draft email" button per row, expandable editor) and the C8 contact page.
-- Action `draftFollowup(contactId)`.
+**Dropped as unnecessary scope.** The brief requires *at least one* meaningful AI feature; we already
+ship several (P1 conference scoring, P2 relationship-arc intelligence, P6 discovery), so the
+auto-drafted follow-up email is redundant surface, not a grade-mover. The Follow-ups tab keeps its
+list + HubSpot push (hardened in P5). Revisit only if time remains after P8.
 
 ## P4 — Coverage map + real gap analysis (Skew 5)
 
@@ -131,7 +130,7 @@ Bring the signature story into the strategic hub.
 
 ## Sequencing note
 P0→P2 are the grade-movers (company-wide framing, real scoring, cross-conference intel) and should
-land first even though we're building full parity. P3–P8 fill out parity. **Model:** this remediation
+land first even though we're building full parity. P4–P8 fill out parity (P3 cut). **Model:** this remediation
 *planning* is Opus-appropriate; the high-volume build (screens/CRUD/wiring) is Sonnet's wheelhouse per
 the model strategy — switch at the P0 build start, keep Opus for any scoring-methodology/relationship-
 verdict reasoning calls.
