@@ -160,12 +160,12 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
             <RecordButton onCapture={handleCapture} />
           </div>
 
-          <div className="text-center animate-fade-up delay-150">
-            <p className="text-sm text-text2">
-              Name · company · role · interest level
-            </p>
-            <p className="text-xs text-text3 italic mt-1">
-              &ldquo;Sarah, Stripe, Head of Payments — very warm&rdquo;
+          <div className="text-center animate-fade-up delay-150 max-w-[300px]">
+            <p className="text-sm font-semibold text-text1 mb-1">Describe your full interaction</p>
+            <p className="text-xs text-text2 leading-relaxed">
+              The more detail, the better. Make sure to include their{' '}
+              <span className="text-text1 font-medium">name, company, and title</span>, what you discussed,
+              their pain points, interest level, and any agreed next steps.
             </p>
           </div>
 

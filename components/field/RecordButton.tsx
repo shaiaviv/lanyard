@@ -1,95 +1,103 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { Mic, Square, MicOff } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Mic, Square, MicOff, Loader2 } from 'lucide-react';
 
 interface RecordButtonProps {
   onCapture: (transcript: string) => void;
   disabled?: boolean;
 }
 
-type SR = new () => {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  onstart: () => void;
-  onresult: (e: SREvent) => void;
-  onend: () => void;
-  onerror: (e: SRError) => void;
-  start: () => void;
-  stop: () => void;
-};
-type SREvent = { resultIndex: number; results: { isFinal: boolean; 0: { transcript: string } }[] };
-type SRError = { error: string };
+type RecordState = 'idle' | 'recording' | 'transcribing';
 
-function getSR(): SR | null {
-  if (typeof window === 'undefined') return null;
-  const w = window as unknown as Record<string, unknown>;
-  return (w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null) as SR | null;
+// Module-level singleton — loaded once, cached in memory and browser cache thereafter
+let whisperPromise: Promise<(audio: Float32Array) => Promise<{ text: string }>> | null = null;
+
+function getWhisper() {
+  if (!whisperPromise) {
+    whisperPromise = import('@huggingface/transformers').then(({ pipeline }) =>
+      pipeline('automatic-speech-recognition', 'onnx-community/whisper-tiny.en', {
+        dtype: 'q8',
+      }) as Promise<(audio: Float32Array) => Promise<{ text: string }>>
+    );
+  }
+  return whisperPromise;
+}
+
+async function blobToFloat32(blob: Blob): Promise<Float32Array> {
+  const arrayBuffer = await blob.arrayBuffer();
+  // AudioContext resamples to 16kHz — what Whisper expects
+  const ctx = new AudioContext({ sampleRate: 16000 });
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+  ctx.close();
+  return audioBuffer.getChannelData(0);
 }
 
 export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
-  const [recording, setRecording] = useState(false);
-  const [initializing, setInitializing] = useState(false);
+  const [recordState, setRecordState] = useState<RecordState>('idle');
+  const [modelReady, setModelReady] = useState(false);
+  const [modelLoading, setModelLoading] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
-  const [interimText, setInterimText] = useState('');
-  const recognitionRef = useRef<{ stop: () => void } | null>(null);
-  const finalRef = useRef('');
+  const [error, setError] = useState<string | null>(null);
 
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  // Pre-warm model as soon as component mounts — so it's ready by the time user hits record
   useEffect(() => {
-    if (!getSR()) setUnsupported(true);
-    return () => { recognitionRef.current?.stop(); };
+    if (typeof window === 'undefined') return;
+    if (!navigator.mediaDevices?.getUserMedia) { setUnsupported(true); return; }
+
+    setModelLoading(true);
+    getWhisper()
+      .then(() => { setModelReady(true); setModelLoading(false); })
+      .catch(() => { setModelLoading(false); });
   }, []);
 
-  function startRecording() {
-    if (initializing || recording) return;
-    const SR = getSR();
-    if (!SR) { setUnsupported(true); return; }
+  const startRecording = useCallback(async () => {
+    if (recordState !== 'idle') return;
+    setError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      chunksRef.current = [];
 
-    const recognition = new SR();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    finalRef.current = '';
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
 
-    recognition.onresult = (event) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const text = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalRef.current += text + ' ';
-        else interim += text;
-      }
-      setInterimText(finalRef.current + interim);
-    };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        setRecordState('transcribing');
+        try {
+          const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
+          const audio = await blobToFloat32(blob);
+          const whisper = await getWhisper();
+          const result = await whisper(audio);
+          const text = result.text.trim();
+          if (text) onCapture(text);
+        } catch {
+          setError('Transcription failed — try again.');
+        } finally {
+          setRecordState('idle');
+        }
+      };
 
-    recognition.onstart = () => {
-      setInitializing(false);
-      setRecording(true);
-    };
+      recorder.start();
+      recorderRef.current = recorder;
+      setRecordState('recording');
+    } catch {
+      setUnsupported(true);
+    }
+  }, [recordState, onCapture]);
 
-    recognition.onend = () => {
-      setRecording(false);
-      setInitializing(false);
-      setInterimText('');
-      const transcript = finalRef.current.trim();
-      if (transcript) onCapture(transcript);
-    };
+  const stopRecording = useCallback(() => {
+    recorderRef.current?.stop();
+    recorderRef.current = null;
+  }, []);
 
-    recognition.onerror = (event) => {
-      if (event.error === 'not-allowed') setUnsupported(true);
-      setRecording(false);
-      setInitializing(false);
-      setInterimText('');
-    };
-
-    recognition.start();
-    recognitionRef.current = recognition;
-    setInitializing(true);
-  }
-
-  function stopRecording() {
-    recognitionRef.current?.stop();
-    recognitionRef.current = null;
-  }
+  useEffect(() => {
+    return () => { recorderRef.current?.stop(); };
+  }, []);
 
   if (unsupported) {
     return (
@@ -107,42 +115,42 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
     );
   }
 
+  const isRecording = recordState === 'recording';
+  const isTranscribing = recordState === 'transcribing';
+  const buttonBusy = disabled || isTranscribing || (modelLoading && !modelReady);
+
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* Button + rings container */}
+      {/* Button + rings */}
       <div className="relative flex items-center justify-center w-60 h-60">
-        {/* Ambient halo rings (idle only) */}
-        {!recording && (
+        {/* Halo rings (idle) */}
+        {!isRecording && !isTranscribing && (
           <>
             <div className="absolute inset-[-10px] rounded-full bg-accent/[0.05]" />
             <div className="absolute inset-[-28px] rounded-full bg-accent/[0.025]" />
             <div className="absolute inset-[-46px] rounded-full bg-accent/[0.01]" />
           </>
         )}
-        {/* Expanding pulse ring (recording) */}
-        {recording && (
+        {/* Pulse rings (recording) */}
+        {isRecording && (
           <>
-            <div
-              className="absolute inset-0 rounded-full border-2 border-red-500/40 ring-out"
-              style={{ transformOrigin: 'center' }}
-            />
-            <div
-              className="absolute inset-0 rounded-full border border-red-500/20 ring-out delay-200"
-              style={{ transformOrigin: 'center' }}
-            />
+            <div className="absolute inset-0 rounded-full border-2 border-red-500/40 ring-out" style={{ transformOrigin: 'center' }} />
+            <div className="absolute inset-0 rounded-full border border-red-500/20 ring-out delay-200" style={{ transformOrigin: 'center' }} />
           </>
         )}
 
         <button
           type="button"
-          disabled={disabled}
-          onClick={recording ? stopRecording : startRecording}
+          disabled={buttonBusy}
+          onClick={isRecording ? stopRecording : startRecording}
           className={`relative w-44 h-44 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-95 hover:scale-[1.03] disabled:opacity-40 disabled:cursor-not-allowed ${
-            recording ? 'record-active' : 'record-idle'
+            isRecording ? 'record-active' : 'record-idle'
           }`}
-          title={recording ? 'Tap to stop' : initializing ? 'Warming up…' : 'Tap to start voice capture'}
+          title={isRecording ? 'Tap to stop' : isTranscribing ? 'Transcribing…' : 'Tap to start voice capture'}
         >
-          {recording ? (
+          {isTranscribing ? (
+            <Loader2 size={44} strokeWidth={1.25} className="text-accent animate-spin" />
+          ) : isRecording ? (
             <Square size={38} strokeWidth={1.5} fill="white" className="text-white" />
           ) : (
             <Mic size={52} strokeWidth={1.25} className="text-[#07090F]" />
@@ -150,23 +158,24 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
         </button>
       </div>
 
-      {initializing ? (
+      {/* Status label */}
+      {modelLoading && !modelReady ? (
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-          <span className="text-sm font-semibold text-yellow-400 tracking-wide">Get ready…</span>
+          <Loader2 size={13} className="text-text3 animate-spin" />
+          <span className="text-xs text-text3">Loading voice model…</span>
         </div>
-      ) : recording ? (
-        <div className="flex flex-col items-center gap-2 max-w-[280px]">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-            <span className="text-sm font-semibold text-red-400 tracking-wide">Recording · tap to finish</span>
-          </div>
-          {interimText && (
-            <p className="text-sm text-text2 text-center leading-relaxed line-clamp-3 italic">
-              &ldquo;{interimText}&rdquo;
-            </p>
-          )}
+      ) : isTranscribing ? (
+        <div className="flex items-center gap-2">
+          <Loader2 size={13} className="text-accent animate-spin" />
+          <span className="text-sm font-semibold text-accent tracking-wide">Transcribing…</span>
         </div>
+      ) : isRecording ? (
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+          <span className="text-sm font-semibold text-red-400 tracking-wide">Recording · tap to finish</span>
+        </div>
+      ) : error ? (
+        <p className="text-xs text-red-400 text-center max-w-[240px]">{error}</p>
       ) : null}
     </div>
   );
