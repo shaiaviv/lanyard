@@ -20,6 +20,33 @@ interface Props {
 }
 
 const DRAFT_KEY = 'lanyard:pending_draft';
+const DRAFT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+type StoredDraft = { repId: string; draft: CaptureDraft; savedAt: number };
+
+function saveDraft(repId: string, draft: CaptureDraft) {
+  try {
+    const entry: StoredDraft = { repId, draft, savedAt: Date.now() };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(entry));
+  } catch { /* ignore quota errors */ }
+}
+
+function loadDraft(repId: string): CaptureDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const entry: StoredDraft = JSON.parse(raw);
+    if (entry.repId !== repId || Date.now() - entry.savedAt > DRAFT_TTL_MS) {
+      localStorage.removeItem(DRAFT_KEY);
+      return null;
+    }
+    return entry.draft;
+  } catch { return null; }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
+}
 
 export function CaptureScreen({ repId, conferenceId, conferences, activeConferenceId }: Props) {
   const [localConferenceId, setLocalConferenceId] = useState<string | null>(
@@ -29,16 +56,11 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
   const [draft, setDraft] = useState<CaptureDraft | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
-  // Restore draft from localStorage — persists across refreshes until commit or re-record
+  // Restore rep-scoped draft on mount; rejects stale or foreign-rep entries
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(DRAFT_KEY);
-      if (saved) {
-        setDraft(JSON.parse(saved));
-        setStage('review');
-      }
-    } catch { /* ignore */ }
-  }, []);
+    const saved = loadDraft(repId);
+    if (saved) { setDraft(saved); setStage('review'); }
+  }, [repId]);
 
   const selectedConference = conferences.find((c) => c.id === localConferenceId);
 
@@ -53,7 +75,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         setVoiceError(result.error);
         setStage('idle');
       } else {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(result));
+        saveDraft(repId, result);
         setDraft(result);
         setStage('review');
       }
@@ -62,7 +84,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
       setVoiceError(msg);
       setStage('idle');
     }
-  }, []);
+  }, [repId]);
 
   /* ── Conference gate ── */
   if (!localConferenceId) {
@@ -109,7 +131,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         draft={draft}
         conferenceId={localConferenceId}
         repId={repId}
-        onRetry={() => { localStorage.removeItem(DRAFT_KEY); setStage('idle'); setDraft(null); }}
+        onRetry={() => { clearDraft(); setStage('idle'); setDraft(null); }}
       />
     );
   }
