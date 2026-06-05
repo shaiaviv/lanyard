@@ -73,7 +73,11 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
     resolution === 'auto-match' && bestMatchId ? bestMatchId : undefined,
   );
   const [linkedinUrl, setLinkedinUrl] = useState('');
-  const [selectedLinkedin, setSelectedLinkedin] = useState<string | null>(null);
+  // Auto-select the LinkedIn candidate when there's exactly one — the rep shouldn't
+  // need an extra tap when the system is already confident about the match.
+  const [selectedLinkedin, setSelectedLinkedin] = useState<string | null>(
+    draft.linkedinCandidates.length === 1 ? draft.linkedinCandidates[0].linkedinUrl : null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
