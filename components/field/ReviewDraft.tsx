@@ -108,6 +108,7 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       if ('error' in result) {
         setError(result.error);
       } else {
+        sessionStorage.removeItem('lanyard:pending_draft');
         setSuccess(true);
         const dest = conferenceId ? `/leads?conf=${conferenceId}` : '/leads';
         setTimeout(() => { router.push(dest); router.refresh(); }, 600);

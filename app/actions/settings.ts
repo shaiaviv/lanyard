@@ -7,7 +7,7 @@ import type { ServiceName } from '@/lib/config/getServiceKey';
 
 export type KeyStatus = { masked: string } | { missing: true };
 
-const SERVICES: ServiceName[] = ['anthropic', 'enrichment', 'hubspot'];
+const SERVICES: ServiceName[] = ['anthropic', 'groq', 'enrichment', 'hubspot'];
 
 export async function getKeyStatuses(): Promise<Record<ServiceName, KeyStatus>> {
   const admin = createAdminClient();

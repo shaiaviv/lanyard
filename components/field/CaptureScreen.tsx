@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { Fingerprint, Settings, MapPin, X, Mic, PencilLine, ChevronLeft } from 'lucide-react';
 import { ConferenceGate } from '@/components/field/ConferenceGate';
@@ -19,6 +19,8 @@ interface Props {
   activeConferenceId: string | null;
 }
 
+const DRAFT_KEY = 'lanyard:pending_draft';
+
 export function CaptureScreen({ repId, conferenceId, conferences, activeConferenceId }: Props) {
   const [localConferenceId, setLocalConferenceId] = useState<string | null>(
     conferenceId ?? activeConferenceId ?? null,
@@ -27,20 +29,38 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
   const [draft, setDraft] = useState<CaptureDraft | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
+  // Restore draft from sessionStorage if a reset happened mid-review
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        setDraft(JSON.parse(saved));
+        setStage('review');
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   const selectedConference = conferences.find((c) => c.id === localConferenceId);
 
   const handleAudioReady = useCallback(async (blob: Blob) => {
     setStage('processing');
     setVoiceError(null);
-    const formData = new FormData();
-    formData.append('audio', blob, 'recording.webm');
-    const result = await transcribeAndProcess(formData);
-    if ('error' in result) {
-      setVoiceError(result.error);
+    try {
+      const formData = new FormData();
+      formData.append('audio', blob, 'recording.webm');
+      const result = await transcribeAndProcess(formData);
+      if ('error' in result) {
+        setVoiceError(result.error);
+        setStage('idle');
+      } else {
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify(result));
+        setDraft(result);
+        setStage('review');
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong — please try again.';
+      setVoiceError(msg);
       setStage('idle');
-    } else {
-      setDraft(result);
-      setStage('review');
     }
   }, []);
 
@@ -89,7 +109,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         draft={draft}
         conferenceId={localConferenceId}
         repId={repId}
-        onRetry={() => { setStage('idle'); setDraft(null); }}
+        onRetry={() => { sessionStorage.removeItem(DRAFT_KEY); setStage('idle'); setDraft(null); }}
       />
     );
   }
