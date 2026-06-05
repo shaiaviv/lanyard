@@ -6,6 +6,7 @@ import { CoverageTimeline } from '@/components/planning/CoverageTimeline';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
 import type { Conference, Rep } from '@/lib/types';
 import type { CoverageRow, FollowUpRow } from '@/lib/db/queries';
+import type { ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
 const TABS = ['Conferences', 'Coverage', 'Follow-ups'] as const;
 type Tab = (typeof TABS)[number];
@@ -15,11 +16,12 @@ interface Props {
   coverage: CoverageRow[];
   followUps: FollowUpRow[];
   reps: Rep[];
+  weights: ScoringWeights;
   repId: string;
   repName: string;
 }
 
-export function PlanningHub({ conferences, coverage, followUps, reps, repId, repName }: Props) {
+export function PlanningHub({ conferences, coverage, followUps, reps, weights, repId, repName }: Props) {
   const [tab, setTab] = useState<Tab>('Conferences');
 
   return (
@@ -75,6 +77,7 @@ export function PlanningHub({ conferences, coverage, followUps, reps, repId, rep
             coverage={coverage}
             reps={reps}
             repId={repId}
+            weights={weights}
           />
         )}
         {tab === 'Coverage' && (

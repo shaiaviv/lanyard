@@ -2,6 +2,7 @@
 import 'server-only';
 import { createSupabaseServerClient } from '@/lib/db/server';
 import type { Contact, Conference, Encounter, Rep } from '@/lib/types';
+import { DEFAULT_WEIGHTS, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
 // ── Reps ─────────────────────────────────────────────────────────────────────
 
@@ -23,6 +24,28 @@ export async function getCurrentRep(): Promise<Rep | null> {
     email: data.email as string | null,
     currentConferenceId: (data.current_conference_id as string | null) ?? null,
   };
+}
+
+// C4 scoring weights — team-level, non-secret config stored as plaintext JSON in app_settings.
+// Returns the team's saved weights or the defaults. Used to seed the live slider panel.
+export async function getScoringWeights(teamId: string): Promise<ScoringWeights> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('app_settings')
+    .select('key_ciphertext')
+    .eq('team_id', teamId)
+    .eq('key_name', 'scoring_weights')
+    .maybeSingle();
+
+  if (data?.key_ciphertext) {
+    try {
+      const parsed = JSON.parse(data.key_ciphertext as string) as Partial<ScoringWeights>;
+      return { ...DEFAULT_WEIGHTS, ...parsed };
+    } catch {
+      // malformed → fall back to defaults
+    }
+  }
+  return DEFAULT_WEIGHTS;
 }
 
 // All reps on a team — the roster a sales lead assigns coverage across.

@@ -1,8 +1,10 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { MapPin, Users, ChevronDown, ChevronUp, Check, UserPlus, X } from 'lucide-react';
+import { MapPin, Users, ChevronDown, ChevronUp, Check, UserPlus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
-import { assignCoverage, type CoverageStatus } from '@/app/actions/planning';
+import { ScoringWeightsPanel } from '@/components/planning/ScoringWeightsPanel';
+import { assignCoverage, rescoreConference, type CoverageStatus } from '@/app/actions/planning';
+import { computeIcpScore, type ScoringWeights, type Tier } from '@/lib/scoring/computeIcpScore';
 import type { Conference, Rep } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
 
@@ -23,6 +25,9 @@ const STATUS_CYCLE: { value: CoverageStatus; label: string; chip: string }[] = [
   { value: 'declined',    label: 'Declined',    chip: 'text-text3 bg-white/5 border-white/10' },
 ];
 
+// A conference plus its LIVE score/tier (recomputed from the AI breakdown + current weights).
+type ConfView = Conference & { liveScore: number | null; liveTier: Tier | null };
+
 function firstName(name: string) {
   return name.split(' ')[0];
 }
@@ -31,9 +36,9 @@ function ScoreBar({ score }: { score: number }) {
   return (
     <div className="flex items-center gap-2.5">
       <div className="flex-1 h-1 rounded-full overflow-hidden bg-white/6">
-        <div className="h-full rounded-full score-bar-fill" style={{ width: `${score}%` }} />
+        <div className="h-full rounded-full score-bar-fill transition-all duration-300" style={{ width: `${score}%` }} />
       </div>
-      <span className={`text-sm font-bold tabular-nums w-6 text-right leading-none ${
+      <span className={`text-sm font-bold tabular-nums w-6 text-right leading-none transition-colors ${
         score >= 75 ? 'text-accent' : score >= 55 ? 'text-text2' : 'text-text3'
       }`}>{score}</span>
     </div>
@@ -41,9 +46,8 @@ function ScoreBar({ score }: { score: number }) {
 }
 
 /**
- * Team coverage control. Summarizes who's covering a conference and lets the lead
- * assign ANY teammate a status. This is the heart of company-wide planning — coverage
- * is "who covers what" across the team, not just the current rep's personal plan.
+ * Team coverage control — assign ANY teammate a status. The heart of company-wide planning
+ * ("who covers what"), not just the current rep's personal plan.
  */
 function CoverageControl({
   coverageForConf,
@@ -72,7 +76,6 @@ function CoverageControl({
     });
   }
 
-  // Summary pill: green if anyone committed, blue if only considering, amber "Uncovered" otherwise.
   let summary: React.ReactNode;
   if (committed.length > 0) {
     summary = (
@@ -82,9 +85,7 @@ function CoverageControl({
       </span>
     );
   } else if (considering.length > 0) {
-    summary = (
-      <span className="text-blue-300">{considering.map((c) => firstName(c.repName)).join(', ')} considering</span>
-    );
+    summary = <span className="text-blue-300">{considering.map((c) => firstName(c.repName)).join(', ')} considering</span>;
   } else {
     summary = <span className="text-warn">Uncovered</span>;
   }
@@ -108,7 +109,6 @@ function CoverageControl({
 
       {open && (
         <>
-          {/* click-away */}
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full mt-1 z-20 bg-card rounded-xl py-2 min-w-[240px] border border-white/10 shadow-2xl">
             <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-white/6">
@@ -163,13 +163,16 @@ function ConferenceCard({
   currentRepId,
   onAssign,
 }: {
-  conf: Conference;
+  conf: ConfView;
   coverageForConf: CoverageRow[];
   reps: Rep[];
   currentRepId: string;
   onAssign: (repId: string, confId: string, status: CoverageStatus) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [isRescoring, startRescore] = useTransition();
+  const [rescoreErr, setRescoreErr] = useState<string | null>(null);
+
   const today = new Date().toISOString().split('T')[0];
   const isActive = conf.startDate && conf.endDate && conf.startDate <= today && today <= conf.endDate;
   const isPast = conf.endDate && conf.endDate < today;
@@ -181,6 +184,14 @@ function ConferenceCard({
     ? new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
 
+  function rescore() {
+    setRescoreErr(null);
+    startRescore(async () => {
+      const res = await rescoreConference(conf.id);
+      if ('error' in res) setRescoreErr(res.error);
+    });
+  }
+
   return (
     <div
       className={`relative bg-card rounded-2xl border border-white/7 overflow-hidden transition-all ${
@@ -188,20 +199,18 @@ function ConferenceCard({
       }`}
       style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.35)' }}
     >
-      {/* Tier accent stripe — top only, not a side stripe */}
-      {conf.tier === 'T1' && (
+      {conf.liveTier === 'T1' && (
         <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-amber-400/90 via-amber-400/60 to-transparent" />
       )}
-      {conf.tier === 'T2' && (
+      {conf.liveTier === 'T2' && (
         <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-400/70 via-blue-400/40 to-transparent" />
       )}
 
       <div className="px-4 pt-4 pb-4">
-        {/* Top row: badges + coverage control */}
         <div className="flex items-start justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-1.5 flex-wrap">
             {isActive && <Badge variant="live" dot pulse>Live</Badge>}
-            {conf.tier && <Badge variant={conf.tier as 'T1' | 'T2' | 'T3'}>{conf.tier}</Badge>}
+            {conf.liveTier && <Badge variant={conf.liveTier as 'T1' | 'T2' | 'T3'}>{conf.liveTier}</Badge>}
           </div>
           {!isPast && (
             <CoverageControl
@@ -213,10 +222,8 @@ function ConferenceCard({
           )}
         </div>
 
-        {/* Name */}
         <h3 className="text-base font-bold text-text1 leading-snug mb-1.5">{conf.name}</h3>
 
-        {/* Meta row */}
         <div className="flex items-center gap-3 text-xs text-text3 flex-wrap">
           {start && end && <span>{start} – {end}</span>}
           {conf.location && (
@@ -227,14 +234,12 @@ function ConferenceCard({
           )}
         </div>
 
-        {/* ICP score */}
-        {conf.icpScore != null && (
+        {conf.liveScore != null && (
           <div className="mt-3">
-            <ScoreBar score={conf.icpScore} />
+            <ScoreBar score={conf.liveScore} />
           </div>
         )}
 
-        {/* Vertical tags */}
         {conf.verticals.length > 0 && (
           <div className="flex gap-1 mt-2.5 flex-wrap">
             {conf.verticals.map((v) => (
@@ -245,7 +250,6 @@ function ConferenceCard({
           </div>
         )}
 
-        {/* AI breakdown toggle */}
         {conf.scoreBreakdown && (
           <button
             onClick={() => setExpanded(!expanded)}
@@ -275,6 +279,17 @@ function ConferenceCard({
                 </div>
               );
             })}
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={rescore}
+              disabled={isRescoring}
+              className="flex items-center gap-1.5 text-xs font-semibold text-accent hover:text-accent/80 disabled:opacity-50 transition-colors"
+            >
+              {isRescoring ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+              {isRescoring ? 'Re-scoring…' : 'Re-score with AI'}
+            </button>
+            {rescoreErr && <span className="text-[11px] text-red-400">{rescoreErr}</span>}
+          </div>
         </div>
       )}
     </div>
@@ -286,20 +301,20 @@ interface Props {
   coverage: CoverageRow[];
   reps: Rep[];
   repId: string;
+  weights: ScoringWeights;
 }
 
-export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
+export function ConferenceList({ conferences, coverage, reps, repId, weights: initialWeights }: Props) {
   const [vertical, setVertical] = useState('All');
   const [tier, setTier] = useState<'All' | 'T1' | 'T2' | 'T3'>('All');
   const [showPast, setShowPast] = useState(false);
-  // Coverage is interactive — lift it into state so assignments reflect instantly
-  // in the cards AND the under-invested banner without a full reload.
   const [coverageState, setCoverageState] = useState<CoverageRow[]>(coverage);
+  // Live weights — drives instant client-side recompute of every score/tier (no AI call).
+  const [weights, setWeights] = useState<ScoringWeights>(initialWeights);
 
   const today = new Date().toISOString().split('T')[0];
 
   function handleAssign(repIdArg: string, confId: string, status: CoverageStatus) {
-    // optimistic upsert into local state
     setCoverageState((prev) => {
       const idx = prev.findIndex((c) => c.repId === repIdArg && c.conferenceId === confId);
       const repName = reps.find((r) => r.id === repIdArg)?.name ?? 'Unknown';
@@ -313,35 +328,45 @@ export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
     void assignCoverage(repIdArg, confId, status);
   }
 
+  // Recompute live score/tier for every conference from its AI breakdown + current weights.
+  const scored: ConfView[] = conferences.map((c) => {
+    if (c.scoreBreakdown) {
+      const { score, tier: t } = computeIcpScore(c.scoreBreakdown, weights);
+      return { ...c, liveScore: score, liveTier: t };
+    }
+    return { ...c, liveScore: c.icpScore, liveTier: (c.tier as Tier | null) ?? null };
+  });
+
   const coverageByConf = new Map<string, CoverageRow[]>();
   for (const c of coverageState) {
     if (!coverageByConf.has(c.conferenceId)) coverageByConf.set(c.conferenceId, []);
     coverageByConf.get(c.conferenceId)!.push(c);
   }
 
-  const filtered = conferences
+  const filtered = scored
     .filter((c) => {
       if (!showPast && c.endDate && c.endDate < today) return false;
       if (vertical !== 'All' && !c.verticals.includes(vertical)) return false;
-      if (tier !== 'All' && c.tier !== tier) return false;
+      if (tier !== 'All' && c.liveTier !== tier) return false;
       return true;
     })
-    .sort((a, b) => (b.icpScore ?? 0) - (a.icpScore ?? 0));
+    .sort((a, b) => (b.liveScore ?? 0) - (a.liveScore ?? 0));
 
-  // Team-wide: a conference is "covered" when ANY rep has committed.
   const committedConfIds = new Set(
     coverageState.filter((c) => c.status === 'committed').map((c) => c.conferenceId),
   );
-  const uncoveredT1 = conferences.filter(
-    (c) => c.tier === 'T1' && !committedConfIds.has(c.id) && (!c.endDate || c.endDate >= today),
+  const uncoveredT1 = scored.filter(
+    (c) => c.liveTier === 'T1' && !committedConfIds.has(c.id) && (!c.endDate || c.endDate >= today),
   );
-  const coveredUpcoming = conferences.filter(
+  const coveredUpcoming = scored.filter(
     (c) => committedConfIds.has(c.id) && (!c.endDate || c.endDate >= today),
   ).length;
+  const tierCount = (t: 'T1' | 'T2' | 'T3') => scored.filter((c) => c.liveTier === t).length;
 
   return (
     <div className="space-y-4">
-      {/* Under-invested banner (team-wide) */}
+      <ScoringWeightsPanel weights={weights} onChange={setWeights} />
+
       {uncoveredT1.length > 0 && (
         <div className="rounded-xl px-4 py-3 space-y-0.5 bg-warn/[0.06] border border-warn/15">
           <p className="text-sm font-semibold text-warn">
@@ -354,7 +379,6 @@ export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
         </div>
       )}
 
-      {/* Single-row combined filters */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
         {TIERS.map((t) => (
           <button
@@ -366,7 +390,7 @@ export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
                 : 'text-text2 hover:text-text1 bg-white/4 border border-white/8'
             }`}
           >
-            {t === 'All' ? `All (${conferences.length})` : `${t} · ${conferences.filter((c) => c.tier === t).length}`}
+            {t === 'All' ? `All (${conferences.length})` : `${t} · ${tierCount(t)}`}
           </button>
         ))}
         <div className="w-px bg-white/10 flex-shrink-0 self-stretch mx-0.5" />
@@ -385,7 +409,6 @@ export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
         ))}
       </div>
 
-      {/* Stats + show past */}
       <div className="flex items-center justify-between">
         <p className="text-xs text-text3">
           {filtered.length} shown
@@ -400,7 +423,6 @@ export function ConferenceList({ conferences, coverage, reps, repId }: Props) {
         </button>
       </div>
 
-      {/* 2-column grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {filtered.map((conf) => (
           <ConferenceCard

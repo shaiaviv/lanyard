@@ -1,8 +1,10 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/db/admin';
-import { getCurrentRep } from '@/lib/db/queries';
-import { getServiceKey } from '@/lib/config/getServiceKey';
+import { getCurrentRep, getScoringWeights } from '@/lib/db/queries';
+import { getServiceKey, MissingServiceKeyError } from '@/lib/config/getServiceKey';
+import { scoreConference } from '@/lib/ai/scoreConference';
+import { computeIcpScore, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
 export type CoverageStatus = 'considering' | 'committed' | 'attended' | 'declined';
 
@@ -43,6 +45,76 @@ export async function upsertCoverage(
   const me = await getCurrentRep();
   if (!me) return { error: 'Not authenticated' };
   return assignCoverage(me.id, conferenceId, status);
+}
+
+// Persist the team's scoring weights (non-secret config → plaintext JSON in app_settings).
+export async function saveScoringWeights(
+  weights: ScoringWeights,
+): Promise<{ success: true } | { error: string }> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
+
+  const admin = createAdminClient();
+  const { error } = await admin.from('app_settings').upsert(
+    {
+      team_id: me.teamId,
+      key_name: 'scoring_weights',
+      key_ciphertext: JSON.stringify(weights),
+      updated_by: me.id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'team_id,key_name' },
+  );
+  if (error) return { error: error.message };
+  revalidatePath('/planning');
+  return { success: true };
+}
+
+// Re-run the AI factor estimation for one conference, then persist factors + the score/tier the
+// current weights produce. The expensive AI half; the formula half runs live client-side.
+export async function rescoreConference(
+  conferenceId: string,
+): Promise<{ success: true; score: number; tier: string } | { error: string }> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
+
+  const admin = createAdminClient();
+  const { data: conf } = await admin
+    .from('conferences')
+    .select('*')
+    .eq('id', conferenceId)
+    .maybeSingle();
+  if (!conf) return { error: 'Conference not found' };
+
+  let factors;
+  try {
+    factors = await scoreConference({
+      name: conf.name,
+      location: conf.location,
+      country: conf.country,
+      region: conf.region,
+      verticals: conf.verticals ?? [],
+      estAudience: conf.est_audience,
+      startDate: conf.start_date,
+    });
+  } catch (err) {
+    if (err instanceof MissingServiceKeyError) {
+      return { error: 'Add an Anthropic API key in Settings to score conferences.' };
+    }
+    return { error: err instanceof Error ? err.message : 'Scoring failed' };
+  }
+
+  const weights = await getScoringWeights(me.teamId);
+  const { score, tier } = computeIcpScore(factors, weights);
+
+  const { error } = await admin
+    .from('conferences')
+    .update({ score_breakdown: factors, icp_score: score, tier })
+    .eq('id', conferenceId);
+  if (error) return { error: error.message };
+
+  revalidatePath('/planning');
+  return { success: true, score, tier };
 }
 
 export interface HubSpotPushInput {

@@ -713,3 +713,29 @@ not the team's). Shipped:
 - tsc + eslint clean. **DB note:** the teammate/coverage seed block must be run against the live
   Supabase for the team story to appear (existing DBs predate it).
 **Next:** P1 — the real ICP scoring engine (AI factor estimation + live weight sliders).
+
+## Entry 017 — 2026-06-06 — P1: the real ICP scoring engine (marquee)
+
+Fixed Skew 2 — scores were hardcoded JSON with no engine. Built the C4 split from
+`tech/3-planning.md` §1: **AI estimates factors (rare) ↔ deterministic formula recomputes (live)**.
+- **`lib/scoring/computeIcpScore.ts`** — pure + isomorphic (NO server-only): `(breakdown, weights)
+  → {score, tier}`. Weighted average over factors PRESENT (a null historicalPerf is dropped + its
+  weight redistributed, so a first-time event isn't penalized for no track record). `DEFAULT_WEIGHTS`
+  40/25/15/10/10 (ICP density first — quality over headcount); `tierForScore` T1≥75/T2≥50/T3<50.
+- **`lib/ai/scoreConference.ts`** — AI factor estimation (Sonnet, copies the parseCapture exemplar:
+  generateText + Output.object; reuses GRAIN_ICP + the existing `conferenceFactorsSchema`/types from
+  the Opus core). Runs once per conference.
+- **Actions** (`planning.ts`): `saveScoringWeights` (team config → plaintext JSON in app_settings,
+  key_name 'scoring_weights') + `rescoreConference` (AI factors → computeIcpScore → persist; degrades
+  with a clear "add Anthropic key" message). **Query** `getScoringWeights`.
+- **`ScoringWeightsPanel.tsx`** — the marquee: 5 weight sliders, % display, Save-as-default / Reset.
+- **ConferenceList**: every card's score/tier is now **recomputed live** from breakdown + weights
+  (drag a slider → instant re-rank, re-tier, re-filter, under-invested updates — zero AI calls).
+  Added per-card "Re-score with AI" (calls the AI module). DB icp_score/tier are now a cache; the
+  live formula is the source of truth.
+- **Reproducibility** (audit flagged scores were ad-hoc): baked all 10 AI breakdowns + scores into
+  `supabase/setup.sql` §2b so a fresh DB is fully scored with no API key. Verified in-DB that
+  computeIcpScore at default weights reproduces the stored scores (8/10 exact; aligned the 2
+  null-historical events to the formula — ITB 51, Web Summit 48 — so seed == live == DB, no drift).
+- tsc + eslint + `npm run build` all clean.
+**Next:** P2 — cross-conference relationship intelligence (C7 Relationships tab + C8 contact arc).
