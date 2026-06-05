@@ -51,6 +51,24 @@ from (values
 ) as v(name, icp_score, tier, breakdown)
 where c.name = v.name;
 
+-- ── 2c. City coordinates (C6 coverage map) ────────────────────────────────────
+alter table conferences add column if not exists latitude double precision;
+alter table conferences add column if not exists longitude double precision;
+update conferences c set latitude = v.lat, longitude = v.lng
+from (values
+  ('Money20/20 Europe 2026', 52.3676, 4.9041),
+  ('Money20/20 Europe 2025', 52.3676, 4.9041),
+  ('Sibos 2026', 48.2082, 16.3738),
+  ('Sibos 2025', 50.1109, 8.6821),
+  ('Money20/20 USA 2026', 36.1699, -115.1398),
+  ('Money20/20 USA 2025', 36.1699, -115.1398),
+  ('Singapore FinTech Festival', 1.3521, 103.8198),
+  ('Web Summit 2026', 38.7223, -9.1393),
+  ('FinovateEurope 2025', 51.5074, -0.1278),
+  ('ITB Berlin 2025', 52.5200, 13.4050)
+) as v(name, lat, lng)
+where c.name = v.name;
+
 -- ── 3. Your rep row ───────────────────────────────────────────────────────────
 -- Replace YOUR_AUTH_USER_ID with the User UID from Authentication → Users in your Supabase dashboard.
 -- Replace name/email with your details.

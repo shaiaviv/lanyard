@@ -283,6 +283,62 @@ export async function getFollowUps(repId: string): Promise<FollowUpRow[]> {
   return (data ?? []).map(mapFollowUpRow);
 }
 
+// ── Coverage gap analysis (C6) ────────────────────────────────────────────────
+
+export interface GapAnalysis {
+  uncovered: { id: string; name: string; tier: string | null; icpScore: number | null; startDate: string | null; region: string | null }[];
+  byRegion: { region: string; total: number; covered: number }[];
+  byQuarter: { quarter: string; total: number; covered: number }[];
+}
+
+// Where the team is under-invested: high-value upcoming events with no committed rep, plus
+// coverage rates by region and quarter. Drives the Coverage view's gap callouts.
+export async function getGapAnalysis(teamId: string): Promise<GapAnalysis> {
+  const supa = await createSupabaseServerClient();
+  const today = new Date().toISOString().split('T')[0];
+
+  const [{ data: confs }, { data: cov }] = await Promise.all([
+    supa.from('conferences').select('id, name, tier, icp_score, start_date, region').gte('end_date', today),
+    supa.from('coverage').select('conference_id, status, reps!inner(team_id)').eq('reps.team_id', teamId).eq('status', 'committed'),
+  ]);
+
+  const committed = new Set((cov ?? []).map((r) => r.conference_id as string));
+  const upcoming = confs ?? [];
+
+  const uncovered = upcoming
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .filter((c: any) => (c.tier === 'T1' || c.tier === 'T2') && !committed.has(c.id))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((c: any) => ({ id: c.id, name: c.name, tier: c.tier, icpScore: c.icp_score, startDate: c.start_date, region: c.region }))
+    .sort((a, b) => (b.icpScore ?? 0) - (a.icpScore ?? 0));
+
+  const regionMap = new Map<string, { total: number; covered: number }>();
+  const quarterMap = new Map<string, { total: number; covered: number }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const c of upcoming as any[]) {
+    const region = (c.region as string) ?? 'Unknown';
+    const r = regionMap.get(region) ?? { total: 0, covered: 0 };
+    r.total += 1;
+    if (committed.has(c.id)) r.covered += 1;
+    regionMap.set(region, r);
+
+    if (c.start_date) {
+      const d = new Date(c.start_date);
+      const q = `${d.getUTCFullYear()} Q${Math.floor(d.getUTCMonth() / 3) + 1}`;
+      const qa = quarterMap.get(q) ?? { total: 0, covered: 0 };
+      qa.total += 1;
+      if (committed.has(c.id)) qa.covered += 1;
+      quarterMap.set(q, qa);
+    }
+  }
+
+  return {
+    uncovered,
+    byRegion: [...regionMap.entries()].map(([region, v]) => ({ region, ...v })).sort((a, b) => a.covered / a.total - b.covered / b.total),
+    byQuarter: [...quarterMap.entries()].map(([quarter, v]) => ({ quarter, ...v })).sort((a, b) => a.quarter.localeCompare(b.quarter)),
+  };
+}
+
 // ── Cross-conference relationship intelligence (C7) ───────────────────────────
 
 export interface RelationshipRow {
@@ -413,6 +469,8 @@ function mapConference(row: any): Conference {
     icpScore: row.icp_score,
     tier: row.tier,
     scoreBreakdown: row.score_breakdown ?? null,
+    latitude: row.latitude ?? null,
+    longitude: row.longitude ?? null,
     source: row.source,
   };
 }

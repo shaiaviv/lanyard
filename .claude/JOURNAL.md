@@ -739,6 +739,24 @@ Fixed Skew 2 — scores were hardcoded JSON with no engine. Built the C4 split f
   null-historical events to the formula — ITB 51, Web Summit 48 — so seed == live == DB, no drift).
 - tsc + eslint + `npm run build` all clean.
 **Next:** P2 — cross-conference relationship intelligence (C7 Relationships tab + C8 contact arc).
+
+## Entry 018 — 2026-06-06 — P2: cross-conference relationship intelligence + P3 cut
+
+**P2 (Skew 3, the most-weighted rubric item):** the signature cross-conference view was entirely
+absent from Planning. Built it:
+- `getRelationshipList(teamId)` — aggregates confirmed encounters per contact (meetings, distinct
+  events, span, last seen, conference trail, latest temperature, follow-up state), reads the arc
+  verdict from `arc_cache`, detects **job changes** by diffing company/title across encounter
+  `identity_snapshot`s, ranks warming > cooling > nurturing > tooearly > tirekicker.
+- `RelationshipList.tsx` + a new **Relationships tab** — verdict badges, job-change flag, conference
+  trail, filters (All / Warming / **Warming · no follow-up** / At risk / Tire-kickers), links to the
+  contact arc page (C8, reused). Headline nudge for "warming + no follow-up" (the killer signal);
+  tab badge shows that count.
+- **Demo data** (the feature is only as good as its data): seeded 4 cross-conference contacts, one
+  per arc — Elena Fischer (warming, Director→VP promotion), Raj Patel (tire-kicker, Trustly→Mollie
+  company switch), Sophie Laurent (cooling), Marcus Weber (nurturing); multi-rep (shared team
+  memory); arc_cache pre-seeded so it works with no API key. Mirrored into setup.sql (idempotent).
+- tsc + eslint + build clean. Now 7 contacts / 5 multi-encounter in the DB.
 - [P3 CUT] Dropped P3 (C9 AI follow-up email drafting) as unnecessary scope — the brief needs only
   one meaningful AI feature and we already ship several (P1 scoring, P2 arc intel, P6 discovery).
   Follow-ups tab keeps list + HubSpot push (hardened in P5). Phase numbers left stable (P4–P8

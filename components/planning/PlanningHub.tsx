@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import { Fingerprint } from 'lucide-react';
 import { ConferenceList } from '@/components/planning/ConferenceList';
-import { CoverageTimeline } from '@/components/planning/CoverageTimeline';
+import { CoverageView } from '@/components/planning/CoverageView';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
 import { RelationshipList } from '@/components/planning/RelationshipList';
 import type { Conference, Rep } from '@/lib/types';
-import type { CoverageRow, FollowUpRow, RelationshipRow } from '@/lib/db/queries';
+import type { CoverageRow, FollowUpRow, RelationshipRow, GapAnalysis } from '@/lib/db/queries';
 import type { ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
 const TABS = ['Conferences', 'Coverage', 'Relationships', 'Follow-ups'] as const;
@@ -17,13 +17,14 @@ interface Props {
   coverage: CoverageRow[];
   followUps: FollowUpRow[];
   relationships: RelationshipRow[];
+  gap: GapAnalysis;
   reps: Rep[];
   weights: ScoringWeights;
   repId: string;
   repName: string;
 }
 
-export function PlanningHub({ conferences, coverage, followUps, relationships, reps, weights, repId, repName }: Props) {
+export function PlanningHub({ conferences, coverage, followUps, relationships, gap, reps, weights, repId, repName }: Props) {
   const [tab, setTab] = useState<Tab>('Conferences');
   const warmingNoFollowUp = relationships.filter(
     (r) => (r.verdict === 'warming' || r.verdict === 'nurturing') && !r.hasFollowUp,
@@ -91,9 +92,10 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, r
           />
         )}
         {tab === 'Coverage' && (
-          <CoverageTimeline
+          <CoverageView
             conferences={conferences}
             coverage={coverage}
+            gap={gap}
             repId={repId}
             repName={repName}
           />

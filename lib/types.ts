@@ -32,6 +32,8 @@ export interface Conference {
   icpScore: number | null;  // 0..100
   tier: ConfTier | null;
   scoreBreakdown: ConferenceScoreBreakdown | null;
+  latitude: number | null;
+  longitude: number | null;
   source: 'seed' | 'discovery';
 }
 

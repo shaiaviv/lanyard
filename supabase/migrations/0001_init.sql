@@ -45,6 +45,8 @@ create table conferences (
   icp_score   integer,                 -- 0..100, computed (C4)
   tier        conf_tier,
   score_breakdown jsonb,               -- {factors:{icpDensity,topicFit,scale,geoRelevance,historicalPerf}, ...} + AI rationale
+  latitude    double precision,        -- coverage map (C6)
+  longitude   double precision,
   source      conf_source not null default 'seed',
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
