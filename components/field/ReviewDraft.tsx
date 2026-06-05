@@ -1,11 +1,21 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ChevronDown, ChevronUp, Plus, RotateCcw, X, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { TemperaturePicker } from '@/components/field/TemperaturePicker';
 import { MetBeforeHint } from '@/components/field/MetBeforeHint';
 import { commitEncounter } from '@/app/actions/field';
 import type { CaptureDraft, Temperature, MatchCandidate } from '@/lib/types';
+
+function safeLinkedinHref(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== 'https:') return null;
+    if (!/(^|\.)linkedin\.com$/.test(u.hostname)) return null;
+    return u.href;
+  } catch { return null; }
+}
 
 interface ReviewDraftProps {
   draft: CaptureDraft;
@@ -271,8 +281,23 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
         )}
       </Label>
 
-      {/* LinkedIn candidates */}
-      {draft.linkedinCandidates.length > 0 && (
+      {/* LinkedIn upsell when no enrichment provider is configured */}
+      {!draft.enrichmentConfigured && (
+        <div
+          className="rounded-xl px-4 py-3 space-y-1"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <p className="text-[11px] font-semibold text-text3 uppercase tracking-wide">LinkedIn Verification</p>
+          <p className="text-sm text-text2 leading-relaxed">
+            Connect an enrichment provider in{' '}
+            <Link href="/settings" className="text-accent underline underline-offset-2">Settings</Link>
+            {' '}to automatically find and confirm LinkedIn profiles.
+          </p>
+        </div>
+      )}
+
+      {/* LinkedIn candidates (real enrichment only) */}
+      {draft.enrichmentConfigured && draft.linkedinCandidates.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-semibold text-text3">Verify LinkedIn</p>
@@ -305,16 +330,18 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
                 </div>
               </button>
               {/* Separate link — opens LinkedIn in new tab */}
-              <a
-                href={c.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="p-1.5 rounded-lg hover:bg-white/8 text-info transition-colors flex-shrink-0"
-                title="Open LinkedIn profile"
-              >
-                <ExternalLink size={15} />
-              </a>
+              {safeLinkedinHref(c.linkedinUrl) && (
+                <a
+                  href={safeLinkedinHref(c.linkedinUrl)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-1.5 rounded-lg hover:bg-white/8 text-info transition-colors flex-shrink-0"
+                  title="Open LinkedIn profile"
+                >
+                  <ExternalLink size={15} />
+                </a>
+              )}
             </div>
           ))}
           {selectedLinkedin && (

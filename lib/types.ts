@@ -145,6 +145,7 @@ export interface CaptureDraft {
   resolution: MatchResolution;
   bestMatchId: string | null;
   linkedinCandidates: PersonCandidate[];
+  enrichmentConfigured: boolean;
 }
 
 export interface Coverage {

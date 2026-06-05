@@ -32,7 +32,8 @@ export async function processCapture(input: {
 
   // Enrichment (LinkedIn verify candidates) — behind the interface; mock when no key (never blocks).
   const enrichKey = await getServiceKey('enrichment');
-  const linkedinCandidates = parsed.name
+  const enrichmentConfigured = !!enrichKey;
+  const linkedinCandidates = parsed.name && enrichmentConfigured
     ? await getEnrichmentProvider(enrichKey).searchPerson({
         name: parsed.name,
         company: parsed.company ?? undefined,
@@ -52,5 +53,6 @@ export async function processCapture(input: {
     resolution,
     bestMatchId: best?.contactId ?? null,
     linkedinCandidates,
+    enrichmentConfigured,
   };
 }
