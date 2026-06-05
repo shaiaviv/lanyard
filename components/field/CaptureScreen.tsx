@@ -7,6 +7,7 @@ import { RecordButton } from '@/components/field/RecordButton';
 import { CaptureForm } from '@/components/field/CaptureForm';
 import { ReviewDraft } from '@/components/field/ReviewDraft';
 import { processVoiceCapture } from '@/app/actions/voice';
+import { setCurrentConference } from '@/app/actions/conference';
 import type { CaptureDraft, Conference } from '@/lib/types';
 
 type Stage = 'idle' | 'manual' | 'processing' | 'review';
@@ -46,7 +47,11 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
     return (
       <ConferenceGate
         conferences={conferences}
-        onSelect={(id) => { setLocalConferenceId(id); setStage('idle'); }}
+        onSelect={(id) => {
+          setLocalConferenceId(id);
+          setStage('idle');
+          setCurrentConference(id);
+        }}
       />
     );
   }
@@ -118,9 +123,9 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
 
   /* ── Record screen (idle) ── */
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full animate-fade-in">
       {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-12 pb-5">
+      <header className="flex items-center justify-between px-5 pt-12 pb-4">
         <div className="flex items-center gap-2">
           <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
           <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-text2">
@@ -136,10 +141,10 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
       </header>
 
       {/* Conference pill */}
-      <div className="px-5 pb-5">
+      <div className="px-5 pb-2">
         <button
-          onClick={() => { setLocalConferenceId(null); setVoiceError(null); }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium text-text2 hover:text-text1 transition-colors"
+          onClick={() => { setLocalConferenceId(null); setVoiceError(null); setCurrentConference(null); }}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium text-text2 hover:text-text1 transition-all hover:bg-elevated"
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.09)',
@@ -153,54 +158,62 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </button>
       </div>
 
-      {/* Hero — record button + instructions */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8 pb-4">
-        <RecordButton onCapture={handleCapture} />
+      {/* Record hero — centered in remaining viewport space */}
+      <div
+        className="flex flex-col items-center px-6"
+        style={{ minHeight: 'calc(100svh - 172px)' }}
+      >
+        {/* Top spacer */}
+        <div className="flex-1 min-h-6" />
 
-        <div className="text-center max-w-[260px] space-y-3">
-          <p className="text-sm text-text2 leading-relaxed">
-            Say their name, company and role, how you met, what you discussed, and how interested they seemed.
-          </p>
-          <div
-            className="inline-flex items-center gap-2 text-xs text-text3 px-3 py-2 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            <span className="font-mono text-accent text-[10px]">e.g.</span>
-            <span className="italic leading-snug text-left">
-              "Met Sarah from Stripe, Head of Payments — interested in FX hedging, very warm."
-            </span>
+        {/* Record button + instructions */}
+        <div className="flex flex-col items-center gap-6">
+          <div className="animate-scale-in">
+            <RecordButton onCapture={handleCapture} />
           </div>
-        </div>
 
-        {voiceError && (
-          <div
-            className="w-full rounded-xl px-4 py-3"
-            style={{
-              background: 'rgba(239,68,68,0.07)',
-              border: '1px solid rgba(239,68,68,0.14)',
-            }}
-          >
-            <p className="text-sm font-semibold text-red-400">Voice capture failed</p>
-            <p className="text-xs mt-1" style={{ color: 'rgba(239,68,68,0.6)' }}>
-              {voiceError} · Add your Anthropic key in{' '}
-              <Link href="/settings" className="underline" style={{ color: 'rgba(239,68,68,0.75)' }}>
-                Settings
-              </Link>
-              , or fill in manually below.
+          <div className="text-center max-w-[260px] space-y-1.5 animate-fade-up delay-150">
+            <p className="text-sm text-text2 tracking-wide">
+              Name · company · role · interest level
+            </p>
+            <p className="text-xs text-text3 italic">
+              &ldquo;Sarah, Stripe, Head of Payments — very warm&rdquo;
             </p>
           </div>
-        )}
-      </div>
 
-      {/* Manual entry fallback */}
-      <div className="px-5 pb-8">
-        <button
-          onClick={() => setStage('manual')}
-          className="w-full flex items-center justify-center gap-2 py-3 text-sm text-text3 hover:text-text2 transition-colors rounded-xl hover:bg-elevated"
-        >
-          <PencilLine size={14} strokeWidth={1.75} />
-          Fill in manually instead
-        </button>
+          {voiceError && (
+            <div
+              className="w-full rounded-xl px-4 py-3 animate-fade-up"
+              style={{
+                background: 'rgba(239,68,68,0.07)',
+                border: '1px solid rgba(239,68,68,0.14)',
+              }}
+            >
+              <p className="text-sm font-semibold text-red-400">Voice capture failed</p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(239,68,68,0.6)' }}>
+                {voiceError} · Add your Anthropic key in{' '}
+                <Link href="/settings" className="underline" style={{ color: 'rgba(239,68,68,0.75)' }}>
+                  Settings
+                </Link>
+                .
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom spacer — pushes "fill manually" to viewport bottom */}
+        <div className="flex-1 min-h-6" />
+
+        {/* Fill manually — sits at the bottom */}
+        <div className="w-full pb-6 animate-fade-up delay-300">
+          <button
+            onClick={() => setStage('manual')}
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm text-text3 hover:text-text2 transition-colors rounded-xl hover:bg-elevated"
+          >
+            <PencilLine size={14} strokeWidth={1.75} />
+            Fill in manually instead
+          </button>
+        </div>
       </div>
     </div>
   );

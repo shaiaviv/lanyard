@@ -16,6 +16,7 @@ export interface Rep {
   teamId: string;
   name: string;
   email: string | null;
+  currentConferenceId: string | null;
 }
 
 export interface Conference {

@@ -21,6 +21,7 @@ export async function getCurrentRep(): Promise<Rep | null> {
     teamId: data.team_id as string,
     name: data.name as string,
     email: data.email as string | null,
+    currentConferenceId: (data.current_conference_id as string | null) ?? null,
   };
 }
 

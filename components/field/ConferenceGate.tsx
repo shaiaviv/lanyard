@@ -41,24 +41,24 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
   return (
     <div className="flex flex-col min-h-full">
       {/* Header */}
-      <div className="px-5 pt-14 pb-7">
-        <div className="flex items-center gap-2 mb-6">
+      <div className="px-5 pt-14 pb-6">
+        <div className="flex items-center gap-2 mb-5 animate-fade-in">
           <Fingerprint size={18} className="text-accent" strokeWidth={1.5} />
           <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-accent">
             Lanyard
           </span>
         </div>
-        <h1 className="text-[26px] font-bold text-text1 leading-tight">
-          Which conference<br />are you at?
+        <h1 className="text-[22px] font-bold text-text1 leading-tight whitespace-nowrap animate-fade-up delay-50">
+          Which conference are you at?
         </h1>
-        <p className="text-sm text-text2 mt-2.5 leading-relaxed">
+        <p className="text-sm text-text2 mt-2 leading-relaxed animate-fade-up delay-100">
           Select to start capturing contacts
         </p>
       </div>
 
       {/* Conference cards */}
       <div className="flex-1 px-5 space-y-2.5 overflow-y-auto pb-4">
-        {sorted.map((conf) => {
+        {sorted.map((conf, index) => {
           const isSelected = selected === conf.id;
           const live = isLive(conf);
           const ts = TIER_STYLE[conf.tier ?? 'T3'] ?? TIER_STYLE.T3;
@@ -68,8 +68,9 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
             <button
               key={conf.id}
               onClick={() => setSelected(conf.id)}
-              className="w-full text-left rounded-2xl relative overflow-hidden transition-all active:scale-[0.99]"
+              className="w-full text-left rounded-2xl relative overflow-hidden transition-all active:scale-[0.99] animate-fade-up hover:-translate-y-0.5"
               style={{
+                animationDelay: `${150 + index * 60}ms`,
                 background: isSelected ? 'rgba(244,168,37,0.07)' : '#161E2E',
                 border: isSelected
                   ? '1.5px solid rgba(244,168,37,0.3)'
@@ -141,7 +142,7 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
       </div>
 
       {/* CTA */}
-      <div className="px-5 pb-8 pt-4">
+      <div className="px-5 pb-8 pt-4 animate-fade-up delay-400">
         <button
           onClick={() => selected && onSelect(selected)}
           disabled={!selected}

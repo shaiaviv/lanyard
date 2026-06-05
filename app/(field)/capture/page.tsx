@@ -15,7 +15,7 @@ export default async function CapturePage({ searchParams }: Props) {
     getConferences(),
   ]);
 
-  const selectedId = params.conf ?? activeConference?.id ?? null;
+  const selectedId = params.conf ?? rep?.currentConferenceId ?? activeConference?.id ?? null;
 
   if (!rep) {
     return (
