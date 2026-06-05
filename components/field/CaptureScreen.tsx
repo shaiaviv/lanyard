@@ -205,7 +205,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
           </div>
 
           <div className="text-center animate-fade-up delay-150 max-w-[300px]">
-            <p className="text-sm font-semibold text-text1 mb-1">Describe your full interaction</p>
+            <p className="text-sm font-semibold text-text1 mb-1">Record an Encounter</p>
             <p className="text-xs text-text2 leading-relaxed">
               The more detail, the better. Make sure to include their{' '}
               <span className="text-text1 font-medium">name, company, and title</span>, what you discussed,
