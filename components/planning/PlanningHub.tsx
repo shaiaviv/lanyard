@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Fingerprint } from 'lucide-react';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageTimeline } from '@/components/planning/CoverageTimeline';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
@@ -20,13 +21,20 @@ interface Props {
 export function PlanningHub({ conferences, coverage, followUps, repId, repName }: Props) {
   const [tab, setTab] = useState<Tab>('Conferences');
 
+  const t1Count = conferences.filter((c) => c.tier === 'T1').length;
+
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Header */}
-      <header className="px-6 pt-10 pb-0 border-b border-zinc-100">
-        <h1 className="text-2xl font-bold text-zinc-900 mb-0.5">Conference Hub</h1>
-        <p className="text-sm text-zinc-500 mb-4">
-          {conferences.length} conferences · {conferences.filter((c) => c.tier === 'T1').length} T1 targets
+    <div className="flex flex-col min-h-screen">
+      <header className="px-6 pt-10 pb-0 border-b border-[rgba(255,255,255,0.06)]">
+        {/* Wordmark row */}
+        <div className="flex items-center gap-2.5 mb-1">
+          <Fingerprint size={20} className="text-accent" strokeWidth={1.5} />
+          <h1 className="text-2xl font-bold tracking-tight text-text1 uppercase">
+            Conference Hub
+          </h1>
+        </div>
+        <p className="text-xs text-text3 mb-5 font-medium">
+          {conferences.length} conferences · {t1Count} T1 must-attend targets
         </p>
 
         {/* Tab bar */}
@@ -35,15 +43,18 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
                 tab === t
-                  ? 'border-orange-500 text-orange-600'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-700'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-text3 hover:text-text2'
               }`}
             >
               {t}
               {t === 'Follow-ups' && followUps.length > 0 && (
-                <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold">
+                <span
+                  className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-accent text-[9px] font-bold"
+                  style={{ background: 'rgba(244,168,37,0.1)', border: '1px solid rgba(244,168,37,0.2)' }}
+                >
                   {followUps.length}
                 </span>
               )}
@@ -54,11 +65,7 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
 
       <div className="flex-1 px-6 py-6">
         {tab === 'Conferences' && (
-          <ConferenceList
-            conferences={conferences}
-            coverage={coverage}
-            repId={repId}
-          />
+          <ConferenceList conferences={conferences} coverage={coverage} repId={repId} />
         )}
         {tab === 'Coverage' && (
           <CoverageTimeline
@@ -68,9 +75,7 @@ export function PlanningHub({ conferences, coverage, followUps, repId, repName }
             repName={repName}
           />
         )}
-        {tab === 'Follow-ups' && (
-          <FollowUpQueue followUps={followUps} />
-        )}
+        {tab === 'Follow-ups' && <FollowUpQueue followUps={followUps} />}
       </div>
     </div>
   );

@@ -145,13 +145,7 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
             </p>
           )}
         </div>
-      ) : (
-        <p className="text-xs text-text3 text-center leading-relaxed">
-          Tap to record a voice note
-          <br />
-          or use the form below
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }

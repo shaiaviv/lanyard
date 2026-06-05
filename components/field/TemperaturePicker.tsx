@@ -1,4 +1,5 @@
 'use client';
+import { Flame, Sun, Minus, Wind, Snowflake } from 'lucide-react';
 import type { Temperature } from '@/lib/types';
 
 interface TemperaturePickerProps {
@@ -6,44 +7,75 @@ interface TemperaturePickerProps {
   onChange: (t: Temperature) => void;
 }
 
-const OPTIONS: { value: Temperature; emoji: string; label: string; activeClass: string }[] = [
-  { value: 'hot',      emoji: '🔥', label: 'Hot',      activeClass: 'bg-red-500 text-white border-red-500' },
-  { value: 'warm',     emoji: '☀️', label: 'Warm',     activeClass: 'bg-orange-400 text-white border-orange-400' },
-  { value: 'lukewarm', emoji: '😐', label: 'Lukewarm', activeClass: 'bg-amber-300 text-zinc-800 border-amber-300' },
-  { value: 'cool',     emoji: '❄️', label: 'Cool',     activeClass: 'bg-sky-400 text-white border-sky-400' },
-  { value: 'cold',     emoji: '🥶', label: 'Cold',     activeClass: 'bg-blue-500 text-white border-blue-500' },
+const OPTIONS: {
+  value: Temperature;
+  Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  label: string;
+  activeBg: string;
+  activeText: string;
+  activeBorder: string;
+}[] = [
+  { value: 'hot',      Icon: Flame,     label: 'Hot',      activeBg: 'bg-red-500',    activeText: 'text-white',     activeBorder: 'border-red-500' },
+  { value: 'warm',     Icon: Sun,       label: 'Warm',     activeBg: 'bg-orange-500', activeText: 'text-white',     activeBorder: 'border-orange-500' },
+  { value: 'lukewarm', Icon: Minus,     label: 'Lukewarm', activeBg: 'bg-amber-400',  activeText: 'text-[#07090F]', activeBorder: 'border-amber-400' },
+  { value: 'cool',     Icon: Wind,      label: 'Cool',     activeBg: 'bg-sky-500',    activeText: 'text-white',     activeBorder: 'border-sky-500' },
+  { value: 'cold',     Icon: Snowflake, label: 'Cold',     activeBg: 'bg-indigo-500', activeText: 'text-white',     activeBorder: 'border-indigo-500' },
 ];
 
 export function TemperaturePicker({ value, onChange }: TemperaturePickerProps) {
   return (
-    <div className="flex gap-2">
-      {OPTIONS.map((opt) => (
+    <div className="flex gap-1.5">
+      {OPTIONS.map(({ value: v, Icon, label, activeBg, activeText, activeBorder }) => (
         <button
-          key={opt.value}
+          key={v}
           type="button"
-          onClick={() => onChange(opt.value)}
-          title={opt.label}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl border-2 text-xs font-medium transition-all ${
-            value === opt.value
-              ? opt.activeClass
-              : 'border-zinc-200 text-zinc-500 hover:border-zinc-300 bg-white'
+          onClick={() => onChange(v)}
+          title={label}
+          className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl border-2 transition-all ${
+            value === v
+              ? `${activeBg} ${activeText} ${activeBorder}`
+              : 'border-[rgba(255,255,255,0.07)] text-text3 hover:border-[rgba(255,255,255,0.12)] bg-elevated'
           }`}
         >
-          <span className="text-base leading-none">{opt.emoji}</span>
-          <span className="text-[10px]">{opt.label}</span>
+          <Icon size={15} strokeWidth={2} />
+          <span className="text-[9px] font-bold tracking-wide">{label}</span>
         </button>
       ))}
     </div>
   );
 }
 
+const CHIP_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+  hot:      Flame,
+  warm:     Sun,
+  lukewarm: Minus,
+  cool:     Wind,
+  cold:     Snowflake,
+};
+
+const CHIP_STYLE: Record<string, { wrapper: string; text: string }> = {
+  hot:      { wrapper: 'bg-red-500/10 border border-red-500/20',       text: 'text-red-400' },
+  warm:     { wrapper: 'bg-orange-500/10 border border-orange-500/20', text: 'text-orange-400' },
+  lukewarm: { wrapper: 'bg-amber-400/10 border border-amber-400/20',   text: 'text-amber-400' },
+  cool:     { wrapper: 'bg-sky-500/10 border border-sky-500/20',       text: 'text-sky-400' },
+  cold:     { wrapper: 'bg-indigo-500/10 border border-indigo-500/20', text: 'text-indigo-400' },
+};
+
+const LABEL: Record<string, string> = {
+  hot: 'Hot', warm: 'Warm', lukewarm: 'Lukewarm', cool: 'Cool', cold: 'Cold',
+};
+
 export function TemperatureChip({ value }: { value: Temperature | null }) {
   if (!value) return null;
-  const opt = OPTIONS.find((o) => o.value === value);
-  if (!opt) return null;
+  const style = CHIP_STYLE[value];
+  const Icon = CHIP_ICON[value];
+  if (!style || !Icon) return null;
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${opt.activeClass}`}>
-      {opt.emoji} {opt.label}
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${style.wrapper} ${style.text}`}
+    >
+      <Icon size={11} strokeWidth={2} />
+      {LABEL[value]}
     </span>
   );
 }

@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ── Design tokens mapped to Tailwind utilities ── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Backgrounds */
+  --color-base:      #07090F;
+  --color-surface:   #0C1220;
+  --color-elevated:  #111828;
+  --color-card:      #161E2E;
+
+  /* Accent — amber gold */
+  --color-accent:     #F4A825;
+  --color-accent-dim: #C17D10;
+
+  /* Text hierarchy */
+  --color-text1: #EEF2FF;
+  --color-text2: #9DB5CC;
+  --color-text3: #6B82A0;
+
+  /* Semantic */
+  --color-success: #10B981;
+  --color-error:   #EF4444;
+  --color-info:    #60A5FA;
+  --color-warn:    #F59E0B;
+
+  /* Typography */
+  --font-sans: var(--font-outfit), "Outfit", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Raw CSS variables (rgba values, not Tailwind utilities) ── */
+:root {
+  --accent-subtle:    rgba(244, 168, 37, 0.07);
+  --accent-glow:      rgba(244, 168, 37, 0.25);
+  --glass-bg:         rgba(13, 18, 32, 0.92);
+  --border:           rgba(255, 255, 255, 0.07);
+  --border-strong:    rgba(255, 255, 255, 0.12);
 }
+
+/* ── Base ────────────────────────────────────── */
+html { color-scheme: dark; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #07090F;
+  color: #EEF2FF;
+  font-family: var(--font-outfit), "Outfit", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ── Scrollbar hiding ────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Glass morphism ──────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+}
+
+/* ── Dark input ──────────────────────────────── */
+.input-dark {
+  display: block;
+  width: 100%;
+  background: #0C1220;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #EEF2FF;
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 42px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-dark::placeholder { color: #6B82A0; }
+.input-dark:focus {
+  border-color: #F4A825;
+  box-shadow: 0 0 0 3px rgba(244, 168, 37, 0.1);
+}
+textarea.input-dark {
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  resize: none;
+}
+.input-dark-warn {
+  border-color: #F59E0B !important;
+  background: rgba(245, 158, 11, 0.06) !important;
+}
+
+/* ── Record button animations ────────────────── */
+@keyframes ambient-glow {
+  0%, 100% { box-shadow: 0 0 24px 4px rgba(244, 168, 37, 0.2), 0 6px 20px rgba(0, 0, 0, 0.6); }
+  50%       { box-shadow: 0 0 50px 14px rgba(244, 168, 37, 0.4), 0 6px 20px rgba(0, 0, 0, 0.6); }
+}
+
+@keyframes ring-out {
+  0%   { transform: scale(1); opacity: 0.45; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+.record-idle   { background: #F4A825; animation: ambient-glow 3s ease-in-out infinite; }
+.record-active { background: #EF4444; box-shadow: 0 0 32px rgba(239, 68, 68, 0.5); animation: none; }
+.ring-out      { animation: ring-out 1.4s ease-out infinite; }
+
+/* ── Score bar gradient ──────────────────────── */
+.score-bar-fill { background: linear-gradient(90deg, #C17D10, #F4A825); }
