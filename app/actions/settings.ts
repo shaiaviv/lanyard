@@ -52,7 +52,7 @@ export async function saveServiceKey(
         team_id: rep.teamId,
         key_name: name,
         key_ciphertext: encrypted,
-        updated_by: rep.authUserId,
+        updated_by: rep.id,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'team_id,key_name' },
