@@ -274,30 +274,48 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       {/* LinkedIn candidates */}
       {draft.linkedinCandidates.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold text-text3">Verify LinkedIn</p>
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold text-text3">Verify LinkedIn</p>
+            <p className="text-[11px] text-text3">Open to check · tap to confirm</p>
+          </div>
           {draft.linkedinCandidates.map((c) => (
-            <button
+            <div
               key={c.linkedinUrl}
-              type="button"
-              onClick={() => setSelectedLinkedin(selectedLinkedin === c.linkedinUrl ? null : c.linkedinUrl)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+              className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                 selectedLinkedin === c.linkedinUrl
                   ? 'border-2 border-accent/40 bg-[rgba(244,168,37,0.05)]'
-                  : 'border border-[rgba(255,255,255,0.07)] bg-elevated hover:border-[rgba(255,255,255,0.12)]'
+                  : 'border border-[rgba(255,255,255,0.07)] bg-elevated'
               }`}
             >
-              {c.photoUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={c.photoUrl} alt={c.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-text1 truncate">{c.name}</p>
-                {c.title && c.company && (
-                  <p className="text-xs text-text2 truncate">{c.title} · {c.company}</p>
+              {/* Tap card body to confirm/deconfirm */}
+              <button
+                type="button"
+                onClick={() => setSelectedLinkedin(selectedLinkedin === c.linkedinUrl ? null : c.linkedinUrl)}
+                className="flex items-center gap-3 min-w-0 flex-1 text-left"
+              >
+                {c.photoUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={c.photoUrl} alt={c.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                 )}
-              </div>
-              <ExternalLink size={13} className="text-text3 flex-shrink-0" />
-            </button>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-text1 truncate">{c.name}</p>
+                  {c.title && c.company && (
+                    <p className="text-xs text-text2 truncate">{c.title} · {c.company}</p>
+                  )}
+                </div>
+              </button>
+              {/* Separate link — opens LinkedIn in new tab */}
+              <a
+                href={c.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-1.5 rounded-lg hover:bg-white/8 text-info transition-colors flex-shrink-0"
+                title="Open LinkedIn profile"
+              >
+                <ExternalLink size={15} />
+              </a>
+            </div>
           ))}
           {selectedLinkedin && (
             <p className="text-xs text-success font-medium">✓ LinkedIn confirmed</p>
