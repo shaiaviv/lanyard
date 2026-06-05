@@ -1,12 +1,11 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, ChevronUp, Plus, RotateCcw, X, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, RotateCcw, X, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { TemperaturePicker } from '@/components/field/TemperaturePicker';
 import { MetBeforeHint } from '@/components/field/MetBeforeHint';
 import { commitEncounter } from '@/app/actions/field';
-import type { CaptureDraft } from '@/lib/types';
-import type { Temperature, MatchCandidate } from '@/lib/types';
+import type { CaptureDraft, Temperature, MatchCandidate } from '@/lib/types';
 
 interface ReviewDraftProps {
   draft: CaptureDraft;
@@ -21,14 +20,36 @@ function confidence(field: string, conf: Record<string, number>): number {
   return conf[field] ?? 1;
 }
 
-function fieldClass(field: string, conf: Record<string, number>) {
-  return confidence(field, conf) < LOW
-    ? 'border-amber-400 bg-amber-50 focus:ring-amber-400'
-    : 'border-zinc-300 bg-white focus:ring-orange-500';
+function inputClass(field: string, conf: Record<string, number>) {
+  return confidence(field, conf) < LOW ? 'input-dark input-dark-warn' : 'input-dark';
 }
 
-const base =
-  'w-full h-10 rounded-lg border px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:border-transparent transition-colors';
+function Label({ text, children }: { text: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">{text}</p>
+      {children}
+    </div>
+  );
+}
+
+function FitChip({ tier }: { tier: string }) {
+  const styles: Record<string, { bg: string; text: string }> = {
+    strong:  { bg: 'rgba(16,185,129,0.1)',  text: 'text-green-400' },
+    moderate:{ bg: 'rgba(96,165,250,0.1)',  text: 'text-blue-400' },
+    weak:    { bg: 'rgba(255,255,255,0.05)', text: 'text-text3' },
+    unclear: { bg: 'rgba(255,255,255,0.05)', text: 'text-text3' },
+  };
+  const s = styles[tier] ?? styles.unclear;
+  return (
+    <span
+      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.text}`}
+      style={{ background: s.bg }}
+    >
+      {tier}
+    </span>
+  );
+}
 
 export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraftProps) {
   const router = useRouter();
@@ -36,7 +57,6 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
   const { parsed, transcript, matchCandidates: initCandidates, resolution, bestMatchId } = draft;
   const conf = parsed.confidencePerField ?? {};
 
-  // Editable fields pre-filled from AI parse
   const [name, setName] = useState(parsed.name ?? '');
   const [company, setCompany] = useState(parsed.company ?? '');
   const [title, setTitle] = useState(parsed.title ?? '');
@@ -48,17 +68,12 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
   const [followUp, setFollowUp] = useState(parsed.followUp ?? false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [showOptional, setShowOptional] = useState(!!email);
-
-  // Match resolution
   const [matchCandidates] = useState<MatchCandidate[]>(initCandidates);
   const [resolvedContactId, setResolvedContactId] = useState<string | null | undefined>(
     resolution === 'auto-match' && bestMatchId ? bestMatchId : undefined,
   );
-
-  // LinkedIn candidates
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [selectedLinkedin, setSelectedLinkedin] = useState<string | null>(null);
-
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -90,7 +105,6 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
         matchCandidates: matchCandidates.length > 0 ? matchCandidates : undefined,
         state: resolvedContactId === undefined && matchCandidates.length > 0 ? 'pending' : 'confirmed',
       });
-
       if ('error' in result) {
         setError(result.error);
       } else {
@@ -104,23 +118,30 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-        <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-2xl">✓</div>
-        <p className="font-semibold text-zinc-900">Captured!</p>
-        <p className="text-sm text-zinc-500">Heading to your leads…</p>
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}
+        >
+          <CheckCircle2 size={24} className="text-success" />
+        </div>
+        <p className="font-semibold text-text1">Captured!</p>
+        <p className="text-sm text-text2">Heading to your leads…</p>
       </div>
     );
   }
+
+  const hasLowConfidence = Object.values(conf).some((v) => v < LOW);
 
   return (
     <div className="px-4 py-6 space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold text-zinc-900">Review capture</h2>
+        <h2 className="text-base font-bold text-text1">Review capture</h2>
         {onRetry && (
           <button
             type="button"
             onClick={onRetry}
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-text3 hover:text-text2 transition-colors"
           >
             <RotateCcw size={13} /> Re-record
           </button>
@@ -128,16 +149,22 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       </div>
 
       {/* Confidence legend */}
-      {Object.values(conf).some((v) => v < LOW) && (
-        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          <span className="text-amber-500 text-sm">⚠</span>
-          <p className="text-xs text-amber-700">
-            Amber fields were low-confidence — please double-check them.
+      {hasLowConfidence && (
+        <div
+          className="flex items-center gap-2 rounded-xl px-3 py-2.5"
+          style={{
+            background: 'rgba(245,158,11,0.07)',
+            border: '1px solid rgba(245,158,11,0.15)',
+          }}
+        >
+          <span className="text-warn text-sm">⚠</span>
+          <p className="text-xs text-warn/80">
+            Highlighted fields were low-confidence — please double-check.
           </p>
         </div>
       )}
 
-      {/* Met before (F3) */}
+      {/* Match hint */}
       {matchCandidates.length > 0 && resolvedContactId === undefined && (
         <MetBeforeHint
           candidates={matchCandidates}
@@ -146,11 +173,15 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
           onSaveLater={() => { void handleSubmit(); }}
         />
       )}
+
       {resolution === 'auto-match' && bestMatchId && (
-        <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
-          <span className="text-orange-500">✓</span>
-          <p className="text-xs text-orange-700 font-medium">
-            Auto-linked to an existing contact (high confidence match).
+        <div
+          className="flex items-center gap-2 rounded-xl px-3 py-2.5"
+          style={{ background: 'rgba(244,168,37,0.06)', border: '1px solid rgba(244,168,37,0.14)' }}
+        >
+          <span className="text-accent">✓</span>
+          <p className="text-xs text-accent/80 font-medium">
+            Auto-linked to an existing contact (high confidence).
           </p>
         </div>
       )}
@@ -162,7 +193,7 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Jane Smith"
-            className={`${base} ${fieldClass('name', conf)}`}
+            className={inputClass('name', conf)}
           />
         </Label>
         <div className="grid grid-cols-2 gap-3">
@@ -171,7 +202,7 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
               value={company}
               onChange={(e) => setCompany(e.target.value)}
               placeholder="Stripe"
-              className={`${base} ${fieldClass('company', conf)}`}
+              className={inputClass('company', conf)}
             />
           </Label>
           <Label text="Title">
@@ -179,24 +210,22 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Head of Payments"
-              className={`${base} ${fieldClass('title', conf)}`}
+              className={inputClass('title', conf)}
             />
           </Label>
         </div>
       </div>
 
-      {/* Temperature */}
       <Label text="Interest level (AI-estimated)">
         <TemperaturePicker value={temperature} onChange={setTemperature} />
       </Label>
 
-      {/* Note */}
       <Label text="Note (AI-cleaned)">
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={3}
-          className={`${base} h-auto py-2 resize-none ${fieldClass('note', conf)}`}
+          className={`${inputClass('note', conf)} h-auto py-2.5 resize-none`}
         />
       </Label>
 
@@ -208,12 +237,13 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
             onChange={(e) => setTopicInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTopic(); } }}
             placeholder="add topic…"
-            className={`${base} flex-1`}
+            className="input-dark flex-1"
           />
           <button
             type="button"
             onClick={addTopic}
-            className="flex-shrink-0 w-10 h-10 rounded-lg border border-zinc-300 flex items-center justify-center text-zinc-500 hover:border-zinc-400"
+            className="flex-shrink-0 w-10 h-[42px] rounded-xl bg-elevated flex items-center justify-center text-text3 hover:text-text2 transition-colors"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
           >
             <Plus size={16} />
           </button>
@@ -221,7 +251,11 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
         {topics.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {topics.map((t) => (
-              <span key={t} className="flex items-center gap-1 text-xs bg-zinc-100 text-zinc-700 rounded-full pl-2.5 pr-1.5 py-1">
+              <span
+                key={t}
+                className="flex items-center gap-1 text-xs text-accent rounded-full pl-2.5 pr-1.5 py-1"
+                style={{ background: 'rgba(244,168,37,0.07)', border: '1px solid rgba(244,168,37,0.15)' }}
+              >
                 {t}
                 <button type="button" onClick={() => setTopics(topics.filter((x) => x !== t))}>
                   <X size={11} />
@@ -232,19 +266,19 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
         )}
       </Label>
 
-      {/* LinkedIn candidates from enrichment */}
+      {/* LinkedIn candidates */}
       {draft.linkedinCandidates.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Verify LinkedIn</p>
+          <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">Verify LinkedIn</p>
           {draft.linkedinCandidates.map((c) => (
             <button
               key={c.linkedinUrl}
               type="button"
               onClick={() => setSelectedLinkedin(selectedLinkedin === c.linkedinUrl ? null : c.linkedinUrl)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-colors ${
+              className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
                 selectedLinkedin === c.linkedinUrl
-                  ? 'border-orange-400 bg-orange-50'
-                  : 'border-zinc-200 hover:border-zinc-300'
+                  ? 'border-2 border-accent/40 bg-[rgba(244,168,37,0.05)]'
+                  : 'border border-[rgba(255,255,255,0.07)] bg-elevated hover:border-[rgba(255,255,255,0.12)]'
               }`}
             >
               {c.photoUrl && (
@@ -252,16 +286,16 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
                 <img src={c.photoUrl} alt={c.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
               )}
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-zinc-900 truncate">{c.name}</p>
+                <p className="text-sm font-semibold text-text1 truncate">{c.name}</p>
                 {c.title && c.company && (
-                  <p className="text-xs text-zinc-500 truncate">{c.title} · {c.company}</p>
+                  <p className="text-xs text-text2 truncate">{c.title} · {c.company}</p>
                 )}
               </div>
-              <ExternalLink size={13} className="text-zinc-400 flex-shrink-0" />
+              <ExternalLink size={13} className="text-text3 flex-shrink-0" />
             </button>
           ))}
           {selectedLinkedin && (
-            <p className="text-xs text-green-700 font-medium">✓ LinkedIn confirmed</p>
+            <p className="text-xs text-success font-medium">✓ LinkedIn confirmed</p>
           )}
         </div>
       )}
@@ -270,21 +304,24 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       <button
         type="button"
         onClick={() => setShowOptional(!showOptional)}
-        className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+        className="flex items-center gap-1.5 text-xs text-text3 hover:text-text2 transition-colors"
       >
-        {showOptional ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        {showOptional ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {showOptional ? 'Hide' : 'Show'} optional fields
       </button>
 
       {showOptional && (
-        <div className="space-y-3 p-4 bg-zinc-50 rounded-xl">
+        <div
+          className="space-y-3 p-4 bg-elevated rounded-xl"
+          style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+        >
           <Label text="Email">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="jane@stripe.com"
-              className={`${base} ${fieldClass('email', conf)}`}
+              className={inputClass('email', conf)}
             />
           </Label>
           {!selectedLinkedin && (
@@ -294,7 +331,7 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
                 value={linkedinUrl}
                 onChange={(e) => setLinkedinUrl(e.target.value)}
                 placeholder="https://linkedin.com/in/…"
-                className={base + ' border-zinc-300 bg-white focus:ring-orange-500'}
+                className="input-dark"
               />
             </Label>
           )}
@@ -302,76 +339,74 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       )}
 
       {/* Follow-up */}
-      <label className="flex items-center gap-3 cursor-pointer">
+      <label className="flex items-center gap-3 cursor-pointer group">
+        <div
+          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all flex-shrink-0 ${
+            followUp ? 'bg-accent' : 'bg-elevated group-hover:border-[rgba(255,255,255,0.2)]'
+          }`}
+          style={{ border: followUp ? 'none' : '1.5px solid rgba(255,255,255,0.15)' }}
+          onClick={() => setFollowUp(!followUp)}
+        >
+          {followUp && <span className="text-[#07090F] text-xs font-bold leading-none">✓</span>}
+        </div>
         <input
           type="checkbox"
           checked={followUp}
           onChange={(e) => setFollowUp(e.target.checked)}
-          className="w-5 h-5 rounded border-zinc-300 text-orange-500 accent-orange-500"
+          className="sr-only"
         />
-        <span className="text-sm font-medium text-zinc-700">Flag for follow-up</span>
+        <span className="text-sm font-medium text-text2">Flag for follow-up</span>
       </label>
 
       {/* Fit chip */}
       {parsed.fit && (
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
+        <div className="flex items-center gap-2 text-xs text-text3">
           <span>AI fit estimate:</span>
           <FitChip tier={parsed.fit.tier} />
-          <span className="text-zinc-400 truncate">{parsed.fit.rationale}</span>
+          <span className="text-text3 truncate">{parsed.fit.rationale}</span>
         </div>
       )}
 
       {/* Transcript toggle */}
-      <div className="border border-zinc-100 rounded-xl overflow-hidden">
+      <div
+        className="rounded-xl overflow-hidden"
+        style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+      >
         <button
           type="button"
           onClick={() => setShowTranscript(!showTranscript)}
-          className="w-full flex items-center justify-between px-4 py-3 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 text-sm text-text2 hover:bg-elevated transition-colors"
         >
           <span className="font-medium">Transcript</span>
           {showTranscript ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>
         {showTranscript && (
-          <div className="px-4 pb-4 text-xs text-zinc-500 leading-relaxed border-t border-zinc-100 pt-3">
+          <div
+            className="px-4 pb-4 pt-3 text-xs text-text3 leading-relaxed"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
+          >
             {transcript || '(no transcript)'}
           </div>
         )}
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        <div
+          className="rounded-xl px-3 py-2.5"
+          style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)' }}
+        >
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
       )}
 
       <button
         onClick={handleSubmit}
         disabled={isPending || !name.trim()}
-        className="w-full h-12 rounded-xl bg-orange-500 text-white font-semibold text-sm hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="w-full h-12 rounded-xl bg-accent text-[#07090F] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+        style={{ boxShadow: '0 4px 20px rgba(244,168,37,0.22)' }}
       >
         {isPending ? 'Saving…' : 'Confirm & save'}
       </button>
     </div>
-  );
-}
-
-function Label({ text, children }: { text: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1">
-      <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">{text}</p>
-      {children}
-    </div>
-  );
-}
-
-function FitChip({ tier }: { tier: string }) {
-  const map: Record<string, string> = {
-    strong: 'bg-green-100 text-green-700',
-    moderate: 'bg-blue-100 text-blue-700',
-    weak: 'bg-zinc-100 text-zinc-500',
-    unclear: 'bg-zinc-100 text-zinc-400',
-  };
-  return (
-    <span className={`px-2 py-0.5 rounded-full font-semibold ${map[tier] ?? map.unclear}`}>
-      {tier}
-    </span>
   );
 }

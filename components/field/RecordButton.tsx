@@ -83,65 +83,72 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
 
   if (unsupported) {
     return (
-      <div className="flex flex-col items-center gap-4 text-center">
+      <div className="flex flex-col items-center gap-5 text-center">
         <div
-          className="w-24 h-24 rounded-full bg-elevated flex items-center justify-center"
+          className="w-44 h-44 rounded-full bg-elevated flex items-center justify-center"
           style={{ border: '1px solid rgba(255,255,255,0.07)' }}
         >
-          <MicOff size={28} className="text-text3" />
+          <MicOff size={44} strokeWidth={1.25} className="text-text3" />
         </div>
-        <p className="text-xs text-text2 max-w-[200px] leading-relaxed">
-          Voice capture requires Chrome, Edge, or Safari. Use the form below.
+        <p className="text-sm text-text2 max-w-[220px] leading-relaxed">
+          Voice capture requires Chrome, Edge, or Safari.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-6">
       {/* Button + rings container */}
-      <div className="relative flex items-center justify-center w-36 h-36">
-        {/* Ambient rings (idle) */}
+      <div className="relative flex items-center justify-center w-60 h-60">
+        {/* Ambient halo rings (idle only) */}
         {!recording && (
           <>
-            <div className="absolute inset-[-4px] rounded-full bg-accent/[0.04]" />
-            <div className="absolute inset-[-14px] rounded-full bg-accent/[0.025]" />
+            <div className="absolute inset-[-10px] rounded-full bg-accent/[0.05]" />
+            <div className="absolute inset-[-28px] rounded-full bg-accent/[0.025]" />
+            <div className="absolute inset-[-46px] rounded-full bg-accent/[0.01]" />
           </>
         )}
-        {/* Expanding ring (recording) */}
+        {/* Expanding pulse ring (recording) */}
         {recording && (
-          <div
-            className="absolute inset-0 rounded-full border-2 border-red-500/30 ring-out"
-            style={{ transformOrigin: 'center' }}
-          />
+          <>
+            <div
+              className="absolute inset-0 rounded-full border-2 border-red-500/40 ring-out"
+              style={{ transformOrigin: 'center' }}
+            />
+            <div
+              className="absolute inset-0 rounded-full border border-red-500/20 ring-out delay-200"
+              style={{ transformOrigin: 'center' }}
+            />
+          </>
         )}
 
         <button
           type="button"
           disabled={disabled}
           onClick={recording ? stopRecording : startRecording}
-          className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
+          className={`relative w-44 h-44 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-95 hover:scale-[1.03] disabled:opacity-40 disabled:cursor-not-allowed ${
             recording ? 'record-active' : 'record-idle'
           }`}
           title={recording ? 'Tap to stop' : 'Tap to start voice capture'}
         >
           {recording ? (
-            <Square size={26} strokeWidth={1.5} fill="white" className="text-white" />
+            <Square size={38} strokeWidth={1.5} fill="white" className="text-white" />
           ) : (
-            <Mic size={32} strokeWidth={1.5} className="text-[#07090F]" />
+            <Mic size={52} strokeWidth={1.25} className="text-[#07090F]" />
           )}
         </button>
       </div>
 
       {recording ? (
-        <div className="flex flex-col items-center gap-2 max-w-[260px]">
+        <div className="flex flex-col items-center gap-2 max-w-[280px]">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-            <span className="text-sm font-semibold text-red-400">Recording · tap to finish</span>
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+            <span className="text-sm font-semibold text-red-400 tracking-wide">Recording · tap to finish</span>
           </div>
           {interimText && (
-            <p className="text-xs text-text2 text-center leading-relaxed line-clamp-3">
-              {interimText}
+            <p className="text-sm text-text2 text-center leading-relaxed line-clamp-3 italic">
+              &ldquo;{interimText}&rdquo;
             </p>
           )}
         </div>

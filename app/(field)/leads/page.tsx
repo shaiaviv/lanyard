@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import { ChevronRight, Inbox } from 'lucide-react';
 import { LeadCard } from '@/components/field/LeadCard';
-import { getCurrentRep, getActiveConference, getConferences, getEncountersForConference, getPendingCount } from '@/lib/db/queries';
+import {
+  getCurrentRep,
+  getActiveConference,
+  getConferences,
+  getEncountersForConference,
+  getPendingCount,
+} from '@/lib/db/queries';
 
 interface Props {
   searchParams: Promise<{ conf?: string }>;
@@ -9,13 +15,11 @@ interface Props {
 
 export default async function LeadsPage({ searchParams }: Props) {
   const params = await searchParams;
-
   const [rep, activeConference, conferences] = await Promise.all([
     getCurrentRep(),
     getActiveConference(),
     getConferences(),
   ]);
-
   if (!rep) return null;
 
   const selectedId = params.conf ?? activeConference?.id ?? null;
@@ -27,54 +31,65 @@ export default async function LeadsPage({ searchParams }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col">
-      {/* Header */}
-      <header className="px-4 pt-12 pb-4 border-b border-zinc-100">
-        <h1 className="text-xl font-bold text-zinc-900">My Leads</h1>
+    <div className="flex flex-col animate-fade-in">
+      <header className="px-5 pt-12 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <h1 className="text-xl font-bold text-text1">My Leads</h1>
         {selectedConference ? (
-          <p className="text-sm text-zinc-500 mt-0.5">{selectedConference.name}</p>
+          <p className="text-sm text-text2 mt-0.5 flex items-center gap-1.5">
+            <span>{selectedConference.name}</span>
+          </p>
         ) : (
-          <p className="text-sm text-zinc-400 mt-0.5">No conference selected</p>
+          <p className="text-sm text-text3 mt-0.5">No conference selected</p>
         )}
       </header>
 
-      {/* Pending review banner */}
       {pendingCount > 0 && (
         <Link
           href="/reconcile"
-          className="mx-4 mt-4 flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"
+          className="mx-4 mt-4 flex items-center justify-between rounded-xl px-4 py-3 transition-colors"
+          style={{
+            background: 'rgba(245,158,11,0.07)',
+            border: '1px solid rgba(245,158,11,0.15)',
+          }}
         >
           <div>
-            <p className="text-sm font-semibold text-amber-900">
+            <p className="text-sm font-semibold text-warn">
               {pendingCount} contact{pendingCount !== 1 ? 's' : ''} need review
             </p>
-            <p className="text-xs text-amber-700">Confirm or discard before data gets stale</p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(245,158,11,0.55)' }}>
+              Confirm or discard before data gets stale
+            </p>
           </div>
-          <ChevronRight size={16} className="text-amber-500 flex-shrink-0" />
+          <ChevronRight size={16} className="text-warn/50 flex-shrink-0" />
         </Link>
       )}
 
-      {/* Leads list */}
       <div className="px-4 py-4 space-y-3">
         {encounters.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Inbox size={36} className="text-zinc-300 mb-3" />
-            <p className="font-medium text-zinc-500">No leads yet</p>
-            <p className="text-sm text-zinc-400 mt-1">
+            <div
+              className="w-14 h-14 rounded-2xl bg-elevated flex items-center justify-center mb-4"
+              style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+            >
+              <Inbox size={22} className="text-text3" />
+            </div>
+            <p className="font-semibold text-text2">No leads yet</p>
+            <p className="text-sm text-text3 mt-1.5 leading-relaxed max-w-[200px]">
               {selectedConference
                 ? 'Tap Capture to log your first contact'
-                : 'Select a conference above to see its leads'}
+                : 'Select a conference above'}
             </p>
             <Link
               href="/capture"
-              className="mt-4 px-5 py-2.5 rounded-full bg-orange-500 text-white text-sm font-semibold"
+              className="mt-5 px-6 py-2.5 rounded-full bg-accent text-[#07090F] text-sm font-bold transition-opacity hover:opacity-90"
+              style={{ boxShadow: '0 4px 16px rgba(244,168,37,0.22)' }}
             >
               Capture now
             </Link>
           </div>
         ) : (
           <>
-            <p className="text-xs text-zinc-400 font-medium">
+            <p className="text-[10px] text-text3 font-bold uppercase tracking-widest">
               {encounters.length} contact{encounters.length !== 1 ? 's' : ''} captured
             </p>
             {encounters.map((enc) => (

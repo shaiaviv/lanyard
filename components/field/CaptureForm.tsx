@@ -1,7 +1,7 @@
 'use client';
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, X, CheckCircle2 } from 'lucide-react';
 import { TemperaturePicker } from '@/components/field/TemperaturePicker';
 import { MetBeforeHint } from '@/components/field/MetBeforeHint';
 import { commitEncounter, runMatch } from '@/app/actions/field';
@@ -10,7 +10,6 @@ import type { Temperature, MatchCandidate } from '@/lib/types';
 interface CaptureFormProps {
   conferenceId: string | null;
   repId: string;
-  /** Pre-filled fields from a voice parse (empty on manual path) */
   prefill?: {
     name?: string; company?: string; title?: string;
     email?: string; note?: string; topics?: string[];
@@ -18,11 +17,21 @@ interface CaptureFormProps {
   };
 }
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-[10px] font-bold text-text3 uppercase tracking-widest">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Form fields
   const [name, setName] = useState(prefill.name ?? '');
   const [company, setCompany] = useState(prefill.company ?? '');
   const [title, setTitle] = useState(prefill.title ?? '');
@@ -34,18 +43,13 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
   const [topicInput, setTopicInput] = useState('');
   const [followUp, setFollowUp] = useState(false);
   const [showOptional, setShowOptional] = useState(false);
-
-  // Match resolution state (F3)
   const [matchCandidates, setMatchCandidates] = useState<MatchCandidate[]>([]);
   const [resolvedContactId, setResolvedContactId] = useState<string | null | undefined>(undefined);
-  // undefined = not resolved yet; null = explicitly "new contact"; string = linked to existing
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  // Debounced live matching — fires 800ms after the rep stops typing name/company/email
   useEffect(() => {
-    if (name.trim().length < 3) {
-      setMatchCandidates([]);
-      return;
-    }
+    if (name.trim().length < 3) { setMatchCandidates([]); return; }
     const t = setTimeout(async () => {
       try {
         const result = await runMatch({
@@ -58,19 +62,14 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
         setMatchCandidates(result.candidates);
         if (result.resolution === 'auto-match' && result.candidates[0]) {
           setResolvedContactId(result.candidates[0].contactId);
-        } else if (result.candidates.length > 0 && resolvedContactId === undefined) {
-          // leave resolvedContactId as undefined so MetBeforeHint prompts the rep
         }
       } catch {
-        // Matching unavailable (e.g., no Anthropic key yet) — degrade gracefully
+        // degrade gracefully
       }
     }, 800);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, company, email]);
-
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   function addTopic() {
     const t = topicInput.trim();
@@ -78,23 +77,14 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
     setTopicInput('');
   }
 
-  function removeTopic(t: string) {
-    setTopics(topics.filter((x) => x !== t));
-  }
-
   function handleTopicKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addTopic();
-    }
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTopic(); }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) { setError('Name is required'); return; }
-
     setError(null);
-
     startTransition(async () => {
       const result = await commitEncounter({
         conferenceId,
@@ -109,18 +99,15 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
         followUp,
         reminder: null,
         resolvedContactId: resolvedContactId ?? undefined,
-        // If user chose "decide later", save as pending
         state: resolvedContactId === undefined && matchCandidates.length > 0 ? 'pending' : 'confirmed',
         matchCandidates: matchCandidates.length > 0 ? matchCandidates : undefined,
       });
-
       if ('error' in result) {
         setError(result.error);
       } else {
         setSuccess(true);
         setTimeout(() => {
-          const dest = conferenceId ? `/leads?conf=${conferenceId}` : '/leads';
-          router.push(dest);
+          router.push(conferenceId ? `/leads?conf=${conferenceId}` : '/leads');
           router.refresh();
         }, 600);
       }
@@ -130,46 +117,45 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
-        <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-2xl">✓</div>
-        <p className="font-semibold text-zinc-900">Captured!</p>
-        <p className="text-sm text-zinc-500">Heading to your leads…</p>
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}
+        >
+          <CheckCircle2 size={24} className="text-success" />
+        </div>
+        <p className="font-semibold text-text1">Captured!</p>
+        <p className="text-sm text-text2">Heading to your leads…</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Met before hint (F3) */}
+    <form onSubmit={handleSubmit} className="space-y-5 pb-4">
       {matchCandidates.length > 0 && resolvedContactId === undefined && (
         <MetBeforeHint
           candidates={matchCandidates}
           onConfirm={(id) => setResolvedContactId(id)}
           onAddNew={() => setResolvedContactId(null)}
-          onSaveLater={() => {
-            // pending state — resolvedContactId stays undefined; submit will set state='pending'
-            void handleSubmit(new Event('submit') as unknown as React.FormEvent);
-          }}
+          onSaveLater={() => { void handleSubmit(new Event('submit') as unknown as React.FormEvent); }}
         />
       )}
 
-      {/* Core identity */}
       <div className="space-y-3">
         <Field label="Name *">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Jane Smith"
-            className={inputClass}
+            className="input-dark"
           />
         </Field>
-
         <div className="grid grid-cols-2 gap-3">
           <Field label="Company">
             <input
               value={company}
               onChange={(e) => setCompany(e.target.value)}
               placeholder="Stripe"
-              className={inputClass}
+              className="input-dark"
             />
           </Field>
           <Field label="Title">
@@ -177,29 +163,26 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Head of Payments"
-              className={inputClass}
+              className="input-dark"
             />
           </Field>
         </div>
       </div>
 
-      {/* Temperature */}
       <Field label="Interest level">
         <TemperaturePicker value={temperature} onChange={setTemperature} />
       </Field>
 
-      {/* Note */}
       <Field label="Notes">
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What did you discuss? What was their reaction?"
           rows={3}
-          className={`${inputClass} resize-none`}
+          className="input-dark h-auto py-2.5 resize-none"
         />
       </Field>
 
-      {/* Topics */}
       <Field label="Topics discussed">
         <div className="flex gap-2">
           <input
@@ -207,12 +190,13 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
             onChange={(e) => setTopicInput(e.target.value)}
             onKeyDown={handleTopicKeyDown}
             placeholder="FX hedging, travel merchants…"
-            className={`${inputClass} flex-1`}
+            className="input-dark flex-1"
           />
           <button
             type="button"
             onClick={addTopic}
-            className="flex-shrink-0 w-10 h-10 rounded-lg border border-zinc-300 flex items-center justify-center text-zinc-500 hover:border-zinc-400"
+            className="flex-shrink-0 w-10 h-[42px] rounded-xl bg-elevated flex items-center justify-center text-text3 hover:text-text2 transition-colors"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
           >
             <Plus size={16} />
           </button>
@@ -220,9 +204,20 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
         {topics.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {topics.map((t) => (
-              <span key={t} className="flex items-center gap-1 text-xs bg-zinc-100 text-zinc-700 rounded-full pl-2.5 pr-1.5 py-1">
+              <span
+                key={t}
+                className="flex items-center gap-1 text-xs text-accent rounded-full pl-2.5 pr-1.5 py-1"
+                style={{
+                  background: 'rgba(244,168,37,0.07)',
+                  border: '1px solid rgba(244,168,37,0.15)',
+                }}
+              >
                 {t}
-                <button type="button" onClick={() => removeTopic(t)}>
+                <button
+                  type="button"
+                  onClick={() => setTopics(topics.filter((x) => x !== t))}
+                  className="hover:text-white transition-colors"
+                >
                   <X size={11} />
                 </button>
               </span>
@@ -231,25 +226,27 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
         )}
       </Field>
 
-      {/* Optional fields toggle */}
       <button
         type="button"
         onClick={() => setShowOptional(!showOptional)}
-        className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+        className="flex items-center gap-1.5 text-xs text-text3 hover:text-text2 transition-colors"
       >
-        {showOptional ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        {showOptional ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {showOptional ? 'Hide' : 'Show'} optional fields
       </button>
 
       {showOptional && (
-        <div className="space-y-3 p-4 bg-zinc-50 rounded-xl">
+        <div
+          className="space-y-3 p-4 bg-elevated rounded-xl"
+          style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+        >
           <Field label="Email">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="jane@stripe.com"
-              className={inputClass}
+              className="input-dark"
             />
           </Field>
           <Field label="LinkedIn URL">
@@ -258,46 +255,52 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
               placeholder="https://linkedin.com/in/…"
-              className={inputClass}
+              className="input-dark"
             />
           </Field>
         </div>
       )}
 
-      {/* Follow-up */}
-      <label className="flex items-center gap-3 cursor-pointer">
+      {/* Follow-up toggle */}
+      <label className="flex items-center gap-3 cursor-pointer group">
+        <div
+          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all flex-shrink-0 ${
+            followUp ? 'bg-accent border-accent' : 'bg-elevated group-hover:border-[rgba(255,255,255,0.2)]'
+          }`}
+          style={{ border: followUp ? 'none' : '1.5px solid rgba(255,255,255,0.15)' }}
+          onClick={() => setFollowUp(!followUp)}
+        >
+          {followUp && <span className="text-[#07090F] text-xs font-bold leading-none">✓</span>}
+        </div>
         <input
           type="checkbox"
           checked={followUp}
           onChange={(e) => setFollowUp(e.target.checked)}
-          className="w-5 h-5 rounded border-zinc-300 text-orange-500 accent-orange-500"
+          className="sr-only"
         />
-        <span className="text-sm font-medium text-zinc-700">Flag for follow-up</span>
+        <span className="text-sm font-medium text-text2">Flag for follow-up</span>
       </label>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        <div
+          className="rounded-xl px-3 py-2.5"
+          style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)' }}
+        >
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
       )}
 
       <button
         type="submit"
         disabled={isPending || !name.trim()}
-        className="w-full h-12 rounded-xl bg-orange-500 text-white font-semibold text-sm hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="w-full h-12 rounded-xl bg-accent text-[#07090F] font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+        style={{
+          boxShadow:
+            isPending || !name.trim() ? 'none' : '0 4px 20px rgba(244,168,37,0.22)',
+        }}
       >
         {isPending ? 'Saving…' : 'Save contact'}
       </button>
     </form>
   );
 }
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1">
-      <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wide">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-const inputClass =
-  'w-full h-10 rounded-lg border border-zinc-300 px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white';

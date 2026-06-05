@@ -4,7 +4,6 @@ import { Key, Check, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { saveServiceKey } from '@/app/actions/settings';
 import type { KeyStatus } from '@/app/actions/settings';
 
-// Mirror of ServiceName from lib/config/getServiceKey — defined here to avoid crossing the server-only boundary
 type ServiceName = 'anthropic' | 'enrichment' | 'hubspot';
 
 const KEY_CONFIGS: {
@@ -72,35 +71,45 @@ function KeyCard({
   }
 
   return (
-    <div className="border border-zinc-200 rounded-xl p-4 space-y-3">
-      <div className="flex items-start justify-between">
+    <div
+      className="bg-card rounded-2xl p-4 space-y-3"
+      style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+    >
+      <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Key size={14} className="text-zinc-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm font-semibold text-zinc-900">{config.label}</p>
+          <div
+            className="w-7 h-7 rounded-lg bg-elevated flex items-center justify-center flex-shrink-0"
+            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            <Key size={13} className="text-text3" />
+          </div>
+          <p className="text-sm font-semibold text-text1">{config.label}</p>
         </div>
-        {flashOk && (
-          <span className="flex items-center gap-1 text-xs text-green-600 font-medium">
-            <Check size={12} /> Saved
-          </span>
-        )}
-        {hasMasked && !flashOk && (
-          <span className="text-xs text-zinc-400 font-mono">
-            {(status as { masked: string }).masked}
-          </span>
-        )}
-        {!hasMasked && !editing && !flashOk && (
-          <span className="flex items-center gap-1 text-xs text-amber-600">
-            <AlertCircle size={11} /> Not set
-          </span>
-        )}
+        <div className="flex-shrink-0">
+          {flashOk && (
+            <span className="flex items-center gap-1 text-xs text-success font-medium">
+              <Check size={12} /> Saved
+            </span>
+          )}
+          {hasMasked && !flashOk && (
+            <span className="text-[11px] text-text3 font-mono">
+              {(status as { masked: string }).masked}
+            </span>
+          )}
+          {!hasMasked && !editing && !flashOk && (
+            <span className="flex items-center gap-1 text-xs text-warn/80">
+              <AlertCircle size={11} /> Not set
+            </span>
+          )}
+        </div>
       </div>
 
-      <p className="text-xs text-zinc-500">{config.desc}</p>
+      <p className="text-xs text-text3 leading-relaxed">{config.desc}</p>
 
       {!editing ? (
         <button
           onClick={() => setEditing(true)}
-          className="text-xs text-orange-600 font-medium hover:text-orange-700 transition-colors"
+          className="text-xs text-accent font-semibold hover:text-accent-dim transition-colors"
         >
           {hasMasked ? 'Update key' : '+ Add key'}
         </button>
@@ -113,20 +122,20 @@ function KeyCard({
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && value.trim() && handleSave()}
               placeholder={config.placeholder}
-              className="w-full h-9 rounded-lg border border-zinc-300 px-3 pr-9 text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+              className="input-dark pr-10 font-mono text-xs"
               autoFocus
             />
             <button
               type="button"
               onClick={() => setShow(!show)}
-              className="absolute right-2.5 top-2 text-zinc-400 hover:text-zinc-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text3 hover:text-text2 transition-colors"
               tabIndex={-1}
             >
               {show ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
           </div>
           {err && (
-            <p className="text-xs text-red-600 flex items-center gap-1">
+            <p className="text-xs text-red-400 flex items-center gap-1">
               <AlertCircle size={11} /> {err}
             </p>
           )}
@@ -134,18 +143,14 @@ function KeyCard({
             <button
               onClick={handleSave}
               disabled={isPending || !value.trim()}
-              className="flex-1 h-8 rounded-lg bg-orange-500 text-white text-xs font-semibold disabled:opacity-40 transition-opacity"
+              className="flex-1 h-9 rounded-xl bg-accent text-[#07090F] text-xs font-bold disabled:opacity-40 transition-opacity"
             >
               {isPending ? 'Saving…' : 'Save'}
             </button>
             <button
-              onClick={() => {
-                setEditing(false);
-                setValue('');
-                setErr(null);
-                setShow(false);
-              }}
-              className="h-8 px-4 rounded-lg border border-zinc-200 text-zinc-600 text-xs hover:bg-zinc-50"
+              onClick={() => { setEditing(false); setValue(''); setErr(null); setShow(false); }}
+              className="h-9 px-4 rounded-xl text-text2 text-xs hover:text-text1 transition-colors"
+              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
             >
               Cancel
             </button>
@@ -163,14 +168,29 @@ export function SettingsClient({ statuses }: { statuses: Record<ServiceName, Key
         <KeyCard key={config.name} config={config} initial={statuses[config.name]} />
       ))}
 
-      <div className="bg-zinc-50 rounded-xl p-4 text-xs text-zinc-500 space-y-1.5">
-        <p className="font-medium text-zinc-700">Env var fallback (dev)</p>
-        <p>
+      <div
+        className="rounded-2xl p-4 space-y-1.5 text-xs"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <p className="font-semibold text-text2">Env var fallback (dev)</p>
+        <p className="text-text3 leading-relaxed">
           Keys saved here take priority. In local dev, you can also set{' '}
-          <code className="bg-zinc-200 px-1 rounded font-mono">ANTHROPIC_API_KEY</code> in{' '}
-          <code className="bg-zinc-200 px-1 rounded font-mono">.env</code> as a shortcut.
+          <code
+            className="rounded px-1 font-mono"
+            style={{ background: 'rgba(255,255,255,0.07)', color: '#EEF2FF' }}
+          >
+            ANTHROPIC_API_KEY
+          </code>{' '}
+          in{' '}
+          <code
+            className="rounded px-1 font-mono"
+            style={{ background: 'rgba(255,255,255,0.07)', color: '#EEF2FF' }}
+          >
+            .env
+          </code>{' '}
+          as a shortcut.
         </p>
-        <p className="text-zinc-400">Keys are AES-256-GCM encrypted at rest and never sent to the browser.</p>
+        <p className="text-text3">Keys are AES-256-GCM encrypted at rest and never sent to the browser.</p>
       </div>
     </div>
   );

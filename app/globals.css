@@ -38,7 +38,16 @@
 }
 
 /* ── Base ────────────────────────────────────── */
-html { color-scheme: dark; }
+/* Force dark unconditionally — this app is dark-only */
+html {
+  color-scheme: dark;
+  background: #07090F;
+}
+
+button:not(:disabled), a, [role="button"], select, label[for], summary {
+  cursor: pointer;
+}
+button:disabled { cursor: not-allowed; }
 
 body {
   background: #07090F;
@@ -108,3 +117,30 @@ textarea.input-dark {
 
 /* ── Score bar gradient ──────────────────────── */
 .score-bar-fill { background: linear-gradient(90deg, #C17D10, #F4A825); }
+
+/* ── Entrance animations ─────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-up  { animation: fade-up  0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in  { animation: fade-in  0.3s  ease both; }
+.animate-scale-in { animation: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.delay-50  { animation-delay:  50ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-250 { animation-delay: 250ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }

@@ -158,10 +158,11 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </button>
       </div>
 
-      {/* Record hero — centered in remaining viewport space */}
+      {/* Record hero — centered in remaining visible viewport space.
+          dvh minus header (~120px) and nav clearance pb-28 (112px). */}
       <div
         className="flex flex-col items-center px-6"
-        style={{ minHeight: 'calc(100svh - 172px)' }}
+        style={{ minHeight: 'calc(100dvh - 240px)' }}
       >
         {/* Top spacer */}
         <div className="flex-1 min-h-6" />
