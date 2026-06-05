@@ -120,6 +120,66 @@ export async function rescoreConference(
   return { success: true, score, tier };
 }
 
+// Override one AI-estimated factor score (P1: the AI estimate is a guess — let the user correct it),
+// then recompute + persist the conference's score/tier with the team weights.
+export async function overrideConferenceFactor(
+  conferenceId: string,
+  factorKey: 'icpDensity' | 'topicFit' | 'scale' | 'geoRelevance' | 'historicalPerf',
+  newScore: number,
+): Promise<{ success: true; score: number; tier: string } | { error: string }> {
+  const me = await getCurrentRep();
+  if (!me) return { error: 'Not authenticated' };
+
+  const admin = createAdminClient();
+  const { data: conf } = await admin.from('conferences').select('score_breakdown').eq('id', conferenceId).maybeSingle();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const breakdown = (conf?.score_breakdown ?? null) as any;
+  if (!breakdown?.factors?.[factorKey]) return { error: 'No factor to override' };
+
+  breakdown.factors[factorKey] = {
+    score: Math.max(0, Math.min(100, Math.round(newScore))),
+    rationale: `${breakdown.factors[factorKey].rationale ?? ''} (adjusted by ${me.name})`.trim(),
+  };
+
+  const weights = await getScoringWeights(me.teamId);
+  const { score, tier } = computeIcpScore(breakdown, weights);
+
+  const { error } = await admin
+    .from('conferences')
+    .update({ score_breakdown: breakdown, icp_score: score, tier })
+    .eq('id', conferenceId);
+  if (error) return { error: error.message };
+
+  revalidatePath('/planning');
+  return { success: true, score, tier };
+}
+
+// Bulk push the QUALIFIED leads captured at a conference (curated handoff, foundation §4b):
+// qualified = hot/warm temperature OR strong/moderate ICP fit.
+export async function bulkPushQualified(
+  conferenceId: string,
+): Promise<{ pushed: number; failed: number; mock: boolean; total: number }> {
+  const me = await getCurrentRep();
+  if (!me) return { pushed: 0, failed: 0, mock: false, total: 0 };
+
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from('encounters')
+    .select('id, temperature, fit')
+    .eq('conference_id', conferenceId)
+    .not('contact_id', 'is', null);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const qualified = (data ?? []).filter((e: any) => {
+    const temp = e.temperature as string | null;
+    const fitTier = (e.fit as { tier?: string } | null)?.tier;
+    return temp === 'hot' || temp === 'warm' || fitTier === 'strong' || fitTier === 'moderate';
+  });
+
+  const res = await bulkPushToHubSpot(qualified.map((e) => e.id as string));
+  return { ...res, total: qualified.length };
+}
+
 // Build the curated note pushed to HubSpot: the relationship ARC + qualification context.
 // This is what makes the push a curated handoff, not a dumb export (foundation §4b).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

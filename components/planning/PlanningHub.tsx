@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Fingerprint } from 'lucide-react';
+import { OverviewTab } from '@/components/planning/OverviewTab';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageView } from '@/components/planning/CoverageView';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
@@ -9,7 +10,7 @@ import type { Conference, Rep } from '@/lib/types';
 import type { CoverageRow, FollowUpRow, RelationshipRow, GapAnalysis } from '@/lib/db/queries';
 import type { ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
-const TABS = ['Conferences', 'Coverage', 'Relationships', 'Follow-ups'] as const;
+const TABS = ['Overview', 'Conferences', 'Coverage', 'Relationships', 'Follow-ups'] as const;
 type Tab = (typeof TABS)[number];
 
 interface Props {
@@ -25,7 +26,7 @@ interface Props {
 }
 
 export function PlanningHub({ conferences, coverage, followUps, relationships, gap, reps, weights, repId, repName }: Props) {
-  const [tab, setTab] = useState<Tab>('Conferences');
+  const [tab, setTab] = useState<Tab>('Overview');
   const warmingNoFollowUp = relationships.filter(
     (r) => (r.verdict === 'warming' || r.verdict === 'nurturing') && !r.hasFollowUp,
   ).length;
@@ -82,6 +83,16 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
       </header>
 
       <div className="flex-1 px-6 py-6">
+        {tab === 'Overview' && (
+          <OverviewTab
+            conferences={conferences}
+            coverage={coverage}
+            relationships={relationships}
+            followUps={followUps}
+            gap={gap}
+            onNavigate={setTab}
+          />
+        )}
         {tab === 'Conferences' && (
           <ConferenceList
             conferences={conferences}

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { MapPin, Users, ChevronDown, ChevronUp, Check, UserPlus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { ScoringWeightsPanel } from '@/components/planning/ScoringWeightsPanel';
@@ -223,7 +224,9 @@ function ConferenceCard({
           )}
         </div>
 
-        <h3 className="text-base font-bold text-text1 leading-snug mb-1.5">{conf.name}</h3>
+        <Link href={`/planning/conference/${conf.id}`} className="block group">
+          <h3 className="text-base font-bold text-text1 leading-snug mb-1.5 group-hover:text-accent transition-colors">{conf.name}</h3>
+        </Link>
 
         <div className="flex items-center gap-3 text-xs text-text3 flex-wrap">
           {start && end && <span>{start} – {end}</span>}

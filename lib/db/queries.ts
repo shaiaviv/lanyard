@@ -283,6 +283,41 @@ export async function getFollowUps(repId: string): Promise<FollowUpRow[]> {
   return (data ?? []).map(mapFollowUpRow);
 }
 
+// Leads captured at a conference (repeat-history / ROI signal for the detail page).
+export interface ConferenceLead {
+  contactId: string | null;
+  name: string;
+  company: string | null;
+  temperature: string | null;
+  verdict: string | null;
+  repName: string;
+  occurredAt: string;
+}
+
+export async function getConferenceLeads(conferenceId: string): Promise<ConferenceLead[]> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('encounters')
+    .select('contact_id, temperature, occurred_at, identity_snapshot, contacts(canonical_name, current_company, arc_cache), reps(name)')
+    .eq('conference_id', conferenceId)
+    .order('occurred_at', { ascending: false });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((row: any) => {
+    const snap = row.identity_snapshot as { name?: string; company?: string } | null;
+    const arc = row.contacts?.arc_cache as ArcSummary | null;
+    return {
+      contactId: row.contact_id as string | null,
+      name: (row.contacts?.canonical_name ?? snap?.name ?? 'Unknown') as string,
+      company: (row.contacts?.current_company ?? snap?.company ?? null) as string | null,
+      temperature: row.temperature as string | null,
+      verdict: (arc?.glance?.verdict ?? null) as string | null,
+      repName: (row.reps?.name ?? 'Unknown') as string,
+      occurredAt: row.occurred_at as string,
+    };
+  });
+}
+
 // ── Coverage gap analysis (C6) ────────────────────────────────────────────────
 
 export interface GapAnalysis {
