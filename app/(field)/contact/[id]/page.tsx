@@ -57,7 +57,7 @@ export default async function ContactPage({ params }: Props) {
             )}
           </div>
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-            {contact.linkedinUrl ? (
+            {contact.linkedinUrl && (
               <a
                 href={contact.linkedinUrl}
                 target="_blank"
@@ -65,15 +65,6 @@ export default async function ContactPage({ params }: Props) {
                 className="flex items-center gap-1 text-xs text-info hover:text-info/80 transition-colors"
               >
                 <ExternalLink size={12} /> LinkedIn
-              </a>
-            ) : (
-              <a
-                href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent([contact.canonicalName, contact.currentCompany].filter(Boolean).join(' '))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-text3 hover:text-text2 transition-colors"
-              >
-                <ExternalLink size={12} /> Search LinkedIn
               </a>
             )}
             {contact.email && (
