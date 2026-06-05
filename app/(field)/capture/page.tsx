@@ -20,9 +20,14 @@ export default async function CapturePage({ searchParams }: Props) {
   if (!rep) {
     return (
       <div className="flex items-center justify-center py-20 px-6 text-center">
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-text3">
           Rep profile not found.{' '}
-          <span className="font-mono text-xs bg-zinc-100 px-1 rounded">supabase/setup.sql</span>{' '}
+          <code
+            className="font-mono text-xs rounded px-1"
+            style={{ background: 'rgba(255,255,255,0.07)', color: '#EEF2FF' }}
+          >
+            supabase/setup.sql
+          </code>{' '}
           seeds the required row.
         </p>
       </div>

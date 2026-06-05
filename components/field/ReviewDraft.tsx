@@ -27,7 +27,7 @@ function inputClass(field: string, conf: Record<string, number>) {
 function Label({ text, children }: { text: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">{text}</p>
+      <p className="text-[11px] font-semibold text-text3 uppercase tracking-wide">{text}</p>
       {children}
     </div>
   );
@@ -269,7 +269,7 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       {/* LinkedIn candidates */}
       {draft.linkedinCandidates.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">Verify LinkedIn</p>
+          <p className="text-[11px] font-semibold text-text3">Verify LinkedIn</p>
           {draft.linkedinCandidates.map((c) => (
             <button
               key={c.linkedinUrl}

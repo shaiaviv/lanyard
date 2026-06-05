@@ -9,12 +9,12 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-const VERDICT_LABELS: Record<string, { label: string; color: string }> = {
-  warming:    { label: '📈 Warming',    color: 'text-green-700 bg-green-50 border-green-200' },
-  nurturing:  { label: '🌱 Nurturing',  color: 'text-blue-700 bg-blue-50 border-blue-200' },
-  tirekicker: { label: '🚗 Tire-kicker', color: 'text-amber-700 bg-amber-50 border-amber-200' },
-  cooling:    { label: '🌡️ Cooling',    color: 'text-red-700 bg-red-50 border-red-200' },
-  tooearly:   { label: '⏳ Too early',  color: 'text-zinc-700 bg-zinc-50 border-zinc-200' },
+const VERDICT_LABELS: Record<string, { label: string; bg: string; border: string; text: string }> = {
+  warming:    { label: '↑ Warming',     bg: 'rgba(16,185,129,0.07)',  border: 'rgba(16,185,129,0.2)',  text: 'text-green-400' },
+  nurturing:  { label: '◎ Nurturing',   bg: 'rgba(96,165,250,0.07)',  border: 'rgba(96,165,250,0.2)',  text: 'text-blue-400' },
+  tirekicker: { label: '— Tire-kicker', bg: 'rgba(245,158,11,0.07)',  border: 'rgba(245,158,11,0.2)',  text: 'text-amber-400' },
+  cooling:    { label: '↓ Cooling',     bg: 'rgba(239,68,68,0.07)',   border: 'rgba(239,68,68,0.2)',   text: 'text-red-400' },
+  tooearly:   { label: '○ Too early',   bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', text: 'text-text2' },
 };
 
 export default async function ContactPage({ params }: Props) {
@@ -33,33 +33,36 @@ export default async function ContactPage({ params }: Props) {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <header className="px-4 pt-12 pb-4 border-b border-zinc-100">
-        <Link href="/leads" className="flex items-center gap-1 text-sm text-zinc-500 mb-4 hover:text-zinc-700">
+      <header className="px-4 pt-12 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <Link
+          href="/leads"
+          className="flex items-center gap-1 text-sm text-text3 mb-4 hover:text-text2 transition-colors"
+        >
           <ArrowLeft size={14} /> Leads
         </Link>
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-zinc-900">{contact.canonicalName}</h1>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-text1">{contact.canonicalName}</h1>
             {contact.currentTitle && (
-              <p className="text-sm text-zinc-600 flex items-center gap-1 mt-0.5">
-                <User size={12} className="text-zinc-400" />
+              <p className="text-sm text-text2 flex items-center gap-1 mt-0.5">
+                <User size={12} className="text-text3 flex-shrink-0" />
                 {contact.currentTitle}
               </p>
             )}
             {contact.currentCompany && (
-              <p className="text-sm text-zinc-500 flex items-center gap-1">
-                <Building2 size={12} className="text-zinc-400" />
+              <p className="text-sm text-text3 flex items-center gap-1">
+                <Building2 size={12} className="text-text3 flex-shrink-0" />
                 {contact.currentCompany}
               </p>
             )}
           </div>
-          <div className="flex flex-col items-end gap-1.5">
+          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
             {contact.linkedinUrl && (
               <a
                 href={contact.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                className="flex items-center gap-1 text-xs text-info hover:text-info/80 transition-colors"
               >
                 <ExternalLink size={12} /> LinkedIn
               </a>
@@ -67,7 +70,7 @@ export default async function ContactPage({ params }: Props) {
             {contact.email && (
               <a
                 href={`mailto:${contact.email}`}
-                className="flex items-center gap-1 text-xs text-zinc-500 hover:underline"
+                className="flex items-center gap-1 text-xs text-text3 hover:text-text2 transition-colors"
               >
                 <Mail size={12} /> Email
               </a>
@@ -77,26 +80,34 @@ export default async function ContactPage({ params }: Props) {
       </header>
 
       <div className="px-4 py-5 space-y-5">
-        {/* Stats bar */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { value: totalMeetings, label: 'meetings' },
-            { value: conferences, label: 'events' },
-            { value: arc ? `${arc.glance.spanMonths}mo` : '—', label: 'span' },
-          ].map(({ value, label }) => (
-            <div key={label} className="bg-zinc-50 rounded-xl p-3 text-center">
-              <p className="text-xl font-bold text-zinc-900">{value}</p>
-              <p className="text-xs text-zinc-500">{label}</p>
-            </div>
-          ))}
+        {/* Compact stats row */}
+        <div
+          className="flex items-center gap-4 px-4 py-3 rounded-xl text-sm"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <span className="text-text1 font-semibold tabular-nums">{totalMeetings}</span>
+          <span className="text-text3">meeting{totalMeetings !== 1 ? 's' : ''}</span>
+          <span className="text-text3/30">·</span>
+          <span className="text-text1 font-semibold tabular-nums">{conferences}</span>
+          <span className="text-text3">event{conferences !== 1 ? 's' : ''}</span>
+          {arc && (
+            <>
+              <span className="text-text3/30">·</span>
+              <span className="text-text1 font-semibold tabular-nums">{arc.glance.spanMonths}mo</span>
+              <span className="text-text3">span</span>
+            </>
+          )}
         </div>
 
         {/* Relationship verdict */}
         {verdictMeta && (
-          <div className={`rounded-xl border px-4 py-3 ${verdictMeta.color}`}>
+          <div
+            className={`rounded-xl px-4 py-3 ${verdictMeta.text}`}
+            style={{ background: verdictMeta.bg, border: `1px solid ${verdictMeta.border}` }}
+          >
             <p className="text-sm font-semibold">{verdictMeta.label}</p>
             {arc?.howToApproach && (
-              <p className="text-xs mt-1 opacity-80">{arc.howToApproach}</p>
+              <p className="text-xs mt-1 opacity-75 leading-relaxed">{arc.howToApproach}</p>
             )}
           </div>
         )}
@@ -106,11 +117,11 @@ export default async function ContactPage({ params }: Props) {
           <div className="space-y-3">
             {arc.openThreads.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-2">Open threads</h3>
-                <ul className="space-y-1">
+                <p className="text-xs font-medium text-text3 mb-2">Open threads</p>
+                <ul className="space-y-1.5">
                   {arc.openThreads.map((t, i) => (
-                    <li key={i} className="text-sm text-zinc-700 flex items-start gap-2">
-                      <span className="text-orange-400 mt-0.5">•</span>
+                    <li key={i} className="text-sm text-text2 flex items-start gap-2 leading-relaxed">
+                      <span className="text-accent mt-0.5 flex-shrink-0">·</span>
                       {t}
                     </li>
                   ))}
@@ -118,9 +129,12 @@ export default async function ContactPage({ params }: Props) {
               </div>
             )}
             {arc.suggestedMove && (
-              <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3">
-                <p className="text-xs font-semibold text-orange-700 mb-1">Suggested next move</p>
-                <p className="text-sm text-orange-900">{arc.suggestedMove}</p>
+              <div
+                className="rounded-xl px-4 py-3"
+                style={{ background: 'rgba(244,168,37,0.06)', border: '1px solid rgba(244,168,37,0.15)' }}
+              >
+                <p className="text-xs font-semibold text-accent mb-1">Suggested next move</p>
+                <p className="text-sm text-text1 leading-relaxed">{arc.suggestedMove}</p>
               </div>
             )}
           </div>
@@ -128,12 +142,16 @@ export default async function ContactPage({ params }: Props) {
 
         {/* Encounter timeline */}
         <div>
-          <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">Meeting history</h3>
+          <p className="text-xs font-medium text-text3 mb-3">Meeting history</p>
           <div className="space-y-3">
             {encounters.map((enc) => (
-              <div key={enc.id} className="border border-zinc-200 rounded-xl p-4 space-y-2">
+              <div
+                key={enc.id}
+                className="rounded-xl p-4 space-y-2"
+                style={{ border: '1px solid rgba(255,255,255,0.07)', background: '#161E2E' }}
+              >
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1 text-xs text-zinc-400">
+                  <span className="flex items-center gap-1 text-xs text-text3">
                     <Clock size={11} />
                     {new Date(enc.occurredAt).toLocaleDateString('en-GB', {
                       day: 'numeric', month: 'short', year: 'numeric',
@@ -141,16 +159,22 @@ export default async function ContactPage({ params }: Props) {
                   </span>
                   <TemperatureChip value={enc.temperature} />
                 </div>
-                {enc.note && <p className="text-sm text-zinc-700">{enc.note}</p>}
+                {enc.note && <p className="text-sm text-text2 leading-relaxed">{enc.note}</p>}
                 {enc.topics.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {enc.topics.map((t) => (
-                      <span key={t} className="text-[11px] bg-zinc-100 text-zinc-600 rounded-full px-2 py-0.5">{t}</span>
+                      <span
+                        key={t}
+                        className="text-[10px] text-text2 rounded-full px-2 py-0.5"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+                      >
+                        {t}
+                      </span>
                     ))}
                   </div>
                 )}
                 {enc.followUp && (
-                  <span className="flex items-center gap-1 text-xs text-orange-500 font-medium">
+                  <span className="flex items-center gap-1 text-xs text-accent font-semibold">
                     <Star size={11} fill="currentColor" /> Follow up
                   </span>
                 )}

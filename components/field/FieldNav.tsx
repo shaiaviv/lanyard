@@ -50,7 +50,7 @@ export function FieldNav({ pendingCount }: FieldNavProps) {
                   )}
                 </div>
                 <span
-                  className={`text-[9px] font-bold tracking-widest uppercase transition-colors duration-200 ${
+                  className={`text-[9px] font-semibold tracking-wide transition-colors duration-200 ${
                     active ? 'text-accent' : 'text-text3'
                   }`}
                 >

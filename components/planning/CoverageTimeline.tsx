@@ -133,7 +133,7 @@ export function CoverageTimeline({ conferences, coverage, repId, repName }: Prop
       <div className="space-y-8">
         {months.map(([month, confs]) => (
           <div key={month}>
-            <h3 className="text-[10px] font-bold text-text3 uppercase tracking-widest mb-3">
+            <h3 className="text-sm font-semibold text-text2 mb-3">
               {monthLabel(month)}
             </h3>
             <div className="space-y-2.5">

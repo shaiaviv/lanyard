@@ -8,15 +8,15 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="px-4 pt-12 pb-4 border-b border-zinc-100">
+      <header className="px-4 pt-12 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <Link
           href="/capture"
-          className="flex items-center gap-1 text-sm text-zinc-500 mb-4 hover:text-zinc-700 transition-colors"
+          className="flex items-center gap-1 text-sm text-text3 mb-4 hover:text-text2 transition-colors"
         >
           <ArrowLeft size={14} /> Back
         </Link>
-        <h1 className="text-xl font-bold text-zinc-900">Settings</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">API keys and configuration</p>
+        <h1 className="text-xl font-bold text-text1">Settings</h1>
+        <p className="text-sm text-text3 mt-0.5">API keys and configuration</p>
       </header>
 
       <div className="px-4 py-6">

@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { Fingerprint, MapPin, Calendar, ArrowRight, Check } from 'lucide-react';
 import type { Conference } from '@/lib/types';
 
-const TIER_STYLE: Record<string, { badge: string; stripe: string }> = {
-  T1: { badge: 'text-amber-400 bg-amber-400/10 border-amber-400/20', stripe: 'bg-amber-400' },
-  T2: { badge: 'text-blue-400 bg-blue-400/10 border-blue-400/20',   stripe: 'bg-blue-400' },
-  T3: { badge: 'text-text3 bg-white/5 border-white/10',              stripe: 'bg-[rgba(255,255,255,0.12)]' },
+const TIER_STYLE: Record<string, { badge: string }> = {
+  T1: { badge: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
+  T2: { badge: 'text-blue-400 bg-blue-400/10 border-blue-400/20' },
+  T3: { badge: 'text-text3 bg-white/5 border-white/10' },
 };
 
 function dateRange(conf: Conference): string | null {
@@ -68,7 +68,7 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
             <button
               key={conf.id}
               onClick={() => setSelected(conf.id)}
-              className="w-full text-left rounded-2xl relative overflow-hidden transition-all active:scale-[0.99] animate-fade-up hover:-translate-y-0.5"
+              className="w-full text-left rounded-2xl transition-all active:scale-[0.99] animate-fade-up hover:-translate-y-0.5"
               style={{
                 animationDelay: `${150 + index * 60}ms`,
                 background: isSelected ? 'rgba(244,168,37,0.07)' : '#161E2E',
@@ -80,10 +80,7 @@ export function ConferenceGate({ conferences, onSelect }: Props) {
                   : '0 2px 8px rgba(0,0,0,0.25)',
               }}
             >
-              {/* Tier stripe */}
-              <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${ts.stripe}`} />
-
-              <div className="pl-4 pr-4 py-4 flex items-start justify-between gap-3">
+              <div className="px-4 py-4 flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     {live && (

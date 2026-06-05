@@ -9,10 +9,10 @@ const VERTICALS = ['All', 'Fintech', 'Payments', 'Travel', 'SaaS', 'Banking'];
 const TIERS: Array<'All' | 'T1' | 'T2' | 'T3'> = ['All', 'T1', 'T2', 'T3'];
 
 /* Tier visual system */
-const TIER_LEFT_BORDER: Record<string, string> = {
-  T1: 'bg-amber-400',
-  T2: 'bg-blue-400',
-  T3: 'bg-[rgba(255,255,255,0.12)]',
+const TIER_BORDER_COLOR: Record<string, string> = {
+  T1: 'rgba(251,191,36,0.25)',
+  T2: 'rgba(96,165,250,0.2)',
+  T3: 'rgba(255,255,255,0.07)',
 };
 
 const TIER_BADGE: Record<string, { bg: string; text: string }> = {
@@ -142,24 +142,21 @@ function ConferenceCard({
     ? new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
 
-  const tierBorderColor = TIER_LEFT_BORDER[conf.tier ?? 'T3'];
+  const tierBorderColor = TIER_BORDER_COLOR[conf.tier ?? 'T3'];
   const tierBadge = TIER_BADGE[conf.tier ?? 'T3'];
 
   return (
     <div
-      className={`relative rounded-2xl overflow-hidden transition-all ${
+      className={`rounded-2xl transition-all ${
         isPast ? 'opacity-50' : 'hover:translate-y-[-1px]'
       }`}
       style={{
         background: '#161E2E',
-        border: '1px solid rgba(255,255,255,0.07)',
+        border: `1px solid ${tierBorderColor}`,
         boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
       }}
     >
-      {/* Tier color left stripe */}
-      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${tierBorderColor}`} />
-
-      <div className="pl-5 pr-4 pt-4 pb-3">
+      <div className="px-4 pt-4 pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             {/* Name + tier + live badge */}
@@ -355,27 +352,27 @@ export function ConferenceList({ conferences, coverage, repId }: Props) {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div
+        className="flex items-center gap-4 px-4 py-2.5 rounded-xl text-sm flex-wrap"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
         {[
           { label: 'T1 targets', value: t1Count },
-          { label: 'Committed', value: Object.values(myStatusMap).filter((s) => s === 'committed').length },
-          { label: 'Considering', value: Object.values(myStatusMap).filter((s) => s === 'considering').length },
-        ].map(({ label, value }) => (
-          <div
-            key={label}
-            className="bg-elevated rounded-xl p-3 text-center"
-            style={{ border: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            <p className="text-xl font-bold text-text1 tabular-nums">{value}</p>
-            <p className="text-[10px] text-text3 mt-0.5 font-medium uppercase tracking-wider">{label}</p>
-          </div>
+          { label: 'committed', value: Object.values(myStatusMap).filter((s) => s === 'committed').length },
+          { label: 'considering', value: Object.values(myStatusMap).filter((s) => s === 'considering').length },
+        ].map(({ label, value }, i) => (
+          <span key={label} className="flex items-center gap-1.5">
+            {i > 0 && <span className="text-text3/30 select-none">·</span>}
+            <span className="font-semibold text-text1 tabular-nums">{value}</span>
+            <span className="text-text3 text-xs">{label}</span>
+          </span>
         ))}
       </div>
 
       {/* Conference list */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] text-text3 font-bold uppercase tracking-widest">
+          <p className="text-xs text-text3 font-medium">
             {filtered.length} conference{filtered.length !== 1 ? 's' : ''} · by ICP score
           </p>
           <button

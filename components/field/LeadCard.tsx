@@ -34,17 +34,14 @@ export function LeadCard({ encounter, contact }: LeadCardProps) {
 
   const cardContent = (
     <div
-      className={`relative bg-card rounded-2xl overflow-hidden transition-all hover:translate-y-[-1px] ${
+      className={`bg-card rounded-2xl transition-all hover:translate-y-[-1px] ${
         isPending
-          ? 'border-[1px] border-[rgba(245,158,11,0.18)]'
-          : 'border-[1px] border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.12)]'
+          ? 'border border-[rgba(245,158,11,0.2)]'
+          : 'border border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.12)]'
       }`}
       style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
     >
-      {/* Temperature left stripe */}
-      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${stripeColor}`} />
-
-      <div className="pl-5 pr-4 py-4 space-y-2.5">
+      <div className="px-4 py-4 space-y-2.5">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -52,14 +49,14 @@ export function LeadCard({ encounter, contact }: LeadCardProps) {
               <p className="font-semibold text-text1 truncate">{name}</p>
               {isPending && (
                 <span
-                  className="flex-shrink-0 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                  className="flex-shrink-0 text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
                   style={{
                     background: 'rgba(245,158,11,0.1)',
                     color: '#F59E0B',
                     border: '1px solid rgba(245,158,11,0.2)',
                   }}
                 >
-                  review
+                  Review
                 </span>
               )}
             </div>

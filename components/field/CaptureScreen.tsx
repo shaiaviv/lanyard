@@ -112,7 +112,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
           </Link>
         </header>
         <div className="px-5 pb-10">
-          <p className="text-[10px] font-bold text-text3 uppercase tracking-widest mb-5">
+          <p className="text-xs font-medium text-text3 mb-5">
             {selectedConference?.name ?? 'Manual capture'}
           </p>
           <CaptureForm conferenceId={localConferenceId} repId={repId} />

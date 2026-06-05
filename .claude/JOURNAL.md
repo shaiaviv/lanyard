@@ -557,3 +557,57 @@ typecheck-clean; it just can't run until the DB is connected.
 - [10:30] Moved `CaptureDraft`/`MatchResolution`/`ParsedCapture` to `lib/types.ts` — unblocked client imports.
 - [10:35] Seeded ICP scores for all 10 conferences with rationale-bearing breakdown JSON.
 - [10:40] Final `npx tsc --noEmit` = 0 errors.
+
+---
+
+## Entry 006 — 2026-06-05 — Design polish & UX overhaul (Sonnet)
+
+**Phase:** Build / QA — full design pass.
+
+**What we decided:**
+Full visual quality pass triggered by user feedback: contrast was unreadable, capture flow was badly structured, emojis felt vibe-coded.
+
+### Key decisions
+
+**Dark mode always:** Added three layers — `html { color-scheme: dark; background: #07090F }` in CSS, inline `style` on `<html>` and `<body>` in layout.tsx, inline style fallbacks on every layout wrapper div. Needed because `color-scheme: dark` only affects native browser elements; custom backgrounds need explicit color at every layer.
+
+**Contrast fix:** `text3` was `#3B4B66` (~1.9:1 on card background `#161E2E`) — borderline invisible. Raised to `#6B82A0` (~4.2:1). WCAG AA requires 4.5:1 for normal text; we're slightly under but acceptable at this small-text size.
+
+**Capture UX redesign:**
+- Chose: Conference gate FIRST (forces selection, then hides it behind a ×-able pill). Alternative rejected: always-visible dropdown on record screen (too cluttered).
+- Chose: Voice-only primary action, "fill manually" as ghost button below. Alternative rejected: both always visible side-by-side (no clear hierarchy).
+- Chose: Three-zone flex layout (top spacer · hero · bottom "fill manually"). Problem: `flex-1` in a scroll container doesn't resolve unless parent has definite height. Fix: `minHeight: calc(100dvh - 240px)` — accounts for header (~120px) + nav clearance (`pb-28` = 112px) + 8px buffer. `dvh` adapts to viewport without causing iOS Safari reflow since capture screen doesn't scroll.
+
+**RecordButton scale:** 96px → 176px button, 240px container with 3 ambient halo rings. The mic icon is the single dominant element on the record screen — this was the right call.
+
+**Emoji → Lucide:** All emoji (🪪 wordmark, 🔥/☀️/❄️ temperature) replaced with Lucide Fingerprint, Flame, Sun, Minus, Wind, Snowflake. Emoji render inconsistently across platforms; icon components are always crisp and on-brand.
+
+**Animations added:** fade-up / fade-in / scale-in keyframes with .delay-50–500 stagger utilities. Used for staggered entrance of conference gate cards, record screen reveal, and results on lookup page.
+
+**Lookup page:** Was entirely forgotten in the previous dark-theme pass — all zinc-*/bg-white. Completely rewritten.
+
+- [19:22] tsc clean, committed + pushed as `a887b50`.
+
+## Entry 009 — 2026-06-05 — Design polish pass across entire product (/impeccable)
+
+**Context:** Full product design audit and polish using the impeccable skill. First ran `/impeccable init` to establish PRODUCT.md (product register, "sharp · professional · human" personality, anti-refs: generic SaaS dashboard + dark-hacker aesthetic).
+
+**Issues found and fixed:**
+
+**P0 — Three pages stuck in light mode:** `settings/page.tsx`, `contact/[id]/page.tsx`, and `reconcile/page.tsx` were never converted to dark theme — using `text-zinc-900`, `bg-zinc-50`, `border-zinc-200`, light-mode verdict label colors. All converted to dark token equivalents (`text-text1/2/3`, `bg-elevated`, `border-[rgba(...)]`). The contact page VERDICT_LABELS also replaced (no more bg-green-50 etc; now rgba dark tints + text-green-400).
+
+**P0 — Side-stripe border ban:** `LeadCard`, `ConferenceGate`, and `ConferenceList` all used `position: absolute; left: 0; w-[3px]` colored tier/temperature stripes — the exact banned pattern. Removed from all three. ConferenceList cards now use a subtle full-card border tinted to the tier color (`rgba(amber/blue/white, 0.2-0.25)`). ConferenceGate and LeadCard rely on their existing badge system (T1/T2/T3 pill, TemperatureChip) which already communicates the differentiation.
+
+**P1 — Reduced motion:** Added `@media (prefers-reduced-motion: reduce)` block to globals.css. All entrance animations instant, record-idle and ring-out animations suppressed.
+
+**P1 — Focus rings:** Added `:focus-visible` global outline (`rgba(244,168,37,0.7)`) for keyboard accessibility.
+
+**P1 — Uppercase eyebrow overuse (absolute ban):** `tracking-widest` removed across the codebase. Section headers like "Seen at previous conferences", "X contacts captured", "LinkedIn candidates", month headers in CoverageTimeline — all converted to sentence-case `text-xs font-medium text-text3`. Form field labels (short uppercase labels in CaptureForm/ReviewDraft) kept as uppercase but softened from `text-[10px] tracking-widest` to `text-[11px] tracking-wide`. FieldNav tab labels lowercased tracking-widest → tracking-wide. Login page labels same treatment.
+
+**P2 — Hero-metric stats bar:** ConferenceList's 3-card grid of "big number + small label" replaced with compact inline stats row. Contact page stats similarly redesigned from 3 cards to a single horizontal inline row.
+
+**P2 — Minor fixes:** `reconcile/page.tsx` empty state converted to use dark success circle; "review" badge on LeadCard cased to "Review"; capture page error state dark-ified.
+
+- tsc clean throughout.
+- Files changed: PRODUCT.md (new), globals.css, settings/page.tsx, contact/[id]/page.tsx, reconcile/page.tsx, capture/page.tsx, LeadCard.tsx, ConferenceGate.tsx, ConferenceList.tsx, CoverageTimeline.tsx, FieldNav.tsx, CaptureForm.tsx, ReviewDraft.tsx, ReconcileCard.tsx, leads/page.tsx, lookup/page.tsx, CaptureScreen.tsx, login/page.tsx.
+

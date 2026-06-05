@@ -101,7 +101,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
         className="bg-elevated rounded-xl p-4 space-y-2"
         style={{ border: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">New capture</p>
+        <p className="text-[11px] font-semibold text-text3">New capture</p>
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-base font-bold text-text1">{displayName}</p>
           {encounter.temperature && (
@@ -179,7 +179,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
 
             {bestContact.encounters.length > 0 && (
               <div className="space-y-2 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">
+                <p className="text-[11px] font-semibold text-text3">
                   {bestContact.encounters.length} prior meeting{bestContact.encounters.length !== 1 ? 's' : ''}
                 </p>
                 {bestContact.encounters.slice(0, 3).map((e) => (

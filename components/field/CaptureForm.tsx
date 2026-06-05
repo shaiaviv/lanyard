@@ -20,7 +20,7 @@ interface CaptureFormProps {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-[10px] font-bold text-text3 uppercase tracking-widest">
+      <label className="block text-[11px] font-semibold text-text3 uppercase tracking-wide">
         {label}
       </label>
       {children}

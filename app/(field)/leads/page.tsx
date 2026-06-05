@@ -89,7 +89,7 @@ export default async function LeadsPage({ searchParams }: Props) {
           </div>
         ) : (
           <>
-            <p className="text-[10px] text-text3 font-bold uppercase tracking-widest">
+            <p className="text-xs text-text3 font-medium">
               {encounters.length} contact{encounters.length !== 1 ? 's' : ''} captured
             </p>
             {encounters.map((enc) => (

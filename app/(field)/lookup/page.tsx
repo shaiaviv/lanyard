@@ -134,7 +134,7 @@ export default function LookupPage() {
           <div className="space-y-6 animate-fade-up">
             {contacts.length > 0 && (
               <section className="space-y-2.5">
-                <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">
+                <p className="text-xs font-medium text-text3">
                   Seen at previous conferences
                 </p>
                 {contacts.map((c) => <ContactCard key={c.id} c={c} />)}
@@ -143,7 +143,7 @@ export default function LookupPage() {
 
             {enrichment.length > 0 && (
               <section className="space-y-2.5">
-                <p className="text-[10px] font-bold text-text3 uppercase tracking-widest">
+                <p className="text-xs font-medium text-text3">
                   LinkedIn candidates
                 </p>
                 {enrichment.map((p) => <EnrichmentCard key={p.linkedinUrl} p={p} />)}

@@ -56,7 +56,7 @@ export default function LoginPage() {
           }}
         >
           <div>
-            <label className="block text-[10px] font-bold text-text3 uppercase tracking-widest mb-2">
+            <label className="block text-[11px] font-semibold text-text3 uppercase tracking-wide mb-2">
               Email
             </label>
             <input
@@ -71,7 +71,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-text3 uppercase tracking-widest mb-2">
+            <label className="block text-[11px] font-semibold text-text3 uppercase tracking-wide mb-2">
               Password
             </label>
             <input

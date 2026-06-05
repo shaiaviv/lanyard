@@ -144,3 +144,35 @@ textarea.input-dark {
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
+
+/* ── Reduced motion ──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scale-in {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .record-idle  { animation: none; }
+  .ring-out     { animation: none; }
+}
+
+/* ── Focus rings ─────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgba(244, 168, 37, 0.7);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid rgba(244, 168, 37, 0.7);
+  outline-offset: 2px;
+}
