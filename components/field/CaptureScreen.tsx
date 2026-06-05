@@ -1,7 +1,83 @@
 'use client';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Fingerprint, Settings, MapPin, X, Mic, PencilLine, ChevronLeft } from 'lucide-react';
+
+const PROCESSING_STEPS = [
+  'Transcribing your recording…',
+  'Analyzing the encounter…',
+  'Extracting key details…',
+  'Scoring ICP fit…',
+  'Checking for repeat contacts…',
+  'Cross-referencing your history…',
+  'Identifying pain points…',
+  'Flagging follow-up signals…',
+  'Drafting your summary…',
+  'Almost there…',
+];
+
+function ProcessingScreen() {
+  const [idx, setIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx((i) => (i + 1) % PROCESSING_STEPS.length);
+        setVisible(true);
+      }, 300);
+    }, 2200);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-full gap-8 px-8">
+      {/* Animated orb */}
+      <div className="relative flex items-center justify-center w-28 h-28">
+        <div className="absolute inset-0 rounded-full animate-ping" style={{ background: 'rgba(244,168,37,0.08)', animationDuration: '2s' }} />
+        <div className="absolute inset-[-12px] rounded-full animate-ping" style={{ background: 'rgba(244,168,37,0.04)', animationDuration: '2.6s', animationDelay: '0.4s' }} />
+        <div
+          className="w-28 h-28 rounded-full flex items-center justify-center"
+          style={{
+            background: 'radial-gradient(circle at 35% 35%, rgba(244,168,37,0.18), rgba(244,168,37,0.04))',
+            border: '1px solid rgba(244,168,37,0.2)',
+            boxShadow: '0 0 40px rgba(244,168,37,0.12)',
+          }}
+        >
+          <Mic size={36} className="text-accent" strokeWidth={1.25} />
+        </div>
+      </div>
+
+      {/* Rotating step text */}
+      <div className="text-center min-h-[52px] flex flex-col items-center justify-center">
+        <p
+          className="text-base font-semibold text-text1 transition-all duration-300"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(6px)' }}
+        >
+          {PROCESSING_STEPS[idx]}
+        </p>
+        <p className="text-xs text-text3 mt-1.5">Powered by Claude + Whisper</p>
+      </div>
+
+      {/* Progress dots */}
+      <div className="flex gap-1.5">
+        {PROCESSING_STEPS.map((_, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-300"
+            style={{
+              width: i === idx ? 16 : 4,
+              height: 4,
+              background: i === idx ? 'rgba(244,168,37,0.8)' : 'rgba(255,255,255,0.12)',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 import { ConferenceGate } from '@/components/field/ConferenceGate';
 import { RecordButton } from '@/components/field/RecordButton';
 import { CaptureForm } from '@/components/field/CaptureForm';
@@ -102,26 +178,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
 
   /* ── AI processing ── */
   if (stage === 'processing') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-full gap-6">
-        <div className="relative w-20 h-20">
-          <div
-            className="absolute inset-0 rounded-full animate-ping"
-            style={{ background: 'rgba(244,168,37,0.1)', animationDuration: '1.5s' }}
-          />
-          <div
-            className="w-20 h-20 rounded-full bg-elevated flex items-center justify-center"
-            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
-          >
-            <Mic size={28} className="text-accent" strokeWidth={1.5} />
-          </div>
-        </div>
-        <div className="text-center space-y-1">
-          <p className="text-sm font-semibold text-text1">Parsing your note…</p>
-          <p className="text-xs text-text2">Checking for repeat contacts</p>
-        </div>
-      </div>
-    );
+    return <ProcessingScreen />;
   }
 
   /* ── Review AI draft ── */
