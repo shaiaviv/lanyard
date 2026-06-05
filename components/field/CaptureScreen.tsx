@@ -209,7 +209,8 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
             <p className="text-xs text-text2 leading-relaxed">
               The more detail, the better. Make sure to include their{' '}
               <span className="text-text1 font-medium">name, company, and title</span>, what you discussed,
-              their pain points, interest level, and any agreed next steps.
+              their pain points, interest level, and any agreed next steps.{' '}
+              Don&apos;t be afraid to tell a tale — our AI will take care of parsing and summarizing all the important points and extract what&apos;s important.
             </p>
           </div>
 
