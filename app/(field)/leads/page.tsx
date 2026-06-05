@@ -90,12 +90,14 @@ export default async function LeadsPage({ searchParams }: Props) {
           </div>
         ) : (
           <>
-            <p className="text-xs text-text3 font-medium">
+            <p className="text-xs text-text3 font-medium mb-3">
               {encounters.length} contact{encounters.length !== 1 ? 's' : ''} captured
             </p>
-            {encounters.map((enc) => (
-              <LeadCard key={enc.id} encounter={enc} contact={enc.contact} />
-            ))}
+            <div className="flex flex-col gap-3">
+              {encounters.map((enc) => (
+                <LeadCard key={enc.id} encounter={enc} contact={enc.contact} />
+              ))}
+            </div>
           </>
         )}
       </div>
