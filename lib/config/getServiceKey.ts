@@ -1,15 +1,14 @@
-// Resolve a SERVICE key (Anthropic, OpenAI, enrichment, HubSpot).
+// Resolve a SERVICE key (Anthropic, enrichment, HubSpot).
 // PRIMARY source = in-app Settings (encrypted in app_settings); env is a dev fallback.
 // Server-only. See plans/tech/00-tech-foundation.md §4/§6.
 import 'server-only';
 import { createAdminClient } from '@/lib/db/admin';
 import { decryptSecret } from '@/lib/config/crypto';
 
-export type ServiceName = 'anthropic' | 'openai' | 'enrichment' | 'hubspot';
+export type ServiceName = 'anthropic' | 'enrichment' | 'hubspot';
 
 const ENV_FALLBACK: Record<ServiceName, string | undefined> = {
   anthropic: process.env.ANTHROPIC_API_KEY,
-  openai: process.env.OPENAI_API_KEY,
   enrichment: process.env.ENRICHMENT_API_KEY,
   hubspot: process.env.HUBSPOT_API_KEY,
 };

@@ -48,7 +48,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         </div>
         <div className="text-center space-y-1">
           <p className="text-sm font-semibold text-zinc-800">Analyzing your note…</p>
-          <p className="text-xs text-zinc-400">Transcribing · Parsing · Checking for repeat contacts</p>
+          <p className="text-xs text-zinc-400">Parsing · Checking for repeat contacts</p>
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
             <p className="font-semibold">Voice capture failed</p>
             <p className="text-xs mt-0.5">{voiceError}</p>
             <p className="text-xs mt-1 text-red-500">
-              Add your Anthropic + OpenAI keys in{' '}
+              Add your Anthropic key in{' '}
               <Link href="/settings" className="underline">Settings</Link>, or use the manual form below.
             </p>
           </div>

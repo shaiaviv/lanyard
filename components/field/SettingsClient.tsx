@@ -5,7 +5,7 @@ import { saveServiceKey } from '@/app/actions/settings';
 import type { KeyStatus } from '@/app/actions/settings';
 
 // Mirror of ServiceName from lib/config/getServiceKey — defined here to avoid crossing the server-only boundary
-type ServiceName = 'anthropic' | 'openai' | 'enrichment' | 'hubspot';
+type ServiceName = 'anthropic' | 'enrichment' | 'hubspot';
 
 const KEY_CONFIGS: {
   name: ServiceName;
@@ -17,16 +17,9 @@ const KEY_CONFIGS: {
   {
     name: 'anthropic',
     label: 'Anthropic (Claude)',
-    desc: 'Voice parse, match adjudication, briefing, conference scoring',
+    desc: 'Voice parse, match adjudication, briefing, conference scoring. Voice transcription uses your browser — no extra key needed.',
     placeholder: 'sk-ant-api03-…',
     docsUrl: 'https://console.anthropic.com/settings/keys',
-  },
-  {
-    name: 'openai',
-    label: 'OpenAI (Whisper)',
-    desc: 'Speech-to-text transcription for voice capture',
-    placeholder: 'sk-proj-…',
-    docsUrl: 'https://platform.openai.com/api-keys',
   },
   {
     name: 'enrichment',
@@ -174,8 +167,7 @@ export function SettingsClient({ statuses }: { statuses: Record<ServiceName, Key
         <p className="font-medium text-zinc-700">Env var fallback (dev)</p>
         <p>
           Keys saved here take priority. In local dev, you can also set{' '}
-          <code className="bg-zinc-200 px-1 rounded font-mono">ANTHROPIC_API_KEY</code> and{' '}
-          <code className="bg-zinc-200 px-1 rounded font-mono">OPENAI_API_KEY</code> in{' '}
+          <code className="bg-zinc-200 px-1 rounded font-mono">ANTHROPIC_API_KEY</code> in{' '}
           <code className="bg-zinc-200 px-1 rounded font-mono">.env</code> as a shortcut.
         </p>
         <p className="text-zinc-400">Keys are AES-256-GCM encrypted at rest and never sent to the browser.</p>

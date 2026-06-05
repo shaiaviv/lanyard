@@ -1,8 +1,7 @@
-// The async capture pipeline orchestration (plans/tech/1-field.md §1, stages STT→draft).
+// The async capture pipeline (plans/tech/1-field.md §1, stages parse→enrich→match).
 // Runs server-side; idempotent; the rep never waits on it (offline queue drains into here).
 // Returns a reviewable draft — the COMMIT (writing the encounter row) is a separate step.
 import 'server-only';
-import { transcribeAudio } from '@/lib/ai/transcribe';
 import { parseCapture } from '@/lib/ai/parseCapture';
 import { retrieveCandidates, adjudicateMatch, resolveMatch } from '@/lib/matching';
 import { getServiceKey } from '@/lib/config/getServiceKey';
@@ -12,14 +11,15 @@ import type { IdentitySnapshot, MatchCandidate, PersonCandidate, CaptureDraft } 
 export type { CaptureDraft };
 
 /**
- * Stages 4-7 of the pipeline: transcribe → parse(+fit) → enrich (LinkedIn) → match.
- * Stages are independent; each degrades gracefully (parse-fail → manual; enrich-empty → manual).
+ * Stages 5-7 of the pipeline: parse(+fit) → enrich (LinkedIn) → match.
+ * Transcription now happens in the browser via Web Speech API; this receives plain text.
+ * Each stage degrades gracefully (parse-fail → manual; enrich-empty → manual).
  */
 export async function processCapture(input: {
-  audio: Uint8Array;
-  firsthand?: boolean; // is the current rep the one who'd have the prior encounter?
+  text: string;
+  firsthand?: boolean;
 }): Promise<CaptureDraft> {
-  const transcript = await transcribeAudio(input.audio);
+  const transcript = input.text;
   const parsed = await parseCapture(transcript);
 
   const identity: IdentitySnapshot = {
@@ -27,7 +27,7 @@ export async function processCapture(input: {
     company: parsed.company,
     title: parsed.title,
     email: parsed.email,
-    linkedin: null, // set once the rep confirms a LinkedIn candidate in review
+    linkedin: null,
   };
 
   // Enrichment (LinkedIn verify candidates) — behind the interface; mock when no key (never blocks).

@@ -3,86 +3,87 @@ import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, MicOff } from 'lucide-react';
 
 interface RecordButtonProps {
-  onCapture: (audioBase64: string) => void;
+  onCapture: (transcript: string) => void;
   disabled?: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSR(): any {
+  if (typeof window === 'undefined') return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any;
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
 export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
   const [recording, setRecording] = useState(false);
-  const [denied, setDenied] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const mediaRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [unsupported, setUnsupported] = useState(false);
+  const [interimText, setInterimText] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const finalRef = useRef('');
 
   useEffect(() => {
-    return () => {
-      mediaRef.current?.stop();
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+    if (!getSR()) setUnsupported(true);
+    return () => { recognitionRef.current?.stop(); };
   }, []);
 
-  async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : MediaRecorder.isTypeSupported('audio/webm')
-        ? 'audio/webm'
-        : 'audio/mp4';
+  function startRecording() {
+    const SR = getSR();
+    if (!SR) { setUnsupported(true); return; }
 
-      const recorder = new MediaRecorder(stream, { mimeType });
-      chunksRef.current = [];
+    const recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    finalRef.current = '';
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalRef.current += text + ' ';
+        } else {
+          interim += text;
+        }
+      }
+      setInterimText(finalRef.current + interim);
+    };
 
-      recorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          // Strip the data URL prefix ("data:audio/webm;base64,")
-          const dataUrl = reader.result as string;
-          const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
-          onCapture(base64);
-        };
-        reader.readAsDataURL(blob);
-      };
+    recognition.onend = () => {
+      setRecording(false);
+      setInterimText('');
+      const transcript = finalRef.current.trim();
+      if (transcript) onCapture(transcript);
+    };
 
-      recorder.start();
-      mediaRef.current = recorder;
-      setSeconds(0);
-      setRecording(true);
-      timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
-    } catch {
-      setDenied(true);
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
+      if (event.error === 'not-allowed') setUnsupported(true);
+      setRecording(false);
+      setInterimText('');
+    };
+
+    recognition.start();
+    recognitionRef.current = recognition;
+    setRecording(true);
   }
 
   function stopRecording() {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    mediaRef.current?.stop();
-    mediaRef.current = null;
-    setRecording(false);
-    setSeconds(0);
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
   }
 
-  function formatTime(s: number) {
-    const m = Math.floor(s / 60).toString().padStart(2, '0');
-    const sec = (s % 60).toString().padStart(2, '0');
-    return `${m}:${sec}`;
-  }
-
-  if (denied) {
+  if (unsupported) {
     return (
       <div className="flex flex-col items-center gap-3 text-center">
         <div className="w-20 h-20 rounded-full bg-zinc-100 flex items-center justify-center">
           <MicOff size={28} className="text-zinc-400" />
         </div>
         <p className="text-xs text-zinc-500 max-w-[220px]">
-          Microphone access denied. Allow access in your browser settings to use voice capture.
+          Voice capture requires Chrome, Edge, or Safari. Use the manual form below.
         </p>
       </div>
     );
@@ -109,12 +110,16 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
       </button>
 
       {recording ? (
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-sm font-mono font-semibold text-red-600 tabular-nums">
-            {formatTime(seconds)}
-          </span>
-          <span className="text-xs text-zinc-400">· tap to stop</span>
+        <div className="flex flex-col items-center gap-1.5 max-w-[260px]">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-sm font-medium text-red-600">Listening… tap to stop</span>
+          </div>
+          {interimText && (
+            <p className="text-xs text-zinc-400 text-center leading-relaxed line-clamp-3">
+              {interimText}
+            </p>
+          )}
         </div>
       ) : (
         <p className="text-xs text-zinc-400 text-center">
