@@ -29,10 +29,10 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
   const [draft, setDraft] = useState<CaptureDraft | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
-  // Restore draft from sessionStorage if a reset happened mid-review
+  // Restore draft from localStorage — persists across refreshes until commit or re-record
   useEffect(() => {
     try {
-      const saved = sessionStorage.getItem(DRAFT_KEY);
+      const saved = localStorage.getItem(DRAFT_KEY);
       if (saved) {
         setDraft(JSON.parse(saved));
         setStage('review');
@@ -53,7 +53,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         setVoiceError(result.error);
         setStage('idle');
       } else {
-        sessionStorage.setItem(DRAFT_KEY, JSON.stringify(result));
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(result));
         setDraft(result);
         setStage('review');
       }
@@ -109,7 +109,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         draft={draft}
         conferenceId={localConferenceId}
         repId={repId}
-        onRetry={() => { sessionStorage.removeItem(DRAFT_KEY); setStage('idle'); setDraft(null); }}
+        onRetry={() => { localStorage.removeItem(DRAFT_KEY); setStage('idle'); setDraft(null); }}
       />
     );
   }
