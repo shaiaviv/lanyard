@@ -1,0 +1,48 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - generic [ref=e134]:
+            - img [ref=e135]
+            - generic [ref=e144]: Lanyard
+          - link [ref=e145] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e146]
+        - button "Sibos 2026" [ref=e150] [cursor=pointer]:
+          - img [ref=e151]
+          - generic [ref=e154]: Sibos 2026
+          - img [ref=e155]
+        - generic [ref=e158]:
+          - button "Tap to start voice capture" [ref=e163] [cursor=pointer]:
+            - img [ref=e164]
+          - generic [ref=e167]:
+            - paragraph [ref=e168]: Say their name, company and role, how you met, what you discussed, and how interested they seemed.
+            - generic [ref=e169]:
+              - generic [ref=e170]: e.g.
+              - generic [ref=e171]: "\"Met Sarah from Stripe, Head of Payments — interested in FX hedging, very warm.\""
+        - button "Fill in manually instead" [ref=e173] [cursor=pointer]:
+          - img [ref=e174]
+          - text: Fill in manually instead
+    - navigation [ref=e89]:
+      - generic [ref=e91]:
+        - link "Capture" [ref=e92] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e94]
+          - generic [ref=e97]: Capture
+        - link "Leads" [ref=e98] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e100]
+          - generic [ref=e105]: Leads
+        - link "Look up" [ref=e106] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e108]
+          - generic [ref=e111]: Look up
+  - button "Open Next.js Dev Tools" [ref=e124] [cursor=pointer]:
+    - generic [ref=e127]:
+      - text: Compiling
+      - generic [ref=e128]:
+        - generic [ref=e129]: .
+        - generic [ref=e130]: .
+        - generic [ref=e131]: .
+  - alert [ref=e121]

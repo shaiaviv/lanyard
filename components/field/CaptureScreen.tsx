@@ -6,7 +6,7 @@ import { ConferenceGate } from '@/components/field/ConferenceGate';
 import { RecordButton } from '@/components/field/RecordButton';
 import { CaptureForm } from '@/components/field/CaptureForm';
 import { ReviewDraft } from '@/components/field/ReviewDraft';
-import { processVoiceCapture } from '@/app/actions/voice';
+import { transcribeAndProcess } from '@/app/actions/voice';
 import { setCurrentConference } from '@/app/actions/conference';
 import type { CaptureDraft, Conference } from '@/lib/types';
 
@@ -29,10 +29,12 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
 
   const selectedConference = conferences.find((c) => c.id === localConferenceId);
 
-  const handleCapture = useCallback(async (transcript: string) => {
+  const handleAudioReady = useCallback(async (blob: Blob) => {
     setStage('processing');
     setVoiceError(null);
-    const result = await processVoiceCapture(transcript);
+    const formData = new FormData();
+    formData.append('audio', blob, 'recording.webm');
+    const result = await transcribeAndProcess(formData);
     if ('error' in result) {
       setVoiceError(result.error);
       setStage('idle');
@@ -157,7 +159,7 @@ export function CaptureScreen({ repId, conferenceId, conferences, activeConferen
         {/* Record button centered */}
         <div className="flex-1 flex flex-col items-center justify-center gap-5">
           <div className="animate-scale-in">
-            <RecordButton onCapture={handleCapture} />
+            <RecordButton onAudioReady={handleAudioReady} />
           </div>
 
           <div className="text-center animate-fade-up delay-150 max-w-[300px]">

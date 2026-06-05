@@ -1,0 +1,30 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - heading "My Leads" [level=1] [ref=e7]
+          - paragraph [ref=e8]: No conference selected
+        - generic [ref=e10]:
+          - img [ref=e12]
+          - paragraph [ref=e15]: No leads yet
+          - paragraph [ref=e16]: Select a conference above
+          - link "Capture now" [ref=e17] [cursor=pointer]:
+            - /url: /capture
+    - navigation [ref=e18]:
+      - generic [ref=e20]:
+        - link "Capture" [ref=e21] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e23]
+          - generic [ref=e26]: Capture
+        - link "Leads" [ref=e27] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e29]
+          - generic [ref=e34]: Leads
+        - link "Look up" [ref=e35] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e37]
+          - generic [ref=e40]: Look up
+  - button "Open Next.js Dev Tools" [ref=e46] [cursor=pointer]:
+    - img [ref=e47]
+  - alert [ref=e50]

@@ -5,10 +5,11 @@ import 'server-only';
 import { createAdminClient } from '@/lib/db/admin';
 import { decryptSecret } from '@/lib/config/crypto';
 
-export type ServiceName = 'anthropic' | 'enrichment' | 'hubspot';
+export type ServiceName = 'anthropic' | 'groq' | 'enrichment' | 'hubspot';
 
 const ENV_FALLBACK: Record<ServiceName, string | undefined> = {
   anthropic: process.env.ANTHROPIC_API_KEY,
+  groq: process.env.GROQ_API_KEY,
   enrichment: process.env.ENRICHMENT_API_KEY,
   hubspot: process.env.HUBSPOT_API_KEY,
 };

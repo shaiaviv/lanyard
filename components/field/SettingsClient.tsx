@@ -4,7 +4,7 @@ import { Key, Check, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { saveServiceKey } from '@/app/actions/settings';
 import type { KeyStatus } from '@/app/actions/settings';
 
-type ServiceName = 'anthropic' | 'enrichment' | 'hubspot';
+type ServiceName = 'anthropic' | 'groq' | 'enrichment' | 'hubspot';
 
 const KEY_CONFIGS: {
   name: ServiceName;
@@ -16,9 +16,16 @@ const KEY_CONFIGS: {
   {
     name: 'anthropic',
     label: 'Anthropic (Claude)',
-    desc: 'Voice parse, match adjudication, briefing, conference scoring. Voice transcription uses your browser — no extra key needed.',
+    desc: 'Voice parsing, match adjudication, briefing, conference scoring.',
     placeholder: 'sk-ant-api03-…',
     docsUrl: 'https://console.anthropic.com/settings/keys',
+  },
+  {
+    name: 'groq',
+    label: 'Groq (Voice transcription)',
+    desc: 'Powers speech-to-text using Whisper large v3. Free tier available — get a key in under a minute.',
+    placeholder: 'gsk_…',
+    docsUrl: 'https://console.groq.com/keys',
   },
   {
     name: 'enrichment',

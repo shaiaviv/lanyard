@@ -1,0 +1,80 @@
+- generic:
+  - generic [active]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - navigation [ref=e6]:
+            - button "previous" [disabled] [ref=e7]:
+              - img "previous" [ref=e8]
+            - generic [ref=e10]:
+              - generic [ref=e11]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e12]:
+              - img "next" [ref=e13]
+          - img
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - img [ref=e17]
+            - generic "Latest available version is detected (16.2.7)." [ref=e19]: Next.js 16.2.7
+            - generic [ref=e20]: Turbopack
+          - img
+      - dialog "Build Error" [ref=e22]:
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]:
+              - generic [ref=e29]: Build Error
+              - generic [ref=e30]:
+                - button "Copy Error Info" [ref=e31] [cursor=pointer]:
+                  - img [ref=e32]
+                - button "No related documentation found" [disabled] [ref=e34]:
+                  - img [ref=e35]
+                - button "Attach Node.js inspector" [ref=e37] [cursor=pointer]:
+                  - img [ref=e38]
+            - generic [ref=e47]: Export ServiceName doesn't exist in target module
+          - generic [ref=e49]:
+            - generic [ref=e51]:
+              - img [ref=e53]
+              - generic [ref=e55]: ./.next-internal/server/app/(field)/settings/page/actions.js (3:1)
+              - button "Open in editor" [ref=e56] [cursor=pointer]:
+                - img [ref=e58]
+            - generic [ref=e61]:
+              - generic [ref=e62]: Export ServiceName doesn't exist in target module
+              - generic [ref=e63]: 1 |
+              - text: export
+              - generic [ref=e64]: "{getKeyStatuses"
+              - text: as '00433b4304f4f2121b61db55dc335019e00100cd60'
+              - generic [ref=e65]: "}"
+              - text: from 'ACTIONS_MODULE0'
+              - generic [ref=e66]: 2 |
+              - text: export
+              - generic [ref=e67]: "{saveServiceKey"
+              - text: as '6053095887f25ad0c06d85f146db52de651cbe6a0d'
+              - generic [ref=e68]: "}"
+              - text: from 'ACTIONS_MODULE0' >
+              - generic [ref=e69]: 3 |
+              - text: export
+              - generic [ref=e70]: "{"
+              - text: ServiceName as '7f5d9fac57f568defec74d74912122d52639449c9a'
+              - generic [ref=e71]: "}"
+              - text: from 'ACTIONS_MODULE0'
+              - generic [ref=e72]: "|"
+              - text: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              - generic [ref=e73]: 4 |
+              - text: export
+              - generic [ref=e74]: "{saveServiceKey"
+              - text: as '6053095887f25ad0c06d85f146db52de651cbe6a0d'
+              - generic [ref=e75]: "}"
+              - text: from 'ACTIONS_MODULE0'
+              - generic [ref=e76]: 5 |
+              - generic [ref=e77]: The export ServiceName was not found in module [project]/app/actions/settings.ts [app-rsc] (ecmascript). Did you mean to import saveServiceKey? All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+        - generic [ref=e78]: "1"
+        - generic [ref=e79]: "2"
+    - generic [ref=e84] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e85]:
+        - img [ref=e86]
+      - button "Open issues overlay" [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: "0"
+          - generic [ref=e93]: "1"
+        - generic [ref=e94]: Issue
+  - alert [ref=e95]

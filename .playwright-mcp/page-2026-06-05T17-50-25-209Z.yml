@@ -1,0 +1,115 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - heading "Conference Hub" [level=1] [ref=e6]
+      - paragraph [ref=e7]: 10 conferences · 0 T1 targets
+      - generic [ref=e8]:
+        - button "Conferences" [ref=e9]
+        - button "Coverage" [ref=e10]
+        - button "Follow-ups" [ref=e11]
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - button "All (10)" [ref=e16]
+          - button "T1 · 0" [ref=e17]
+          - button "T2 · 0" [ref=e18]
+          - button "T3 · 0" [ref=e19]
+        - generic [ref=e20]:
+          - button "All" [ref=e21]
+          - button "Fintech" [ref=e22]
+          - button "Payments" [ref=e23]
+          - button "Travel" [ref=e24]
+          - button "SaaS" [ref=e25]
+          - button "Banking" [ref=e26]
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - paragraph [ref=e29]: "0"
+          - paragraph [ref=e30]: T1 targets
+        - generic [ref=e31]:
+          - paragraph [ref=e32]: "0"
+          - paragraph [ref=e33]: Committed
+        - generic [ref=e34]:
+          - paragraph [ref=e35]: "0"
+          - paragraph [ref=e36]: Considering
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - paragraph [ref=e39]: 4 conferences · sorted by ICP score
+          - button "Show past" [ref=e40]
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - heading "Sibos 2026" [level=3] [ref=e46]
+            - generic [ref=e47]:
+              - generic [ref=e48]: 5 Oct – 8 Oct 2026
+              - generic [ref=e49]:
+                - img [ref=e50]
+                - text: Vienna
+              - generic [ref=e53]:
+                - img [ref=e54]
+                - text: 10,000
+            - generic [ref=e59]:
+              - generic [ref=e60]: payments
+              - generic [ref=e61]: treasury
+              - generic [ref=e62]: banking
+              - generic [ref=e63]: FX
+          - button "Add to plan" [ref=e65]:
+            - text: Add to plan
+            - img [ref=e66]
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - heading "Money20/20 USA 2026" [level=3] [ref=e73]
+            - generic [ref=e74]:
+              - generic [ref=e75]: 26 Oct – 29 Oct 2026
+              - generic [ref=e76]:
+                - img [ref=e77]
+                - text: Las Vegas
+              - generic [ref=e80]:
+                - img [ref=e81]
+                - text: 13,000
+            - generic [ref=e86]:
+              - generic [ref=e87]: fintech
+              - generic [ref=e88]: payments
+              - generic [ref=e89]: banking
+              - generic [ref=e90]: FX
+          - button "Add to plan" [ref=e92]:
+            - text: Add to plan
+            - img [ref=e93]
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - heading "Singapore FinTech Festival" [level=3] [ref=e100]
+            - generic [ref=e101]:
+              - generic [ref=e102]: 2 Nov – 6 Nov 2026
+              - generic [ref=e103]:
+                - img [ref=e104]
+                - text: Singapore
+              - generic [ref=e107]:
+                - img [ref=e108]
+                - text: 60,000
+            - generic [ref=e113]:
+              - generic [ref=e114]: fintech
+              - generic [ref=e115]: payments
+              - generic [ref=e116]: banking
+              - generic [ref=e117]: cross-border
+          - button "Add to plan" [ref=e119]:
+            - text: Add to plan
+            - img [ref=e120]
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - heading "Web Summit 2026" [level=3] [ref=e127]
+            - generic [ref=e128]:
+              - generic [ref=e129]: 10 Nov – 13 Nov 2026
+              - generic [ref=e130]:
+                - img [ref=e131]
+                - text: Lisbon
+              - generic [ref=e134]:
+                - img [ref=e135]
+                - text: 70,000
+            - generic [ref=e140]:
+              - generic [ref=e141]: technology
+              - generic [ref=e142]: SaaS
+              - generic [ref=e143]: fintech
+          - button "Add to plan" [ref=e145]:
+            - text: Add to plan
+            - img [ref=e146]
+  - button "Open Next.js Dev Tools" [ref=e153] [cursor=pointer]:
+    - img [ref=e154]
+  - alert [ref=e157]

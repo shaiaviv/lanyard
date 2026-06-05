@@ -1,0 +1,41 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e124]:
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - img [ref=e127]
+            - generic [ref=e136]: Lanyard
+          - link [ref=e137] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e138]
+        - button "Sibos 2026" [ref=e142] [cursor=pointer]:
+          - img [ref=e143]
+          - generic [ref=e146]: Sibos 2026
+          - img [ref=e147]
+        - generic [ref=e150]:
+          - button "Tap to start voice capture" [ref=e157] [cursor=pointer]:
+            - img [ref=e158]
+          - generic [ref=e161]:
+            - paragraph [ref=e162]: Name · company · role · how you met · interest level
+            - paragraph [ref=e163]: “Met Sarah from Stripe, Head of Payments — very interested in FX hedging.”
+        - button "Fill in manually instead" [ref=e165] [cursor=pointer]:
+          - img [ref=e166]
+          - text: Fill in manually instead
+    - navigation [ref=e89]:
+      - generic [ref=e91]:
+        - link "Capture" [ref=e92] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e94]
+          - generic [ref=e97]: Capture
+        - link "Leads" [ref=e98] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e100]
+          - generic [ref=e105]: Leads
+        - link "Look up" [ref=e106] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e108]
+          - generic [ref=e111]: Look up
+  - button "Open Next.js Dev Tools" [ref=e117] [cursor=pointer]:
+    - img [ref=e118]
+  - alert [ref=e121]

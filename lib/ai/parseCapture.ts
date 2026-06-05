@@ -24,7 +24,7 @@ Return companyFit + personFit + a combined tier + a 0..100 score + a one-line ra
 "unclear" (not a guess) when the note is too sparse to judge.`;
 
 export async function parseCapture(transcript: string): Promise<ParseCaptureOutput> {
-  const model = await anthropicModel(MODELS.HAIKU);
+  const model = await anthropicModel(MODELS.SONNET);
   const { output } = await generateText({
     model,
     system: SYSTEM,

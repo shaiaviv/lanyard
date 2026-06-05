@@ -361,9 +361,9 @@ export function ReviewDraft({ draft, conferenceId, repId, onRetry }: ReviewDraft
       {/* Fit chip */}
       {parsed.fit && (
         <div className="flex items-center gap-2 text-xs text-text3">
-          <span>AI fit estimate:</span>
+          <span className="shrink-0 whitespace-nowrap">AI fit estimate:</span>
           <FitChip tier={parsed.fit.tier} />
-          <span className="text-text3 truncate">{parsed.fit.rationale}</span>
+          <span className="text-text3 truncate min-w-0">{parsed.fit.rationale}</span>
         </div>
       )}
 

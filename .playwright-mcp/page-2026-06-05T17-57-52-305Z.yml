@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - heading "🪪 Lanyard" [level=1] [ref=e8]
+            - generic [ref=e9]:
+              - img [ref=e10]
+              - combobox [ref=e13] [cursor=pointer]:
+                - option "— pick a conference —"
+                - option "ITB Berlin 2025 · Berlin"
+                - option "FinovateEurope 2025 · London"
+                - option "Money20/20 Europe 2025 · Amsterdam"
+                - option "Sibos 2025 · Frankfurt"
+                - option "Money20/20 USA 2025 · Las Vegas"
+                - option "Money20/20 Europe 2026 · Amsterdam" [selected]
+                - option "Sibos 2026 · Vienna"
+                - option "Money20/20 USA 2026 · Las Vegas"
+                - option "Singapore FinTech Festival · Singapore"
+                - option "Web Summit 2026 · Lisbon"
+          - link [ref=e14] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e15]
+        - generic [ref=e18]:
+          - generic [ref=e20]:
+            - button "Tap to start voice capture" [ref=e21]:
+              - img [ref=e22]
+            - paragraph [ref=e25]:
+              - text: Tap to record · or use
+              - text: the manual form below
+          - generic [ref=e30]: or enter manually
+          - generic [ref=e109]:
+            - generic [ref=e110]: ✓
+            - paragraph [ref=e111]: Captured!
+            - paragraph [ref=e112]: Heading to your leads…
+    - navigation [ref=e77]:
+      - generic [ref=e78]:
+        - link "Capture" [ref=e79] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e81]
+          - generic [ref=e84]: Capture
+        - link "Leads" [ref=e85] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e87]
+          - generic [ref=e92]: Leads
+        - link "Look up" [ref=e93] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e95]
+          - generic [ref=e98]: Look up
+  - button "Open Next.js Dev Tools" [ref=e113] [cursor=pointer]:
+    - generic [ref=e116]:
+      - text: Rendering
+      - generic [ref=e117]:
+        - generic [ref=e118]: .
+        - generic [ref=e119]: .
+        - generic [ref=e120]: .
+  - alert [ref=e108]

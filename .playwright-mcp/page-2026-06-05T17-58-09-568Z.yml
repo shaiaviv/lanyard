@@ -1,0 +1,37 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - heading "My Leads" [level=1] [ref=e7]
+          - paragraph [ref=e8]: Money20/20 Europe 2026
+        - generic [ref=e9]:
+          - paragraph [ref=e10]: 1 contact captured
+          - link "Sarah Chen Adyen ☀️ Warm 0m ago" [ref=e11] [cursor=pointer]:
+            - /url: /contact/5c8461c9-f846-4705-aaa7-e5d12cfcc7bd
+            - generic [ref=e12]:
+              - generic [ref=e13]:
+                - generic [ref=e14]:
+                  - paragraph [ref=e16]: Sarah Chen
+                  - paragraph [ref=e17]: Adyen
+                - generic [ref=e18]: ☀️ Warm
+              - generic [ref=e20]:
+                - img [ref=e21]
+                - text: 0m ago
+    - navigation [ref=e24]:
+      - generic [ref=e25]:
+        - link "Capture" [ref=e26] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e28]
+          - generic [ref=e31]: Capture
+        - link "Leads" [ref=e32] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e34]
+          - generic [ref=e39]: Leads
+        - link "Look up" [ref=e40] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e42]
+          - generic [ref=e45]: Look up
+  - button "Open Next.js Dev Tools" [ref=e51] [cursor=pointer]:
+    - img [ref=e52]
+  - alert [ref=e55]

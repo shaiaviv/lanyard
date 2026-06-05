@@ -1,0 +1,106 @@
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - heading "Conference Hub" [level=1] [ref=e6]
+      - paragraph [ref=e7]: 10 conferences · 6 T1 targets
+      - generic [ref=e8]:
+        - button "Conferences" [ref=e9]
+        - button "Coverage" [active] [ref=e10]
+        - button "Follow-ups" [ref=e11]
+    - generic [ref=e197]:
+      - generic [ref=e198]:
+        - paragraph [ref=e199]: "Under-invested: 4 priority events without a committed rep"
+        - generic [ref=e200]:
+          - generic [ref=e201]:
+            - generic [ref=e203]: T1
+            - generic [ref=e204]: Money20/20 Europe 2026
+            - generic [ref=e205]: · 2 Jun
+          - generic [ref=e206]:
+            - generic [ref=e208]: T1
+            - generic [ref=e209]: Sibos 2026
+            - generic [ref=e210]: · 5 Oct
+          - generic [ref=e211]:
+            - generic [ref=e213]: T1
+            - generic [ref=e214]: Money20/20 USA 2026
+            - generic [ref=e215]: · 26 Oct
+          - generic [ref=e216]:
+            - generic [ref=e218]: T2
+            - generic [ref=e219]: Singapore FinTech Festival
+            - generic [ref=e220]: · 2 Nov
+      - generic [ref=e221]:
+        - generic [ref=e222]: "Your status:"
+        - generic [ref=e223]: committed
+        - generic [ref=e224]: considering
+        - generic [ref=e225]: declined
+      - generic [ref=e226]:
+        - generic [ref=e227]:
+          - heading "June 2026" [level=3] [ref=e228]
+          - generic [ref=e231]:
+            - generic [ref=e232]:
+              - paragraph [ref=e235]: Money20/20 Europe 2026
+              - generic [ref=e236]:
+                - generic [ref=e237]: 2 Jun
+                - generic [ref=e238]:
+                  - img [ref=e239]
+                  - text: Amsterdam
+                - generic [ref=e242]:
+                  - img [ref=e243]
+                  - text: 6,000
+            - generic [ref=e248]: "89"
+        - generic [ref=e249]:
+          - heading "October 2026" [level=3] [ref=e250]
+          - generic [ref=e251]:
+            - generic [ref=e253]:
+              - generic [ref=e254]:
+                - paragraph [ref=e257]: Sibos 2026
+                - generic [ref=e258]:
+                  - generic [ref=e259]: 5 Oct
+                  - generic [ref=e260]:
+                    - img [ref=e261]
+                    - text: Vienna
+                  - generic [ref=e264]:
+                    - img [ref=e265]
+                    - text: 10,000
+              - generic [ref=e270]: "80"
+            - generic [ref=e272]:
+              - generic [ref=e273]:
+                - paragraph [ref=e276]: Money20/20 USA 2026
+                - generic [ref=e277]:
+                  - generic [ref=e278]: 26 Oct
+                  - generic [ref=e279]:
+                    - img [ref=e280]
+                    - text: Las Vegas
+                  - generic [ref=e283]:
+                    - img [ref=e284]
+                    - text: 13,000
+              - generic [ref=e289]: "85"
+        - generic [ref=e290]:
+          - heading "November 2026" [level=3] [ref=e291]
+          - generic [ref=e292]:
+            - generic [ref=e294]:
+              - generic [ref=e295]:
+                - paragraph [ref=e298]: Singapore FinTech Festival
+                - generic [ref=e299]:
+                  - generic [ref=e300]: 2 Nov
+                  - generic [ref=e301]:
+                    - img [ref=e302]
+                    - text: Singapore
+                  - generic [ref=e305]:
+                    - img [ref=e306]
+                    - text: 60,000
+              - generic [ref=e311]: "66"
+            - generic [ref=e313]:
+              - generic [ref=e314]:
+                - paragraph [ref=e317]: Web Summit 2026
+                - generic [ref=e318]:
+                  - generic [ref=e319]: 10 Nov
+                  - generic [ref=e320]:
+                    - img [ref=e321]
+                    - text: Lisbon
+                  - generic [ref=e324]:
+                    - img [ref=e325]
+                    - text: 70,000
+              - generic [ref=e330]: "47"
+  - button "Open Next.js Dev Tools" [ref=e192] [cursor=pointer]:
+    - img [ref=e193]
+  - alert [ref=e196]

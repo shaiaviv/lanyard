@@ -3,59 +3,36 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, Square, MicOff, Loader2 } from 'lucide-react';
 
 interface RecordButtonProps {
-  onCapture: (transcript: string) => void;
+  onAudioReady: (blob: Blob) => void;
   disabled?: boolean;
 }
 
-type RecordState = 'idle' | 'recording' | 'transcribing';
+type RecordState = 'idle' | 'preparing' | 'recording';
 
-// Module-level singleton — loaded once, cached in memory and browser cache thereafter
-let whisperPromise: Promise<(audio: Float32Array) => Promise<{ text: string }>> | null = null;
-
-function getWhisper() {
-  if (!whisperPromise) {
-    whisperPromise = import('@huggingface/transformers').then(({ pipeline }) =>
-      pipeline('automatic-speech-recognition', 'onnx-community/whisper-tiny.en', {
-        dtype: 'q8',
-      }) as Promise<(audio: Float32Array) => Promise<{ text: string }>>
-    );
-  }
-  return whisperPromise;
-}
-
-async function blobToFloat32(blob: Blob): Promise<Float32Array> {
-  const arrayBuffer = await blob.arrayBuffer();
-  // AudioContext resamples to 16kHz — what Whisper expects
-  const ctx = new AudioContext({ sampleRate: 16000 });
-  const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-  ctx.close();
-  return audioBuffer.getChannelData(0);
-}
-
-export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
+export function RecordButton({ onAudioReady, disabled }: RecordButtonProps) {
   const [recordState, setRecordState] = useState<RecordState>('idle');
-  const [modelReady, setModelReady] = useState(false);
-  const [modelLoading, setModelLoading] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [elapsed, setElapsed] = useState(0);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Pre-warm model as soon as component mounts — so it's ready by the time user hits record
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!navigator.mediaDevices?.getUserMedia) { setUnsupported(true); return; }
+    if (typeof window !== 'undefined' && !navigator.mediaDevices?.getUserMedia) {
+      setUnsupported(true);
+    }
+  }, []);
 
-    setModelLoading(true);
-    getWhisper()
-      .then(() => { setModelReady(true); setModelLoading(false); })
-      .catch(() => { setModelLoading(false); });
+  useEffect(() => {
+    return () => {
+      recorderRef.current?.stop();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, []);
 
   const startRecording = useCallback(async () => {
     if (recordState !== 'idle') return;
-    setError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
@@ -65,38 +42,35 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      recorder.onstop = async () => {
+      // onstart fires when codec is initialised — wait 500ms more for hardware warmup
+      recorder.onstart = () => {
+        setTimeout(() => {
+          setElapsed(0);
+          timerRef.current = setInterval(() => setElapsed((s) => s + 1), 1000);
+          setRecordState('recording');
+        }, 500);
+      };
+
+      recorder.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
-        setRecordState('transcribing');
-        try {
-          const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
-          const audio = await blobToFloat32(blob);
-          const whisper = await getWhisper();
-          const result = await whisper(audio);
-          const text = result.text.trim();
-          if (text) onCapture(text);
-        } catch {
-          setError('Transcription failed — try again.');
-        } finally {
-          setRecordState('idle');
-        }
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+        setElapsed(0);
+        setRecordState('idle');
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
+        if (blob.size > 0) onAudioReady(blob);
       };
 
       recorder.start();
       recorderRef.current = recorder;
-      setRecordState('recording');
+      setRecordState('preparing');
     } catch {
       setUnsupported(true);
     }
-  }, [recordState, onCapture]);
+  }, [recordState, onAudioReady]);
 
   const stopRecording = useCallback(() => {
     recorderRef.current?.stop();
     recorderRef.current = null;
-  }, []);
-
-  useEffect(() => {
-    return () => { recorderRef.current?.stop(); };
   }, []);
 
   if (unsupported) {
@@ -115,23 +89,20 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
     );
   }
 
+  const isPreparing = recordState === 'preparing';
   const isRecording = recordState === 'recording';
-  const isTranscribing = recordState === 'transcribing';
-  const buttonBusy = disabled || isTranscribing || (modelLoading && !modelReady);
+  const buttonBusy = disabled || isPreparing;
 
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* Button + rings */}
       <div className="relative flex items-center justify-center w-60 h-60">
-        {/* Halo rings (idle) */}
-        {!isRecording && !isTranscribing && (
+        {!isRecording && !isPreparing && (
           <>
             <div className="absolute inset-[-10px] rounded-full bg-accent/[0.05]" />
             <div className="absolute inset-[-28px] rounded-full bg-accent/[0.025]" />
             <div className="absolute inset-[-46px] rounded-full bg-accent/[0.01]" />
           </>
         )}
-        {/* Pulse rings (recording) */}
         {isRecording && (
           <>
             <div className="absolute inset-0 rounded-full border-2 border-red-500/40 ring-out" style={{ transformOrigin: 'center' }} />
@@ -146,11 +117,9 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
           className={`relative w-44 h-44 rounded-full flex items-center justify-center transition-transform duration-150 active:scale-95 hover:scale-[1.03] disabled:opacity-40 disabled:cursor-not-allowed ${
             isRecording ? 'record-active' : 'record-idle'
           }`}
-          title={isRecording ? 'Tap to stop' : isTranscribing ? 'Transcribing…' : 'Tap to start voice capture'}
+          title={isPreparing ? 'Get ready…' : isRecording ? 'Tap to stop' : 'Tap to start voice capture'}
         >
-          {isTranscribing ? (
-            <Loader2 size={44} strokeWidth={1.25} className="text-accent animate-spin" />
-          ) : isRecording ? (
+          {isRecording ? (
             <Square size={38} strokeWidth={1.5} fill="white" className="text-white" />
           ) : (
             <Mic size={52} strokeWidth={1.25} className="text-[#07090F]" />
@@ -158,24 +127,21 @@ export function RecordButton({ onCapture, disabled }: RecordButtonProps) {
         </button>
       </div>
 
-      {/* Status label */}
-      {modelLoading && !modelReady ? (
+      {isPreparing ? (
         <div className="flex items-center gap-2">
-          <Loader2 size={13} className="text-text3 animate-spin" />
-          <span className="text-xs text-text3">Loading voice model…</span>
-        </div>
-      ) : isTranscribing ? (
-        <div className="flex items-center gap-2">
-          <Loader2 size={13} className="text-accent animate-spin" />
-          <span className="text-sm font-semibold text-accent tracking-wide">Transcribing…</span>
+          <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+          <span className="text-sm font-semibold text-yellow-400 tracking-wide">Get ready…</span>
         </div>
       ) : isRecording ? (
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-          <span className="text-sm font-semibold text-red-400 tracking-wide">Recording · tap to finish</span>
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+            <span className="text-sm font-semibold text-red-400 tracking-wide">
+              Recording · {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
+            </span>
+          </div>
+          <p className="text-xs text-text3 text-center">Speak freely · tap stop when done</p>
         </div>
-      ) : error ? (
-        <p className="text-xs text-red-400 text-center max-w-[240px]">{error}</p>
       ) : null}
     </div>
   );

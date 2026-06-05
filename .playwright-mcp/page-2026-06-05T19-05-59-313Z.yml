@@ -1,0 +1,68 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "Back" [ref=e7] [cursor=pointer]:
+            - /url: /capture
+            - img [ref=e8]
+            - text: Back
+          - heading "Settings" [level=1] [ref=e10]
+          - paragraph [ref=e11]: API keys and configuration
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - generic [ref=e15]:
+              - generic [ref=e16]:
+                - img [ref=e18]
+                - paragraph [ref=e22]: Anthropic (Claude)
+              - generic [ref=e24]:
+                - img [ref=e25]
+                - text: Not set
+            - paragraph [ref=e27]: Voice parse, match adjudication, briefing, conference scoring. Voice transcription uses your browser — no extra key needed.
+            - button "+ Add key" [ref=e28] [cursor=pointer]
+          - generic [ref=e29]:
+            - generic [ref=e30]:
+              - generic [ref=e31]:
+                - img [ref=e33]
+                - paragraph [ref=e37]: Enrichment provider
+              - generic [ref=e39]:
+                - img [ref=e40]
+                - text: Not set
+            - paragraph [ref=e42]: LinkedIn candidate lookup (Clay / Apollo / PDL — mock used without key)
+            - button "+ Add key" [ref=e43] [cursor=pointer]
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - img [ref=e48]
+                - paragraph [ref=e52]: HubSpot
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: Not set
+            - paragraph [ref=e57]: Push qualified leads to CRM
+            - button "+ Add key" [ref=e58] [cursor=pointer]
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: Env var fallback (dev)
+            - paragraph [ref=e61]:
+              - text: Keys saved here take priority. In local dev, you can also set
+              - code [ref=e62]: ANTHROPIC_API_KEY
+              - text: in
+              - code [ref=e63]: .env
+              - text: as a shortcut.
+            - paragraph [ref=e64]: Keys are AES-256-GCM encrypted at rest and never sent to the browser.
+    - navigation [ref=e65]:
+      - generic [ref=e67]:
+        - link "Capture" [ref=e68] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e70]
+          - generic [ref=e73]: Capture
+        - link "Leads" [ref=e74] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e76]
+          - generic [ref=e81]: Leads
+        - link "Look up" [ref=e82] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e84]
+          - generic [ref=e87]: Look up
+  - button "Open Next.js Dev Tools" [ref=e93] [cursor=pointer]:
+    - img [ref=e94]
+  - alert [ref=e97]

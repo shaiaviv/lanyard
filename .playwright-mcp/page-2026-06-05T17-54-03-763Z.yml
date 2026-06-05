@@ -1,0 +1,146 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - heading "Conference Hub" [level=1] [ref=e6]
+      - paragraph [ref=e7]: 10 conferences · 6 T1 targets
+      - generic [ref=e8]:
+        - button "Conferences" [ref=e9]
+        - button "Coverage" [ref=e10]
+        - button "Follow-ups" [ref=e11]
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - paragraph [ref=e15]: 2 T1 conferences without coverage
+        - paragraph [ref=e16]: Sibos 2026, Money20/20 USA 2026
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - button "All (10)" [ref=e19]
+          - button "T1 · 6" [ref=e20]
+          - button "T2 · 2" [ref=e21]
+          - button "T3 · 2" [ref=e22]
+        - generic [ref=e23]:
+          - button "All" [ref=e24]
+          - button "Fintech" [ref=e25]
+          - button "Payments" [ref=e26]
+          - button "Travel" [ref=e27]
+          - button "SaaS" [ref=e28]
+          - button "Banking" [ref=e29]
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - paragraph [ref=e32]: "6"
+          - paragraph [ref=e33]: T1 targets
+        - generic [ref=e34]:
+          - paragraph [ref=e35]: "0"
+          - paragraph [ref=e36]: Committed
+        - generic [ref=e37]:
+          - paragraph [ref=e38]: "0"
+          - paragraph [ref=e39]: Considering
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - paragraph [ref=e42]: 4 conferences · sorted by ICP score
+          - button "Show past" [ref=e43]
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - generic [ref=e48]:
+                - generic [ref=e49]: T1
+                - heading "Money20/20 USA 2026" [level=3] [ref=e50]
+              - generic [ref=e51]:
+                - generic [ref=e52]: 26 Oct – 29 Oct 2026
+                - generic [ref=e53]:
+                  - img [ref=e54]
+                  - text: Las Vegas
+                - generic [ref=e57]:
+                  - img [ref=e58]
+                  - text: 13,000
+              - generic [ref=e67]: "85"
+              - generic [ref=e68]:
+                - generic [ref=e69]: fintech
+                - generic [ref=e70]: payments
+                - generic [ref=e71]: banking
+                - generic [ref=e72]: FX
+            - button "Add to plan" [ref=e74]:
+              - text: Add to plan
+              - img [ref=e75]
+          - button "AI scoring breakdown" [ref=e77]:
+            - img [ref=e78]
+            - text: AI scoring breakdown
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - generic [ref=e84]:
+                - generic [ref=e85]: T1
+                - heading "Sibos 2026" [level=3] [ref=e86]
+              - generic [ref=e87]:
+                - generic [ref=e88]: 5 Oct – 8 Oct 2026
+                - generic [ref=e89]:
+                  - img [ref=e90]
+                  - text: Vienna
+                - generic [ref=e93]:
+                  - img [ref=e94]
+                  - text: 10,000
+              - generic [ref=e103]: "80"
+              - generic [ref=e104]:
+                - generic [ref=e105]: payments
+                - generic [ref=e106]: treasury
+                - generic [ref=e107]: banking
+                - generic [ref=e108]: FX
+            - button "Add to plan" [ref=e110]:
+              - text: Add to plan
+              - img [ref=e111]
+          - button "AI scoring breakdown" [ref=e113]:
+            - img [ref=e114]
+            - text: AI scoring breakdown
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - generic [ref=e121]: T2
+                - heading "Singapore FinTech Festival" [level=3] [ref=e122]
+              - generic [ref=e123]:
+                - generic [ref=e124]: 2 Nov – 6 Nov 2026
+                - generic [ref=e125]:
+                  - img [ref=e126]
+                  - text: Singapore
+                - generic [ref=e129]:
+                  - img [ref=e130]
+                  - text: 60,000
+              - generic [ref=e139]: "66"
+              - generic [ref=e140]:
+                - generic [ref=e141]: fintech
+                - generic [ref=e142]: payments
+                - generic [ref=e143]: banking
+                - generic [ref=e144]: cross-border
+            - button "Add to plan" [ref=e146]:
+              - text: Add to plan
+              - img [ref=e147]
+          - button "AI scoring breakdown" [ref=e149]:
+            - img [ref=e150]
+            - text: AI scoring breakdown
+        - generic [ref=e153]:
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]:
+                - generic [ref=e157]: T3
+                - heading "Web Summit 2026" [level=3] [ref=e158]
+              - generic [ref=e159]:
+                - generic [ref=e160]: 10 Nov – 13 Nov 2026
+                - generic [ref=e161]:
+                  - img [ref=e162]
+                  - text: Lisbon
+                - generic [ref=e165]:
+                  - img [ref=e166]
+                  - text: 70,000
+              - generic [ref=e175]: "47"
+              - generic [ref=e176]:
+                - generic [ref=e177]: technology
+                - generic [ref=e178]: SaaS
+                - generic [ref=e179]: fintech
+            - button "Add to plan" [ref=e181]:
+              - text: Add to plan
+              - img [ref=e182]
+          - button "AI scoring breakdown" [ref=e184]:
+            - img [ref=e185]
+            - text: AI scoring breakdown
+  - button "Open Next.js Dev Tools" [ref=e192] [cursor=pointer]:
+    - img [ref=e193]
+  - alert [ref=e196]

@@ -1,0 +1,95 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - main [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - heading "🪪 Lanyard" [level=1] [ref=e8]
+            - generic [ref=e9]:
+              - img [ref=e10]
+              - combobox [ref=e13] [cursor=pointer]:
+                - option "— pick a conference —" [selected]
+                - option "ITB Berlin 2025 · Berlin"
+                - option "FinovateEurope 2025 · London"
+                - option "Money20/20 Europe 2025 · Amsterdam"
+                - option "Sibos 2025 · Frankfurt"
+                - option "Money20/20 USA 2025 · Las Vegas"
+                - option "Money20/20 Europe 2026 · Amsterdam"
+                - option "Sibos 2026 · Vienna"
+                - option "Money20/20 USA 2026 · Las Vegas"
+                - option "Singapore FinTech Festival · Singapore"
+                - option "Web Summit 2026 · Lisbon"
+          - link [ref=e14] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e15]
+        - generic [ref=e18]:
+          - generic [ref=e20]:
+            - button "Tap to start voice capture" [ref=e21]:
+              - img [ref=e22]
+            - paragraph [ref=e25]:
+              - text: Tap to record · or use
+              - text: the manual form below
+          - generic [ref=e30]: or enter manually
+          - generic [ref=e31]:
+            - generic [ref=e32]:
+              - generic [ref=e33]:
+                - generic [ref=e34]: Name *
+                - textbox "Jane Smith" [ref=e35]
+              - generic [ref=e36]:
+                - generic [ref=e37]:
+                  - generic [ref=e38]: Company
+                  - textbox "Stripe" [ref=e39]
+                - generic [ref=e40]:
+                  - generic [ref=e41]: Title
+                  - textbox "Head of Payments" [ref=e42]
+            - generic [ref=e43]:
+              - generic [ref=e44]: Interest level
+              - generic [ref=e45]:
+                - button "🔥 Hot" [ref=e46]:
+                  - generic [ref=e47]: 🔥
+                  - generic [ref=e48]: Hot
+                - button "☀️ Warm" [ref=e49]:
+                  - generic [ref=e50]: ☀️
+                  - generic [ref=e51]: Warm
+                - button "😐 Lukewarm" [ref=e52]:
+                  - generic [ref=e53]: 😐
+                  - generic [ref=e54]: Lukewarm
+                - button "❄️ Cool" [ref=e55]:
+                  - generic [ref=e56]: ❄️
+                  - generic [ref=e57]: Cool
+                - button "🥶 Cold" [ref=e58]:
+                  - generic [ref=e59]: 🥶
+                  - generic [ref=e60]: Cold
+            - generic [ref=e61]:
+              - generic [ref=e62]: Notes
+              - textbox "What did you discuss? What was their reaction?" [ref=e63]
+            - generic [ref=e64]:
+              - generic [ref=e65]: Topics discussed
+              - generic [ref=e66]:
+                - textbox "FX hedging, travel merchants…" [ref=e67]
+                - button [ref=e68]:
+                  - img [ref=e69]
+            - button "Show optional fields" [ref=e70]:
+              - img [ref=e71]
+              - text: Show optional fields
+            - generic [ref=e73] [cursor=pointer]:
+              - checkbox "Flag for follow-up" [ref=e74]
+              - generic [ref=e75]: Flag for follow-up
+            - button "Save contact" [disabled] [ref=e76]
+    - navigation [ref=e77]:
+      - generic [ref=e78]:
+        - link "Capture" [ref=e79] [cursor=pointer]:
+          - /url: /capture
+          - img [ref=e81]
+          - generic [ref=e84]: Capture
+        - link "Leads" [ref=e85] [cursor=pointer]:
+          - /url: /leads
+          - img [ref=e87]
+          - generic [ref=e92]: Leads
+        - link "Look up" [ref=e93] [cursor=pointer]:
+          - /url: /lookup
+          - img [ref=e95]
+          - generic [ref=e98]: Look up
+  - button "Open Next.js Dev Tools" [ref=e104] [cursor=pointer]:
+    - img [ref=e105]
+  - alert [ref=e108]

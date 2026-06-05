@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - text: 🪪 Lanyard
+      - paragraph [ref=e5]: Conference intelligence for sales teams
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]: Email
+        - textbox "you@company.com" [ref=e9]
+      - generic [ref=e10]:
+        - generic [ref=e11]: Password
+        - textbox "••••••••" [ref=e12]
+      - button "Sign in" [ref=e13]
+    - paragraph [ref=e14]: Account created by your admin via Supabase dashboard.
+  - alert [ref=e15]
