@@ -62,13 +62,11 @@ introduces them: the **Planning Overview** dashboard on desktop first, then the 
 screen on a phone frame. Keep it to 3–4 seconds each.
 
 **🎙️ NARRATION:**
-> Lanyard is three connected experiences, one for each moment in the conference cycle. The first, and
-> the heart of the product, is the planning experience: the sales lead at their desk, choosing which
-> events are worth attending, who covers them, and how to map out the whole year. The second is the
-> field experience: the rep on a busy show floor, capturing the people they meet in seconds. And the
-> third is for that same rep back at the hotel that night, turning the day's messy notes into clean,
-> trustworthy records. Three moments, one shared set of data. It all starts with a single lead captured
-> on the floor, so that's where I'll begin.
+> Lanyard is three connected experiences. The first, and the heart of the product, is planning: the
+> sales lead choosing which events to attend, who covers them, and how to map the year. The second is
+> the field experience: the rep capturing people in seconds on a busy show floor. And the third is for
+> that same rep back at the hotel, turning messy notes into clean records. Three moments, one set of
+> data. It all starts on the floor, so that's where I'll begin.
 
 ---
 
