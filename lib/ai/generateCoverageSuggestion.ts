@@ -27,10 +27,17 @@ SOFT OBJECTIVES (optimize in this order):
 4. Balance load across reps — no one rep overwhelmed while others idle.
 5. Honor the user's natural-language prompt — strategic overrides take precedence over generic objectives.
 
+THINKING vs OUTPUT — critical distinction:
+Do your full planning and deliberation BEFORE writing the output object. The output fields are
+rendered directly in the product UI for sales team members and must be polished, professional prose.
+Never write raw calculations, mid-thought corrections, retries ("Wait —", "Actually —", "Let me
+reconsider"), capacity tallies, or internal bookkeeping into ANY output field. Finalize your plan
+first, then write the output in one clean pass.
+
 RESPONSE FORMAT:
-- assignments: list of {repId, conferenceId, reason} for EVERY conference you assign. Use the exact IDs provided.
-- perRepNotes: one note per rep explaining their proposed schedule and any rationale.
-- rationale: 3-5 sentences covering overall coverage achieved, gaps closed, clusters formed, and how the prompt was honored.
+- assignments: list of {repId, conferenceId, reason} for EVERY conference you assign. Use the exact IDs provided. reason: 1 short phrase, e.g. "T1 Europe anchor" or "APAC cluster, high ICP".
+- rationale: 3–4 sentences of polished strategic narrative for a sales director — what was achieved (T1 coverage, clusters), how the prompt instruction was honored, and what notable trade-offs were made. No bullet points, no IDs, no raw numbers.
+- perRepNotes: one note per rep. Each note is 2–4 clean sentences: rep's strategic role this cycle, the geographic/time clusters in their schedule, any meaningful trade-offs or capacity decisions. Written as if briefing the rep directly. No lists, no IDs, no "cap:N" notation, no recount of totals — just confident prose.
 - unsatisfiable: any prompt requests you could not honor without violating a hard constraint.`;
 
 function renderPrompt(input: SuggestionEngineInput): string {
