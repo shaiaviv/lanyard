@@ -1,5 +1,6 @@
 'use client';
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { MapPin, Users, ChevronDown, ChevronUp, Check, UserPlus, X, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
@@ -65,10 +66,48 @@ function CoverageControl({
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [pendingRepId, setPendingRepId] = useState<string | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  // Popover is portaled to <body> so the card's overflow-hidden can't clip it.
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxH: number } | null>(null);
 
   const statusByRep = new Map(coverageForConf.map((c) => [c.repId, c.status]));
   const committed = coverageForConf.filter((c) => c.status === 'committed');
   const considering = coverageForConf.filter((c) => c.status === 'considering');
+
+  function place() {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const width = 260;
+    const margin = 8;
+    const left = Math.max(margin, Math.min(r.right - width, window.innerWidth - width - margin));
+    const spaceBelow = window.innerHeight - r.bottom - margin;
+    const spaceAbove = r.top - margin;
+    // Flip up when there isn't enough room below; cap height + scroll either way.
+    const up = spaceBelow < 300 && spaceAbove > spaceBelow;
+    const maxH = Math.min(Math.round(window.innerHeight * 0.7), up ? spaceAbove : spaceBelow);
+    setPos(
+      up
+        ? { left, width, maxH, bottom: window.innerHeight - r.top + 6 }
+        : { left, width, maxH, top: r.bottom + 6 },
+    );
+  }
+
+  function toggle() {
+    if (!open) place();
+    setOpen((o) => !o);
+  }
+
+  // Reposition / close on scroll + resize so the fixed popover never drifts.
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [open]);
 
   function set(repId: string, status: CoverageStatus) {
     setPendingRepId(repId);
@@ -100,20 +139,24 @@ function CoverageControl({
         : 'border-warn/25 bg-warn/8';
 
   return (
-    <div className="relative flex-shrink-0">
+    <div className="flex-shrink-0">
       <button
-        onClick={() => setOpen(!open)}
+        ref={btnRef}
+        onClick={toggle}
         className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all ${summaryClass}`}
       >
         {summary}
         <ChevronDown size={11} className="opacity-60" />
       </button>
 
-      {open && (
+      {open && pos && createPortal(
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 z-20 bg-card rounded-xl py-2 min-w-[240px] border border-white/10 shadow-2xl">
-            <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-white/6">
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-50 bg-card rounded-xl py-2 border border-white/10 shadow-2xl overflow-y-auto"
+            style={{ top: pos.top, bottom: pos.bottom, left: pos.left, width: pos.width, maxHeight: pos.maxH }}
+          >
+            <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-white/6 sticky top-0 bg-card">
               <span className="text-[11px] font-semibold text-text3 flex items-center gap-1.5">
                 <UserPlus size={12} /> Team coverage
               </span>
@@ -152,7 +195,8 @@ function CoverageControl({
               );
             })}
           </div>
-        </>
+        </>,
+        document.body,
       )}
     </div>
   );
