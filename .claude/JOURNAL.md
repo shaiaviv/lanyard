@@ -874,3 +874,81 @@ resolving the signed-in rep via a subquery so it's reproducible on a fresh DB; c
   tier stripe) — couldn't show >2 reps. Portaled it to `<body>` with fixed positioning + a
   viewport-aware flip-up/height-cap + internal scroll. Verified all 6 reps visible + in-viewport for
   cards at top and bottom of the list.
+
+## Entry 024 — 2026-06-06 — New feature: AI Coverage Suggestions — product plan (Opus)
+
+**Phase:** New-feature planning. Back on Opus for the open-ended design (model strategy: planning =
+Opus). User wants a major Coverage enhancement: **"Generate Coverage Suggestion with AI"** — a full
+AI rep-allocation across the year that respects committed tickets, clusters trips, hits priority/
+region/quarter coverage, takes a free-text instruction, and is inspected in a non-destructive
+**Suggestion Mode** overlay (`/planning?suggestionId=<uuid>`) with a per-rep ordered travel map.
+
+**What I did before planning:** re-read foundation + product/3-planning + tech/3-planning + JOURNAL
+through Entry 023, and mapped the live Coverage code (`CoverageView`, `CoverageTimeline`,
+`CoverageMap`, the `coverage` table + `considering|committed|attended|declined` enum,
+`getGapAnalysis`, the `parseCapture`/`scoreConference` AI exemplar) via an Explore agent.
+
+**Spotted before designing (logged because they shaped the plan):**
+1. **A latent contradiction in the ask** — "read-only / don't save to DB" vs. "list all suggestions
+   and reload a specific one by URL." Listing + reload-by-UUID needs persistence. Reconciled:
+   "read-only" = *never mutate the real `coverage` truth*; the draft itself still must live somewhere.
+2. **An unstated hard constraint** — a rep can't be at two date-overlapping conferences. "Smart
+   clustering" is meaningless without no-double-booking; baked in as a hard constraint.
+
+**3 decisions made (asked the user; all confirmed the recommended option):**
+- **Persistence = dedicated `coverage_suggestions` table** (prompt + full proposed allocation as
+  JSON). Never touches `coverage`, so still read-only w.r.t. truth; enables list + reload + shareable
+  URLs across devices. (Over localStorage / in-memory, which break reload/share.)
+- **Only `committed` is locked.** AI treats `considering` as soft (keep/move/drop) → a genuinely
+  optimized plan, not a thin gap-filler. (Over lock-both / blank-slate.)
+- **Enrich reps with `home_base` + `capacity`** so clustering/travel is realistic and "send rep X to
+  region Y" is groundable. (Over name-only.)
+
+**Design backbone (full doc in `plans/product/3b-coverage-suggestions.md`):** hybrid AI stance
+consistent with the rest of the app — **AI does fuzzy reasoning + natural-language intent;
+deterministic code enforces/validates hard constraints** (committed preserved, no double-booking,
+capacity). Methodology = hard constraints + soft objectives (cover T1→T2 ICP-weighted, balance
+region/quarter, cluster trips around home base, fairness, honor prompt) — the *active* counterpart to
+the gap-analysis/cluster panels we already defend. Suggestion Mode is **P1 made literal** (generous
+hint, strict record). Rep filter → ordered numbered timeline + a route-connected travel map (hover =
+conference + dates + "Stop N of M") for sanity-checking clusters. **Mock/heuristic fallback** (greedy
+allocator) so it demos with no Anthropic key, matching the app-wide pattern. Read-only in v1; "apply
+suggestion" parked.
+
+**AI-collab note:** asked 3 sharp clarifying Qs (not 20) before writing — the contradiction +
+double-booking catches were the leverage points. **Next:** tech plan
+(`plans/tech/3b-coverage-suggestions.md`), then implementation.
+
+## Entry 025 — 2026-06-06 — Conference DB expanded 44 → 190 real events (Sonnet/Opus build)
+
+**What:** Grew the conference database from 44 to **190 real, deduped events** (146 new),
+covering H2 2026 + full 2027 across Europe/Americas/APAC/MEA and the payments, fintech,
+treasury/FX, cross-border, travel and SaaS verticals. User flagged that "44" was too thin for
+a tool meant to help reps *discover* and prioritise conferences.
+
+**How:** Fanned out **6 parallel research agents** by region × vertical (EU payments; treasury/FX
+global; North America; APAC; MEA+LATAM; travel+SaaS), each returning structured JSON with the
+5 ICP factor scores + rationales — NOT the final score. Consolidated to
+`scripts/conference-candidates.json`, then a shared transform (`scripts/build-conferences.mjs`)
+does dedup (vs the 44 + intra-batch), date-window filter, country→region normalization, vertical
+canonicalization, and **deterministic scoring with the exact `computeIcpScore` formula** so all
+190 sit on one ruler. Two emit paths off the same transform: `gen-conferences.mjs` (SQL →
+appended to `supabase/setup.sql`) and `apply-conferences.mjs` (live insert via supabase-js +
+service-role key, idempotent by name).
+
+**Decisions / alternatives:**
+- **Agents return factors, code computes the score** — same Opus-fills-inputs / formula-turns-them-
+  into-a-score split as the engine; avoids 6 agents inventing 6 scoring scales.
+- **Kept all 146** (→190) rather than trimming to the chosen "~150 total" — they're all real and
+  the breadth helps the planning/coverage view; offered to trim.
+- **2027 editions of recurring events** (Money20/20 Europe 2027, Sibos 2027, EuroFinance 2027…)
+  added deliberately — real, distinct name+year, valuable for the year-coverage timeline.
+- Dropped a duplicate `Sibos 2027` (one event, two agent-guessed cities); fixed an agent tagging a
+  DC event "MEA"; normalized `commerce→retail`, `saas→SaaS`.
+
+**Verified:** live DB 190 rows, 0 duplicate names, 0 null critical fields; tiers T1 24 / T2 100 /
+T3 22 (Europe richest in T1, APAC/MEA mostly T2/T3 — ICP-correct). **NOT done:** trimming to 150;
+backfilling exact 2027 dates as organizers announce them (many marked dates_estimated).
+
+**AI-collab note:** parallel fan-out turned a long linear research slog into ~4 min wall-clock;
+the leverage was forcing structured factor output + a single deterministic scoring pass.
