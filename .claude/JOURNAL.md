@@ -1070,3 +1070,13 @@ build sequence, all 6 steps + QA pass.
   *future-state* facts drifted, which is exactly what estimated data risks.
 
 - [06:XX] Applied migration `0003_coverage_suggestions.sql` via Supabase MCP (`apply_migration`). Confirmed `coverage_suggestions` table live with all 7 columns (id/team_id/created_by/prompt/source/payload/created_at) and RLS policies. All 6 reps (including Demo Rep) have `home_city`, `home_region`, `capacity` populated — engine has full inputs for both heuristic and AI paths. `tsc --noEmit` = 0 errors. Feature is fully live.
+
+- [later] **Submission video — drafted the narration/shooting script** (`docs/VIDEO_SCRIPT.md`).
+  Plan: AI-avatar narration (HeyGen) over manually screen-recorded demos, assembled in CapCut. Script
+  is a 12-scene shooting doc (~8.5 min): each scene pairs a 🎬 RECORD shot-list with a 🎙️ NARRATION
+  block written *for the ear* (shorter sentences/contractions, not README prose, since avatars mis-pace
+  long em-dash sentences). Structured so all five brief-graded video topics are explicit scenes —
+  scoring defense (S6), cross-conf + edge cases (S4/S5), how-I-used-AI incl. helped-vs-got-in-the-way
+  (S10), what's-next (S11), salesperson demo throughout. The two core AI features lead (voice capture
+  S3, AI coverage planning S8). Added appendices: a 5–7 min trim order, a brief→scene coverage table,
+  and HeyGen delivery notes. Narration plays over AI-call spinners by design so no dead-air on latency.
