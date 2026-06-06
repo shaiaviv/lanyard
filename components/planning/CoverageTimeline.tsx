@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { MapPin, Users, AlertTriangle } from 'lucide-react';
 import type { Conference } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
@@ -8,6 +9,8 @@ interface Props {
   conferences: Conference[];
   coverage: CoverageRow[];
 }
+
+type Tier = 'T1' | 'T2' | 'T3';
 
 // Coverage card colors — three clearly distinct hues, no overlap with each other
 const COVERAGE_STYLE: Record<'committed' | 'considering' | 'uncovered', { bg: string; border: string; dashed?: boolean }> = {
@@ -31,7 +34,7 @@ const TIMELINE_LEGEND = [
       },
       {
         swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.25)' }} />,
-        label: 'T1, uncovered', labelClass: 'text-text2',
+        label: 'Uncovered', labelClass: 'text-text2',
       },
     ],
   },
@@ -46,15 +49,12 @@ function monthLabel(ym: string) {
 
 export function CoverageTimeline({ conferences, coverage }: Props) {
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = conferences.filter((c) => !c.endDate || c.endDate >= today.slice(0, 7) + '-01');
+  // Which uncovered tiers to fold into the calendar. Default: none — the calendar shows only the
+  // events the team is already engaging (committed/considering), keeping it short. Reps opt into
+  // the uncovered backlog one tier at a time, instead of scrolling all ~190 events.
+  const [uncoveredTiers, setUncoveredTiers] = useState<Set<Tier>>(new Set());
 
-  const byMonth = new Map<string, Conference[]>();
-  for (const conf of upcoming) {
-    const key = conf.startDate ? monthKey(conf.startDate) : 'unknown';
-    if (!byMonth.has(key)) byMonth.set(key, []);
-    byMonth.get(key)!.push(conf);
-  }
-  const months = [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b));
+  const upcoming = conferences.filter((c) => !c.endDate || c.endDate >= today.slice(0, 7) + '-01');
 
   const committedConfIds = new Set(
     coverage.filter((c) => c.status === 'committed').map((c) => c.conferenceId),
@@ -62,15 +62,41 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   const consideringConfIds = new Set(
     coverage.filter((c) => c.status === 'considering').map((c) => c.conferenceId),
   );
-  // Under-invested = T1 (must-cover) events with no committed rep. T2 is intentionally excluded:
-  // counting T1+T2 surfaced ~135 events and drowned the signal — the nudge should be the short
-  // list of events the team genuinely can't afford to skip.
-  const uncoveredPriority = upcoming.filter(
-    (c) => c.tier === 'T1' && !committedConfIds.has(c.id),
+  // "Covered" = at least one rep is committed OR considering. Everything else is the uncovered
+  // backlog, hidden by default and revealed per-tier via the toggles.
+  const isCovered = (id: string) => committedConfIds.has(id) || consideringConfIds.has(id);
+
+  // Under-invested alert — T1 (must-cover) events with no committed rep. T2/T3 excluded on purpose:
+  // the nudge is the short list of events the team genuinely can't afford to skip.
+  const uncoveredPriority = upcoming.filter((c) => c.tier === 'T1' && !committedConfIds.has(c.id));
+
+  // Counts for the include-uncovered toggles.
+  const uncoveredCount = (t: Tier) =>
+    upcoming.filter((c) => c.tier === t && !isCovered(c.id)).length;
+
+  // Calendar contents: always covered events, plus uncovered events for any opted-in tier.
+  const shown = upcoming.filter(
+    (c) => isCovered(c.id) || (c.tier != null && uncoveredTiers.has(c.tier as Tier)),
   );
 
+  const byMonth = new Map<string, Conference[]>();
+  for (const conf of shown) {
+    const key = conf.startDate ? monthKey(conf.startDate) : 'unknown';
+    if (!byMonth.has(key)) byMonth.set(key, []);
+    byMonth.get(key)!.push(conf);
+  }
+  const months = [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b));
+
+  // Clustering opportunities — computed over ALL upcoming events (a discovery nudge that's
+  // independent of current coverage or the calendar's tier toggles).
+  const monthAll = new Map<string, Conference[]>();
+  for (const conf of upcoming) {
+    const key = conf.startDate ? monthKey(conf.startDate) : 'unknown';
+    if (!monthAll.has(key)) monthAll.set(key, []);
+    monthAll.get(key)!.push(conf);
+  }
   const clusters: Record<string, { region: string; confs: Conference[] }> = {};
-  for (const [key, confs] of byMonth) {
+  for (const [key, confs] of monthAll) {
     const regionGroups = new Map<string, Conference[]>();
     for (const c of confs) {
       const r = c.region ?? c.country ?? 'Unknown';
@@ -81,6 +107,8 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
       if (rConfs.length >= 2) clusters[`${key}-${region}`] = { region, confs: rConfs };
     }
   }
+
+  const anyUncoveredShown = uncoveredTiers.size > 0;
 
   return (
     <div className="space-y-6">
@@ -137,8 +165,37 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
 
       {/* Full calendar */}
       <div className="space-y-4">
-        <div className="space-y-1.5">
-          <p className="text-sm font-semibold text-text1">Full conference calendar</p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-sm font-semibold text-text1">Full conference calendar</p>
+            {/* Include-uncovered toggles — default off so the list shows only covered events */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[11px] text-text3">Include uncovered:</span>
+              {(['T1', 'T2', 'T3'] as const).map((t) => {
+                const on = uncoveredTiers.has(t);
+                return (
+                  <button
+                    key={t}
+                    onClick={() =>
+                      setUncoveredTiers((prev) => {
+                        const next = new Set(prev);
+                        if (on) next.delete(t); else next.add(t);
+                        return next;
+                      })
+                    }
+                    aria-pressed={on}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all ${
+                      on
+                        ? 'bg-accent/15 border-accent/30 text-accent'
+                        : 'text-text3 bg-white/3 border-white/8 hover:text-text2 hover:border-white/14'
+                    }`}
+                  >
+                    {t} · {uncoveredCount(t)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <Legend groups={TIMELINE_LEGEND} />
         </div>
 
@@ -151,9 +208,8 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
               </div>
               <div className="space-y-2">
                 {confs.map((conf) => {
-                  const isCovered = committedConfIds.has(conf.id);
-                  const isConsidering = !isCovered && consideringConfIds.has(conf.id);
-                  const isUncoveredPriority = !isCovered && !isConsidering && conf.tier === 'T1';
+                  const covered = committedConfIds.has(conf.id);
+                  const considering = !covered && consideringConfIds.has(conf.id);
 
                   const allCommitted = coverage.filter(
                     (c) => c.conferenceId === conf.id && c.status === 'committed',
@@ -166,28 +222,22 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                     ? new Date(conf.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                     : null;
 
-                  const coverageStyle = isCovered
+                  // shown ⊆ {covered, considering, opted-in uncovered}, so the else is always uncovered.
+                  const coverageStyle = covered
                     ? COVERAGE_STYLE.committed
-                    : isConsidering
+                    : considering
                     ? COVERAGE_STYLE.considering
-                    : isUncoveredPriority
-                    ? COVERAGE_STYLE.uncovered
-                    : null;
+                    : COVERAGE_STYLE.uncovered;
 
-                  const borderStyle = coverageStyle?.dashed
+                  const borderStyle = coverageStyle.dashed
                     ? `1px dashed ${coverageStyle.border}`
-                    : coverageStyle
-                    ? `1px solid ${coverageStyle.border}`
-                    : '1px solid rgba(255,255,255,0.07)';
+                    : `1px solid ${coverageStyle.border}`;
 
                   return (
                     <div
                       key={conf.id}
                       className="rounded-xl p-3.5 space-y-2"
-                      style={{
-                        background: coverageStyle ? coverageStyle.bg : 'rgba(255,255,255,0.02)',
-                        border: borderStyle,
-                      }}
+                      style={{ background: coverageStyle.bg, border: borderStyle }}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -245,7 +295,9 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
 
           {months.length === 0 && (
             <div className="text-center py-16 text-sm text-text3">
-              No upcoming conferences. Add some in the Conferences tab.
+              {anyUncoveredShown
+                ? 'No conferences match. Try including more uncovered tiers above.'
+                : 'No covered conferences yet. Use “Include uncovered” above to show events the team hasn’t picked up.'}
             </div>
           )}
         </div>
