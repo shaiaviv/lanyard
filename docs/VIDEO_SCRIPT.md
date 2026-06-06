@@ -167,11 +167,12 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    markers colored by tier, sized by score.
 
 **🎙️ NARRATION:**
-> The brief also asks for coverage across the year, where we're under-invested, and where events cluster.
-> The Coverage tab is two lenses on the same data. The timeline shows when, and the gap bars make thin
-> coverage obvious: almost nothing in the Middle East here. It only flags the must-attend T1 events
-> nobody owns, so the nudge stays signal, not noise. The map shows where: a London cluster, a US
-> East-Coast cluster, an APAC cluster, where one trip beats five separate flights.
+> The brief also asks for coverage across the year: where we're under-invested, and where events cluster.
+> The Coverage tab gives two lenses on the same data. First, the timeline shows when events fall, and its
+> gap bars make thin coverage obvious, like almost nothing in the Middle East. It flags only the
+> must-attend T1 events that nobody owns yet, so the alert stays signal, not noise. Second, the map shows
+> where, surfacing clusters like London, the US East Coast, and APAC, where one trip can replace five
+> separate flights.
 
 ---
 
