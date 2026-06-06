@@ -1,5 +1,5 @@
 'use client';
-import { MapPin, Users } from 'lucide-react';
+import { MapPin, Users, AlertTriangle } from 'lucide-react';
 import type { Conference } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
 import { Legend } from '@/components/planning/Legend';
@@ -65,6 +65,8 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   const uncoveredT1T2 = upcoming.filter(
     (c) => (c.tier === 'T1' || c.tier === 'T2') && !committedConfIds.has(c.id),
   );
+  const t1Uncovered = uncoveredT1T2.filter((c) => c.tier === 'T1');
+  const t2Uncovered = uncoveredT1T2.filter((c) => c.tier === 'T2');
 
   const clusters: Record<string, { region: string; confs: Conference[] }> = {};
   for (const [key, confs] of byMonth) {
@@ -84,24 +86,54 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
       {/* Under-invested alert */}
       {uncoveredT1T2.length > 0 && (
         <div
-          className="rounded-xl p-4 space-y-2"
-          style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.14)' }}
+          className="rounded-xl p-4"
+          style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}
         >
-          <p className="text-sm font-semibold text-warn">
-            Under-invested: {uncoveredT1T2.length} priority event{uncoveredT1T2.length !== 1 ? 's' : ''} without a committed rep
-          </p>
-          <div className="space-y-1">
-            {uncoveredT1T2.map((c) => (
-              <div key={c.id} className="flex items-center gap-2 text-xs" style={{ color: 'rgba(245,158,11,0.7)' }}>
-                <span className="font-semibold">{c.tier}</span>
-                <span>{c.name}</span>
-                {c.startDate && (
-                  <span style={{ color: 'rgba(245,158,11,0.5)' }}>
-                    · {new Date(c.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
-                  </span>
-                )}
-              </div>
-            ))}
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle size={14} className="text-warn flex-shrink-0" />
+            <span className="text-sm font-semibold text-warn">
+              {uncoveredT1T2.length} priority event{uncoveredT1T2.length !== 1 ? 's' : ''} without coverage
+            </span>
+          </div>
+
+          {/* T1 group — full brightness */}
+          <div className="space-y-0.5">
+            {t1Uncovered.map((c) => {
+              const date = c.startDate
+                ? new Date(c.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })
+                : null;
+              const meta = [c.location, date].filter(Boolean).join(' · ');
+              return (
+                <div key={c.id} className="flex items-center gap-2.5 py-0.5 text-xs" style={{ color: 'rgba(245,158,11,0.85)' }}>
+                  <span className="font-bold w-5 flex-shrink-0">T1</span>
+                  <span className="flex-1 min-w-0 truncate font-medium">{c.name}</span>
+                  {meta && <span className="flex-shrink-0" style={{ color: 'rgba(245,158,11,0.5)' }}>{meta}</span>}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Divider between T1 and T2 */}
+          {t1Uncovered.length > 0 && t2Uncovered.length > 0 && (
+            <div className="my-2.5 h-px" style={{ background: 'rgba(245,158,11,0.1)' }} />
+          )}
+
+          {/* T2 group — dimmed */}
+          <div className="space-y-0.5">
+            {t2Uncovered.map((c) => {
+              const date = c.startDate
+                ? new Date(c.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })
+                : null;
+              const meta = [c.location, date].filter(Boolean).join(' · ');
+              return (
+                <div key={c.id} className="flex items-center gap-2.5 py-0.5 text-xs" style={{ color: 'rgba(245,158,11,0.5)' }}>
+                  <span className="font-bold w-5 flex-shrink-0">T2</span>
+                  <span className="flex-1 min-w-0 truncate">{c.name}</span>
+                  {meta && <span className="flex-shrink-0" style={{ color: 'rgba(245,158,11,0.3)' }}>{meta}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
