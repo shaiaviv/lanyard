@@ -25,16 +25,25 @@ const db = createClient(url, key, { auth: { persistSession: false } });
 
 const { rows } = buildConferenceRows();
 
-const { data: existing, error: selErr } = await db.from('conferences').select('name');
+// upsert by name: update existing rows in place (keeps verification corrections in sync),
+// insert any that are missing.
+const { data: existing, error: selErr } = await db.from('conferences').select('id,name');
 if (selErr) { console.error('select failed:', selErr.message); process.exit(1); }
-const have = new Set(existing.map((r) => r.name));
+const idByName = new Map(existing.map((r) => [r.name, r.id]));
 
-const toInsert = rows.filter((r) => !have.has(r.name));
-console.log(`db already has ${have.size} conferences; inserting ${toInsert.length} new (skipping ${rows.length - toInsert.length} already present)`);
-if (toInsert.length === 0) { console.log('nothing to do'); process.exit(0); }
+const toInsert = rows.filter((r) => !idByName.has(r.name));
+const toUpdate = rows.filter((r) => idByName.has(r.name));
 
-const { data, error } = await db.from('conferences').insert(toInsert).select('id');
-if (error) { console.error('insert failed:', error.message); process.exit(1); }
+if (toInsert.length) {
+  const { error } = await db.from('conferences').insert(toInsert);
+  if (error) { console.error('insert failed:', error.message); process.exit(1); }
+}
+let updated = 0;
+for (const r of toUpdate) {
+  const { error } = await db.from('conferences').update({ ...r, updated_at: new Date().toISOString() }).eq('id', idByName.get(r.name));
+  if (error) { console.error(`update failed for ${r.name}:`, error.message); process.exit(1); }
+  updated++;
+}
 
 const { count } = await db.from('conferences').select('*', { count: 'exact', head: true });
-console.log(`inserted ${data.length}. conferences table now has ${count} rows.`);
+console.log(`inserted ${toInsert.length}, updated ${updated}. conferences table now has ${count} rows.`);

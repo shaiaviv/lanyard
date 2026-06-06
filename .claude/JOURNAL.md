@@ -1009,3 +1009,13 @@ switches via `/model`).
   must agree: `getGapAnalysis` (Overview card) and `CoverageTimeline` (alert + calendar
   highlight + legend label "T1, uncovered"). Net: ~135 → ~30 actionable events. T2 still
   appears in the full calendar, just no longer flagged under-invested.
+
+- [later] Verified all 146 new conferences via a 10-way adversarial web-check fan-out (agents
+  default to "unconfirmed" unless they find an official site/listing). Result: **0 fabrications** —
+  all 146 are real events. 138 clean, 8 minor drifts on rotating/projected attributes; fixed 7
+  (Sibos 2027 → Singapore/Oct [was Frankfurt], RISE 2027 → Kuala Lumpur [left HK], Fintech Nexus
+  USA → May, Shoptalk Fall 2026 → Sep 29-Oct 1 & 3.5k, Seamless North Africa → April,
+  eTail Connect East → May, Phocuswright Europe → 600 attendees). EBAday 2027 host city left as an
+  estimate (rotates, 2027 unannounced). Synced live (apply script now upserts by name); audit trail
+  in `scripts/verification-results.json`. Takeaway: the real events were never fake — only their
+  *future-state* facts drifted, which is exactly what estimated data risks.

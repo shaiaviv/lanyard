@@ -1,0 +1,1324 @@
+{
+  "generated": "2026-06-06",
+  "total": 146,
+  "tally": {
+    "confirmed": 138,
+    "minor_issue": 8
+  },
+  "results": [
+    {
+      "name": "Money20/20 Europe 2027",
+      "status": "confirmed",
+      "evidence_url": "https://europe.money2020.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Merchant Payments Ecosystem (MPE) 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.merchantpaymentsecosystem.com/",
+      "issues": "Real, recurring Berlin event (MPE 2026 was March 17-19 in Berlin); March timing matches.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "MoneyLIVE Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://moneylive-insights.com/events/summit/",
+      "issues": "Real; 2026 edition was March 9-10 in London, matches claimed March timing.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "PAY360 2027",
+      "status": "confirmed",
+      "evidence_url": "https://pay360event.com/",
+      "issues": "Official 2027 page confirms April 21-22 2027 at ExCeL London, exact match.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EBAday 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://www.ebaday.com/",
+      "issues": "Event is real (Euro Banking Association + Finextra), June timing consistent. But EBAday rotates host city each year (2024 Lisbon, 2025 Paris, 2026 Copenhagen); 2027 city is not announced and is very unlikely to be Paris again so soon. Location claim is questionable.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FinovateEurope 2027",
+      "status": "confirmed",
+      "evidence_url": "https://finovate.com/finovateeurope-2026-is-almost-here-what-you-need-to-know-before-you-go/",
+      "issues": "Real; 2026 edition Feb 10-11 in London, matches claimed February timing.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Innovate Finance Global Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.innovatefinance.com/ifgs2026/",
+      "issues": "Real; 2026 edition April 21 at Guildhall, London. One-day format and April timing match.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Fintech Week London 2026",
+      "status": "confirmed",
+      "evidence_url": "https://fintechweek.london/",
+      "issues": "Real; relaunched city-wide festival running Sept 7-11 2026, exact match to claimed dates.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FinTech Connect 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechconnect.com/",
+      "issues": "Real; Dec 1-2 2026 at ExCeL London, exact match.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FT Live Global Banking Summit 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.charteredbanker.com/events/ft-live--global-banking-summit.html",
+      "issues": "Real FT/The Banker event; early-December London timing matches (2025 was Dec 2-4). Small senior audience plausible.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Open Banking Expo UK & Europe 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.openbankingexpo.com/uk/",
+      "issues": "Real; Oct 13-14 2026 at Business Design Centre, London, exact match.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Payments Leaders' Summit London 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.payments-leaderssummit.com/payments-leaders-summit-uk-october",
+      "issues": "Real; October edition Oct 20-21 2026 in London, exact match. Invite-only ~400 plausible.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Banking Transformation Summit Europe 2027",
+      "status": "confirmed",
+      "evidence_url": "https://bankingtransformationsummit.com/",
+      "issues": "Real; 2026 edition May 19-20 at Tobacco Dock, London. May timing and London match.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Point Zero Forum 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.pointzeroforum.com/",
+      "issues": "Real GFTN event; 2026 edition June 23-25 at Kongresshaus Zurich, matches claimed June Zurich.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Nordic Fintech Week 2026",
+      "status": "confirmed",
+      "evidence_url": "https://nfweek.com/",
+      "issues": "Real; Sept 21-25 2026 at TAP1, Copenhagen, exact match.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Stockholm Fintech Week 2027",
+      "status": "confirmed",
+      "evidence_url": "https://stockholmfintechweek.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Money Motion 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.money-motion.eu/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Revolution Banking Madrid 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.revolutionbanking.es/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Il Salone dei Pagamenti 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.salonedeipagamenti.com/en",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "The Banking Scene Conference Brussels 2027",
+      "status": "confirmed",
+      "evidence_url": "https://thebankingscene.com/events/tbsconfbxl/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Fintech Meetup Europe 2026",
+      "status": "confirmed",
+      "evidence_url": "https://europe.fintechmeetup.com/home",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Digital Banking & Mobile Payments Summit Vienna 2027",
+      "status": "confirmed",
+      "evidence_url": "https://paymentsinbanking.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Fintech Ireland Summit 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechirelandsummit.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Europe 2026",
+      "status": "confirmed",
+      "evidence_url": "https://messe-muenchen.de/en/events/seamless-europe.html",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Web Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://websummit.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EuroFinance International Treasury Management 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.eurofinance.com/international-treasury-event/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EuroFinance International Treasury & Cash Management Miami 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.eurofinance.com/international-treasury-cash-management-summit-miami/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EuroFinance Brazil Treasury Summit 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.eurofinance.com/brazil-treasury-summit/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EuroFinance Treasury & Cash Management Africa & Middle East 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.eurofinance.com/treasury-cash-management-summit-africa-middle-east/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ACT Annual Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.treasurers.org/events/conferences/annual-conference-2026",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ACT Middle East Treasury Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.treasurers.org/events/conferences/middle-east-summit-2026",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ACT Cash Management Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.treasurers.org/events/conferences/cash-management-conference-2026",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "AFP Annual Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://conference.financialprofessionals.org/",
+      "issues": "Real flagship conference (Association for Financial Professionals, ~7000 attendees). 2026 is in Las Vegas; 2027 host city not yet officially confirmed, Boston plausible.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "TEXPO Treasury Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://aafp.memberclicks.net/texpo-2027",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "iFX EXPO Asia 2026",
+      "status": "confirmed",
+      "evidence_url": "https://asia2025.ifxexpo.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "iFX EXPO Dubai 2027",
+      "status": "confirmed",
+      "evidence_url": "https://dubai2026.ifxexpo.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "iFX EXPO International 2027",
+      "status": "confirmed",
+      "evidence_url": "https://cyprus2026.ifxexpo.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Finance Magnates London Summit 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.clocate.com/finance-magnates-london-summit-fmls/52459/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Finance Magnates Pacific Summit 2026",
+      "status": "confirmed",
+      "evidence_url": "https://events.financemagnates.com/event/bfb8e41b-740c-4543-922d-9b0ab8e783de",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Finance Magnates Africa Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.cticc.co.za/whats_on_events/finance-magnates-africa-summit-2026/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Forex Expo Dubai 2027",
+      "status": "confirmed",
+      "evidence_url": "https://theforexexpo.com/dubai",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "CrossTech World 2026",
+      "status": "confirmed",
+      "evidence_url": "https://crosstechpayments.com/events/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "CrossTech World 2027",
+      "status": "confirmed",
+      "evidence_url": "https://crosstechpayments.com/events/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "CrossTech Fintech Fest 2027",
+      "status": "confirmed",
+      "evidence_url": "https://crosstechpayments.com/fintech-fest-2026/",
+      "issues": "Official short name is 'Fintech Fest' (organized by CrossTech); held in Miami in May.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Sibos 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://en.wikipedia.org/wiki/Sibos_(conference)",
+      "issues": "Real SWIFT flagship event, but wrong location: Frankfurt hosted Sibos 2025. Sibos 2027 is in Singapore (Oct 11-14). 2026 is Miami, 2028 Paris.",
+      "suggested_name": "",
+      "suggested_location": "Singapore",
+      "suggested_month": "October"
+    },
+    {
+      "name": "Money20/20 Asia 2027",
+      "status": "confirmed",
+      "evidence_url": "https://asia.money2020.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "BAFT Global Annual Meeting 2027",
+      "status": "confirmed",
+      "evidence_url": "https://baft.org/event/2026-global-annual-meeting/",
+      "issues": "Event is real and recurs annually in early May; host city rotates (2025 Washington DC, 2026 Orlando), so claimed Washington for 2027 is plausible but unconfirmed.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "BAFT International Trade and Payments Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://baft.org/event/2026-international-trade-and-payments-conference/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "BAFT Africa Forum 2027",
+      "status": "confirmed",
+      "evidence_url": "https://baft.org/event/africa-forum/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Central Bank Payments Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://currencyresearch.com/the-central-bank-payments-conference/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Treasury 360 Nordic 2027",
+      "status": "confirmed",
+      "evidence_url": "https://treasury360nordic.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Structured FINANCE 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.messe-stuttgart.de/en/locations/references/structured-finance/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "GTR Asia 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.gtreview.com/events/asia/gtr-asia-2026-singapore/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "GTR MENA 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.gtreview.com/events/mena/gtr-mena-2027-dubai/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Money20/20 USA 2027",
+      "status": "confirmed",
+      "evidence_url": "https://us.money2020.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Fintech Meetup 2027",
+      "status": "confirmed",
+      "evidence_url": "https://fintechmeetup.com/home",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Nacha Smarter Faster Payments 2027",
+      "status": "confirmed",
+      "evidence_url": "https://payments.nacha.org/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Payments Canada SUMMIT 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.thesummit.ca/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FinovateSpring 2027",
+      "status": "confirmed",
+      "evidence_url": "https://informaconnect.com/finovatespring/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FinovateFall 2027",
+      "status": "confirmed",
+      "evidence_url": "https://informaconnect.com/finovatefall/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Fintech Nexus USA 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://www.heyfuturenexus.com/usa/",
+      "issues": "Real recurring NYC fintech event, but historically runs in April/May, not June. Audience historically cited as 5,000+, so 3,000 is conservative but acceptable.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": "April"
+    },
+    {
+      "name": "American Banker Payments Forum 2027",
+      "status": "confirmed",
+      "evidence_url": "https://payments-forum.americanbanker.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "American Banker Digital Banking 2027",
+      "status": "confirmed",
+      "evidence_url": "https://conference.americanbanker.com/digital-banking",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Wespay Payments Symposium 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.mywespay.org/public/s/education/payments-symposium",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Wespay Payments Symposium 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.mywespay.org/public/s/education/payments-symposium",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "NEACH Payments Management Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://paymentselearning.neach.org/conference",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EPCOR Payments Conference Fall 2026",
+      "status": "confirmed",
+      "evidence_url": "https://conference.epcor.org/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "EPCOR Payments Conference Spring 2027",
+      "status": "confirmed",
+      "evidence_url": "https://conference.epcor.org/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Shoptalk Spring 2027",
+      "status": "confirmed",
+      "evidence_url": "https://spring.shoptalk.com/home",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Shoptalk Fall 2026",
+      "status": "minor_issue",
+      "evidence_url": "https://fall.shoptalk.com/home",
+      "issues": "Real event in Nashville, but official dates are Sep 29-Oct 1, 2026 (not Oct 12-14). Official attendance ~3,500, so 5,000 is overstated.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": "September"
+    },
+    {
+      "name": "eTail West 2027",
+      "status": "confirmed",
+      "evidence_url": "https://etailwest.wbresearch.com/",
+      "issues": "Now branded 'eTail Palm Springs 2027' but same WBR event; Feb 22-25, 2027 in Palm Desert matches exactly.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "eTail Boston 2026",
+      "status": "confirmed",
+      "evidence_url": "https://etaileast.wbresearch.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "U.S. BankTech Summit 2026",
+      "status": "confirmed",
+      "evidence_url": "https://usbanktechsummit.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Bank Automation Summit US 2027",
+      "status": "confirmed",
+      "evidence_url": "https://bankautomationsummit.com/us/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Bank Director Acquire or Be Acquired 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.bankdirector.com/event/acquire-or-be-acquired-2026/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Canada Fintech Forum 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.forumfintechcanada.com/en",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Canadian Finance Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://financeevents.ca/events/2026-canadian-finance-summit/",
+      "issues": "Real Finance Events conference in Toronto, ~800 execs, held in May. Matches claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Velera THINK 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.pscu.com/velera-announces-charitable-giving-at-think-24-conference-reaches-140-000",
+      "issues": "Velera (formerly PSCU/Co-op) THINK conference, Nashville, early May. ~800 attendees vs claimed 1000 (plausible).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Empire Fintech Conference 2027",
+      "status": "confirmed",
+      "evidence_url": "https://empirestartups.com/events/fintech-conference/",
+      "issues": "Empire Startups Empire FinTech Conference, NYC, April. ~700+ attendees vs claimed 1000 (plausible).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "eTail Connect East 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://etailconnect.wbresearch.com/",
+      "issues": "Real WBR invitation-only event at JW Marriott Marquis Miami, but it runs in May (2026 was May 12-14), not August as claimed.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": "May"
+    },
+    {
+      "name": "Intersekt 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.intersektfestival.com/",
+      "issues": "FinTech Australia's Intersekt, Melbourne, confirmed 3-4 Sept 2026. Matches claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Global Fintech Fest 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.globalfintechfest.com/",
+      "issues": "GFF Mumbai, Sept 8-11 2026, 100k+ attendees (claimed 80k plausible).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Singapore FinTech Festival 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechfestival.sg/",
+      "issues": "SFF, Singapore, November, 70k+ attendees. Matches claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Asia 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless/",
+      "issues": "Terrapinn Seamless Asia, Singapore, late Feb (2025 was Feb 26-27). ~6000 vs claimed 8000 (plausible).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Indonesia 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless-indonesia/speakers.stm",
+      "issues": "Real Terrapinn Seamless Indonesia brand (Jakarta).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Philippines 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless-philippines/index.stm",
+      "issues": "Real Terrapinn Seamless Philippines brand with dedicated event page (Manila).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Vietnam 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless-vietnam/speakers.stm",
+      "issues": "Real Terrapinn Seamless Vietnam, Ho Chi Minh City (2018 edition was Nov 7-8; autumn timing consistent with claimed Oct).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Thailand 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/events/all/all?s=seamless",
+      "issues": "Real Terrapinn Seamless Thailand, Bangkok. Regional Seamless dates vary by year/country.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Hong Kong FinTech Week 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechweek.hk/",
+      "issues": "HK FinTech Week, early November (2026 is Nov 2-6). 37k-45k attendees vs claimed 30k (plausible).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Korea Fintech Week 2026",
+      "status": "confirmed",
+      "evidence_url": "https://fintechweek.or.kr/en/",
+      "issues": "FSC-organized Korea Fintech Week, Seoul, ~11k-12.5k attendees (matches claim). Month varies year to year (Aug 2024, Nov 2025), so Oct is within plausible range.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Japan FinTech Festival 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechfestival.jp/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Bharat Fintech Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://bharatfintechsummit.com/",
+      "issues": "Real annual event in Mumbai (Feb); 4000 audience and Feb dates match the confirmed 2026 edition.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "World Financial Innovation Series Indonesia 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.indonesia.worldfis.com/",
+      "issues": "Confirmed: WFIS Indonesia 8th edition 27-28 Oct 2026, Jakarta, 600+ delegates - matches exactly.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "World Financial Innovation Series Philippines 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.philippines.worldfis.com/",
+      "issues": "Confirmed: WFIS Philippines 25-26 Aug 2026, Manila, 600+ delegates - matches exactly.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "The Asian Banker Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.theasianbanker.com/summit2026/",
+      "issues": "Confirmed: 27th edition held in Kuala Lumpur 13-14 May 2026, 800+ leaders - matches location, May timing and audience.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Finweek Kuala Lumpur 2026",
+      "status": "confirmed",
+      "evidence_url": "https://finweek.my/",
+      "issues": "Confirmed: 11-13 Nov 2026, PARKROYAL KL, 1000+ delegates - matches dates, location and audience.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Indonesia Fintech Summit & Expo 2026",
+      "status": "confirmed",
+      "evidence_url": "https://fintech.id/en/education-and-literacy/activity-agenda/6732ef4178223c096e16500f",
+      "issues": "Confirmed: IFSE is an annual OJK/AFTECH-organized event held in November in Jakarta (6th edition Nov 2024). November 2026 timing and Jakarta location consistent.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "World Fintech Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://worldfintechsummit.com/",
+      "issues": "Confirmed: 2nd edition 5-6 May 2026, Bengaluru, invite-only 500-800 senior leaders - matches location, May timing and 800 audience.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FinTech India Expo 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechindiaexpo.com/",
+      "issues": "Confirmed: 2027 edition 23-25 March, Bharat Mandapam, New Delhi - matches March timing and New Delhi location.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Elevandi Insights Forum 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.elevandi.io/initiative/insights-forum",
+      "issues": "Confirmed: invite-only forum in Singapore each November preceding Singapore FinTech Festival (2025 edition 10-11 Nov). November timing and Singapore location consistent.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Money20/20 Middle East 2026",
+      "status": "confirmed",
+      "evidence_url": "https://money2020middleeast.com/",
+      "issues": "Confirmed: 15-17 Sep 2026, Riyadh - matches dates and location. Note actual attendance is ~38,500 visitors, well above the claimed 8000 (may reflect delegates vs total footfall).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "24 Fintech 2026",
+      "status": "confirmed",
+      "evidence_url": "https://24fintech.com/",
+      "issues": "Confirmed: 14-16 Sep 2026, RECC Riyadh; inaugural 2024 edition drew 26,000+ attendees - matches Sep timing, Riyadh and 26000 audience.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Fintech Surge 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.fintechsurge.com/",
+      "issues": "Confirmed: held in Dubai each October alongside GITEX/Expand North Star (2025 edition 12-15 Oct, Dubai Harbour) - matches October timing and Dubai.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Dubai FinTech Summit 2027",
+      "status": "confirmed",
+      "evidence_url": "https://dubaifintechsummit.com/",
+      "issues": "Confirmed: DIFC-organized, Madinat Jumeirah Dubai, May (2026 edition 11-12 May), 10,000+ delegates - matches Dubai, May timing; 9000 audience reasonable.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Middle East 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.tradefairdates.com/Seamless-Middle-East-M9829/Dubai.html",
+      "issues": "Confirmed: Terrapinn-organized, Dubai (DWTC), May each year (2026 edition 12-14 May), 25,000+ visitors - matches Dubai, May timing; 18000 audience plausible.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless Saudi Arabia 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless-saudi-arabia/index.stm",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Finnovex North Africa 2027",
+      "status": "confirmed",
+      "evidence_url": "https://na.finnovex.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Seamless North Africa 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless-north-africa/index.stm",
+      "issues": "Event is real (Terrapinn, New Cairo) but timing is wrong: it runs in April (2026 edition April 6-7) / October (2025), not July.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": "April"
+    },
+    {
+      "name": "Seamless East Africa 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.terrapinn.com/exhibition/seamless-east-africa/index.stm",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Connected Banking Summit East Africa 2027",
+      "status": "confirmed",
+      "evidence_url": "https://connected-banking.com/summit/east-africa/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Nigeria Fintech Forum 2026",
+      "status": "confirmed",
+      "evidence_url": "https://fintech.eventhive.ng/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Digital PayExpo 2027",
+      "status": "confirmed",
+      "evidence_url": "https://digitalpayexpo.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Africa Tech Festival (AfricaCom) 2026",
+      "status": "confirmed",
+      "evidence_url": "https://africatechfestival.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Africa Fintech Summit Washington 2027",
+      "status": "confirmed",
+      "evidence_url": "https://africafintechsummit.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FEBRABAN TECH 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.febrabantech.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FEBRABAN TECH 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.febrabantech.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "CLAB 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.clab2026.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FELABAN Asamblea Anual 2026",
+      "status": "confirmed",
+      "evidence_url": "https://felabanperu.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Chile Fintech Forum 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.chilefintechforum.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Mexico Fintech Week 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.mexicofintechweek.com",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "CMS Fin & Pay Latam Forum 2027",
+      "status": "confirmed",
+      "evidence_url": "https://cmseventos.com/evento/finpay",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Latam Fintech Market 2027",
+      "status": "confirmed",
+      "evidence_url": "https://colombiafintech.co/evento/latam-fintech-market/",
+      "issues": "Real event organized by Colombia Fintech; historically held in various Colombian cities (Bogota, Barranquilla).",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ITB Asia 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.itb-asia.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Phocuswright Europe 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://www.phocuswrighteurope.com/",
+      "issues": "Audience overstated: Phocuswright Europe draws ~600 decision-makers, not 1200. Location (Barcelona) and June timing are correct.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Skift Global Forum 2026",
+      "status": "confirmed",
+      "evidence_url": "https://live.skift.com/events/skift-global-forum-2026/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "GBTA Convention 2026",
+      "status": "confirmed",
+      "evidence_url": "https://convention.gbta.org/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "WiT Singapore 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.witevents.com/witsingapore/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "WTM Africa 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.wtm.com/africa/en-gb.html",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "WTM Latin America 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.wtm.com/latin-america/en-gb.html",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "IATA World Financial Symposium 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.iata.org/en/events/all/wfs--wps/",
+      "issues": "Real IATA event (held jointly with World Passenger Symposium); 2026 edition in Macau in Q4, consistent with claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ITB India 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.itb-india.com/",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ILTM Cannes 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.iltm.com/cannes/en-gb.html",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "FITUR 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.ifema.es/en/fitur",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "WTM London 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.wtm.com/london/en-gb.html",
+      "issues": "",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "GBTA Europe Conference 2026",
+      "status": "confirmed",
+      "evidence_url": "https://europeconference.gbta.org/",
+      "issues": "Officially branded 'GBTA + VDR + ABTA Europe Conference 2026'; Vienna, Nov 2-4 confirmed. Claimed name is a reasonable shorthand.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "ITB Berlin 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.itb.com/en",
+      "issues": "Official site lists 16-18 March 2027, exactly matching claimed dates.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "SaaStock Europe 2026",
+      "status": "confirmed",
+      "evidence_url": "https://saastock-europe.com/",
+      "issues": "Real event in Dublin (RDS), Oct 13-14 2026 matches claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Web Summit Qatar 2027",
+      "status": "confirmed",
+      "evidence_url": "https://qatar.websummit.com/",
+      "issues": "Official site lists Jan 31 - Feb 3, 2027 in Doha, exactly matching claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Web Summit Vancouver 2027",
+      "status": "confirmed",
+      "evidence_url": "https://vancouver.websummit.com/",
+      "issues": "Official site lists May 25-28, 2027 in Vancouver, exactly matching claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "GITEX Global 2026",
+      "status": "confirmed",
+      "evidence_url": "https://www.gitex.com/",
+      "issues": "Official site lists 7-11 Dec 2026 in Dubai (moved from October to December), exactly matching claimed dates.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "VivaTech 2027",
+      "status": "confirmed",
+      "evidence_url": "https://vivatech.com/",
+      "issues": "Real annual June event in Paris (Porte de Versailles); 2026 is June 17-20, June timing consistent with claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Shoptalk Europe 2027",
+      "status": "confirmed",
+      "evidence_url": "https://europe.shoptalk.com/home",
+      "issues": "Real event in Barcelona; 2026 is June 9-11, June timing consistent with claim. 2027 date not yet announced.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "RISE 2027",
+      "status": "minor_issue",
+      "evidence_url": "https://riseconf.com/",
+      "issues": "Real Web Summit Asia event. RISE 2026 is confirmed in Kuala Lumpur (Mar 17-19), not Hong Kong; the event left Hong Kong. Hong Kong listing for 2027 is uncertain. March timing is correct.",
+      "suggested_name": "",
+      "suggested_location": "Kuala Lumpur",
+      "suggested_month": ""
+    },
+    {
+      "name": "Web Summit Rio 2027",
+      "status": "confirmed",
+      "evidence_url": "https://rio.websummit.com/",
+      "issues": "Real event in Rio de Janeiro; 2026 is June 8-11 with ~34,000 attendees matching claim. 2027 pre-registration open.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "Slush 2027",
+      "status": "confirmed",
+      "evidence_url": "https://slush.org/",
+      "issues": "Real annual November event in Helsinki (Messukeskus); 2026 is Nov 18-19, November timing consistent with claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    },
+    {
+      "name": "SaaStr Annual 2027",
+      "status": "confirmed",
+      "evidence_url": "https://www.saastr.com/",
+      "issues": "Real annual event in San Mateo (San Mateo County Event Center), held in September, consistent with claim.",
+      "suggested_name": "",
+      "suggested_location": "",
+      "suggested_month": ""
+    }
+  ]
+}
