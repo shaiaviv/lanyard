@@ -1,7 +1,8 @@
 # 🎥 Lanyard — Submission Video Script (shooting script)
 
 **Format:** AI-avatar narration (HeyGen) over screen-recorded demo, assembled in CapCut.
-**Target runtime:** ~8.5–9 minutes (the brief asks for 5–10).
+**Target runtime:** ~6.5–7.5 minutes (the brief asks for 5–10). Scenes 3–12 were trimmed for per-token
+avatar cost; Scenes 1–2 are locked (already filmed) and unchanged.
 **Voice/tone:** confident, warm, fast-moving founder demoing their own product. First person — the
 avatar **is Shai Aviv** (you, the builder), speaking as himself and defending his own decisions. The
 video opens by introducing him by name and acknowledging the avatar is AI — a deliberate, on-brand
@@ -19,7 +20,7 @@ Each scene has three parts:
 - **⏱️** — running time + notes (where narration plays over live action, where to hold a beat).
 
 **Production notes**
-- HeyGen reads ~145 words/minute. Total script ≈ 1,250 words ≈ **~8.5 min** with demo beats.
+- An avatar reads ~145 words/minute. Trimmed total ≈ 1,150 words ≈ **~7 min** with demo beats.
 - Record demos at the seeded **demo login** (`demo@grain.com` / `LanyardDemo!2026`) so every screen
   has real data.
 - Record Field clips on a **phone-shaped frame** (or browser mobile viewport, 430px) — it sells the
@@ -82,19 +83,13 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    all pre-filled. Linger on the confidence-highlighted fields.
 5. Tap **commit**. Cut to the **Leads** list showing the new lead landed.
 
-**🎙️ NARRATION** *(this plays over steps 2–5; keep talking through the spinner):*
-> Here's the single most important design decision in the whole product. Picture the rep: it's loud,
-> they've got thirty seconds before the next conversation, and split attention. If I ask them to tab
-> through a form mid-conversation — they just won't. They'll lose the lead.
->
-> So the hero action is one button. They talk for ten seconds as they walk away…
-> *(beat — let the recording play)*
-> …and the AI does the rest. It transcribes the voice note, pulls out name, company, title, topics,
-> how warm they were — and scores how well they fit Grain's ICP. A throwaway sentence becomes a fully
-> structured, scored lead. A lot of data, captured fast, without stealing a second of conference time.
->
-> And notice — this is *why* AI belongs here. It's not bolted on. It's placed at the exact moment a
-> human refuses to do the work themselves. Everything downstream depends on this one capture being good.
+**🎙️ NARRATION** *(plays over steps 2–5; keep talking through the spinner):*
+> On a loud show floor, a rep has thirty seconds and won't tab through a form mid-conversation. So the
+> hero action is one button: they talk for ten seconds as they walk away, and the AI does the rest. It
+> transcribes the note, pulls out name, company, title, and topics, and scores how well they fit Grain's
+> ICP. A throwaway sentence becomes a structured, scored lead, without stealing a second of conference
+> time. That's why AI belongs here: it's placed at the exact moment a human won't do the work
+> themselves, and everything downstream depends on this one capture.
 
 ---
 
@@ -112,23 +107,14 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    *Director → VP Treasury*).
 
 **🎙️ NARRATION:**
-> This is the part the brief weights most heavily, so it's where I put the most thought. When you meet
-> the same person across different conferences, Lanyard recognizes it — and it tells you what it *means*.
->
-> Because a count is noise. "Met them three times" doesn't tell you anything. The question a rep
-> actually has is: *is this going somewhere, or am I being polite to a tire-kicker who's been listening
-> for a year and will never buy?* So every relationship gets a verdict based on **movement, not mood** —
-> is the engagement *progressing* toward a deal across events? Warming. Nurturing. Cooling. Tire-kicker.
->
-> *(over the Relationships tab + filter)*
-> And the nudge is calibrated. Too aggressive, it's noise; too subtle, it's invisible. So the headline
-> filter is the one that matters most — "warming, but no follow-up scheduled." Rising intent, nothing
-> booked. That's a rep's highest-leverage hour, one tap away.
->
-> *(over the job-change badge)*
-> Two edge cases the brief called out specifically. **Job changes** — when someone's title moves between
-> events, Lanyard flags it instead of treating it as a different person. A promotion in your buyer is a
-> buying signal, not an error. And **name variations**, which I'll show you next.
+> This is the criterion the brief weights most heavily, so it got the most thought. When you meet the
+> same person across different conferences, Lanyard recognizes it and tells you what it means. A count is
+> noise. The real question is: is this relationship going somewhere, or am I being polite to a
+> tire-kicker who's listened for a year and never buys? So every relationship gets a verdict based on
+> movement, not mood: is engagement progressing toward a deal? Warming, nurturing, cooling, or
+> tire-kicker. And the nudge is calibrated to the one that matters most: warming, but no follow-up
+> scheduled. Two edge cases the brief named: job changes, where a new title between events is flagged as
+> a buying signal, not a mismatch, and name variations, which I'll show you next.
 
 ---
 
@@ -142,15 +128,12 @@ screen on a phone frame. Keep it to 3–4 seconds each.
 3. Show the four options: **Match / Create new / Re-analyze (Sonnet) / Skip**. Hover **Re-analyze**.
 
 **🎙️ NARRATION:**
-> Out on the floor, I let the matching be fast and forgiving — a wrong hint there is harmless, the rep
-> just shrugs it off. But a wrong *committed record* is corrosive. It kills trust, and then the tool
-> dies. So capture and commit are deliberately separate surfaces.
->
-> Here's a real case I seeded. On the floor someone said *"Elena Fisher, Adyen treasury — think I've met
-> her before?"* We already have an *Elena Fisch-er* at Adyen. F-I-S-H-E-R versus F-I-S-C-H-E-R. The
-> matcher catches it as a likely match — but it's honest that confidence is low. It will **never
-> auto-merge a maybe.** The rep decides: match, create new, or re-analyze with a stronger model — richer
-> than the snap judgment the floor could afford. A bad merge corrupts the record forever. A deferred
+> Out on the floor, matching is fast and forgiving, because a wrong hint is harmless. But a wrong
+> committed record is corrosive: it kills trust, and the tool dies. So capture and commit are separate
+> surfaces. Here's a seeded case. On the floor, someone said Elena Fisher, Adyen treasury. We already
+> have an Elena Fischer at Adyen. F-I-S-H-E-R versus F-I-S-C-H-E-R. The matcher flags it as a likely
+> match but is honest that confidence is low, and it never auto-merges a maybe. The rep decides: match,
+> create new, or re-analyze with a stronger model. A bad merge corrupts the record forever; a deferred
 > decision costs nothing. So I optimize for the cheap mistake.
 
 ---
@@ -164,22 +147,15 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    instantly. (This is the money shot — do it slowly.)
 4. Optionally scroll so the viewer sees treasury/payments events on top, generalist tech at the bottom.
 
-**🎙️ NARRATION** *(consider cutting to avatar talking head for the first two sentences, then back to screen):*
-> Now the strategy side. The brief says: rank conferences by ICP fit, pick a methodology, and defend it.
-> Here's mine.
->
-> Grain's ICP is fintech, payments, treasury, and cross-border FX. The core belief I baked in is
-> **quality over headcount.** A six-hundred-person treasury summit full of FX-risk owners is worth more
-> to Grain than a seventy-thousand-person generalist tech expo. So every event scores zero to a hundred
-> across five factors — and **ICP density is weighted highest, at forty percent.** Raw scale is capped on
-> purpose, so headcount can't dominate.
->
-> *(over the breakdown + slider drag)*
-> And here's what makes it defensible. The AI estimates the fuzzy inputs — "how ICP-dense is this event?"
-> — and shows its reasoning on every factor. Nothing's a black box. But a plain, deterministic formula
-> turns those inputs into the score. So when I drag a weight slider, the entire list re-ranks instantly,
-> with zero AI calls. A team that cares more about geography than topic encodes that in five seconds.
-> The AI fills the inputs; the math makes the decision. That same split shows up everywhere in the app.
+**🎙️ NARRATION** *(consider cutting to avatar talking head for the first sentence, then back to screen):*
+> The brief asks me to rank conferences by ICP fit and defend the method. The core belief is quality over
+> headcount: a six-hundred-person treasury summit full of FX-risk owners beats a seventy-thousand-person
+> generalist expo. Every event scores zero to a hundred across five factors, and ICP density is weighted
+> highest, at forty percent, with raw scale capped so headcount can't dominate. Here's what makes it
+> defensible: the AI estimates the fuzzy inputs, like how ICP-dense an event is, and shows its reasoning,
+> while a plain, deterministic formula turns those inputs into the score. So when I drag a weight slider,
+> the whole list re-ranks instantly, with zero AI calls. The AI fills the inputs; the math makes the
+> decision.
 
 ---
 
@@ -193,16 +169,11 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    markers colored by tier, sized by score.
 
 **🎙️ NARRATION:**
-> The brief also asks: show coverage across the year, where we're under-invested, and where events
-> cluster. The Coverage tab is two lenses on the same data. The timeline shows *when* — and the gap bars
-> make thin coverage obvious: here, almost nothing in the Middle East, barely anything in Europe. And it
-> only flags the must-attend T1 events nobody owns — because flagging all hundred-plus uncovered events
-> would just be noise.
->
-> *(over the map)*
-> The map shows *where.* You can see the clusters jump out — a dense London cluster, a US East-Coast
-> cluster, an APAC cluster. That's where one rep on one trip beats five separate flights. Which sets up
-> the most powerful AI feature in the product.
+> The brief also asks for coverage across the year, where we're under-invested, and where events cluster.
+> The Coverage tab is two lenses on the same data. The timeline shows when, and the gap bars make thin
+> coverage obvious: almost nothing in the Middle East here. It only flags the must-attend T1 events
+> nobody owns, so the nudge stays signal, not noise. The map shows where: a London cluster, a US
+> East-Coast cluster, an APAC cluster, where one trip beats five separate flights.
 
 ---
 
@@ -217,18 +188,13 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    you can compare drafts.
 
 **🎙️ NARRATION** *(keep talking over the generation spinner):*
-> Planning a whole team's conference year by hand is hours of spreadsheet work — who goes where, honoring
-> tickets already booked, never double-booking anyone, clustering trips, balancing regions. Here the
-> sales lead just asks, in plain English…
-> *(beat — let it generate)*
-> …and gets a complete, validated, year-long plan in seconds. And it's not one button — it's *unlimited*
-> plans from custom prompts. "Minimize travel." "Maximize T1 coverage in APAC." Generate as many as you
-> want and compare them side by side.
->
-> Under the hood it's the same stance as the scoring engine: the **AI proposes** the assignments and the
-> reasoning, and **deterministic code disposes** — it locks committed tickets, drops any double-booking,
-> and enforces each rep's capacity. So the AI can never hand you an impossible plan. And every draft is
-> non-destructive — your real commitments don't change until you say so.
+> Planning a whole team's year by hand is hours of spreadsheet work: who goes where, honoring booked
+> tickets, never double-booking, clustering trips. Here the sales lead just asks in plain English and
+> gets a complete, validated, year-long plan in seconds, and not just one: unlimited plans from custom
+> prompts you can compare side by side. Under the hood it's the same stance as scoring: the AI proposes
+> the assignments, and deterministic code disposes. It locks committed tickets, drops double-bookings,
+> and enforces each rep's capacity, so the AI can never hand you an impossible plan. And every draft is
+> non-destructive.
 
 ---
 
@@ -240,11 +206,10 @@ screen on a phone frame. Keep it to 3–4 seconds each.
    "met at X" context — not just a name and email.
 
 **🎙️ NARRATION:**
-> Finally — Lanyard isn't trying to be a CRM. It's the thing that *feeds* the CRM. So the push to HubSpot
-> isn't a dumb export. It carries the relationship arc as a note, the ICP fit, the temperature, where you
-> met them — the qualified handoff the role is actually hired to deliver. It dedupes by email, so
-> re-pushing never creates duplicates. And the HubSpot key, like every service key, lives in encrypted
-> Settings — never hardcoded, exactly as the brief requires.
+> Finally, Lanyard isn't a CRM; it feeds the CRM. So the push to HubSpot isn't a dumb export: it carries
+> the relationship arc as a note, plus ICP fit and where you met them, the qualified handoff this role
+> exists to deliver. It dedupes by email, and the HubSpot key lives in encrypted settings, never
+> hardcoded, exactly as the brief requires.
 
 ---
 
@@ -254,21 +219,13 @@ screen on a phone frame. Keep it to 3–4 seconds each.
 in the editor, show the `plans/` directory tree, show a commit history. Land back on the avatar.
 
 **🎙️ NARRATION:**
-> A quick word on *how* I built this, since the role is really about working with AI. I built Lanyard
-> with Claude Code, end to end — and I kept the whole decision trail in the repo. There's an append-only
-> journal with thirty-plus entries: every decision, every alternative, and every thing I chose *not* to
-> do.
->
-> That journal wasn't bookkeeping — it was a strategy for the AI's memory. An agent forgets everything
-> between sessions. So I treated the *files* as the memory and the chat as disposable. That's also what
-> let me run a deliberate cost strategy: expensive reasoning model for the architecture and the scoring
-> methodology — the decisions made once and copied everywhere — and a cheaper, faster model for the
-> high-volume screen-building and QA.
->
-> And where did AI get in the way? It pushed me toward a *smaller* scope — one hero feature, one AI
-> trick. I overrode that toward the three-experience product you just saw. On the matching design it
-> proposed a hybrid; I pushed to LLM-first, and then it caught the scaling problem and added cheap
-> retrieval in front. That back-and-forth is the honest story, and it's all in the log.
+> A word on how I built this, since the role is about working with AI. I built Lanyard with Claude Code
+> and kept the whole decision trail in the repo: an append-only journal of every decision and
+> alternative. That journal wasn't bookkeeping; it was a strategy for the AI's memory, since an agent
+> forgets between sessions. It also let me run a deliberate cost strategy: an expensive model for
+> architecture and the scoring methodology, and a cheaper one for high-volume screens and QA. And where
+> did AI get in the way? It pushed me toward a smaller scope, one hero feature; I overrode that toward
+> the three-experience product you just saw. That back-and-forth is all in the log.
 
 ---
 
@@ -278,14 +235,11 @@ in the editor, show the `plans/` directory tree, show a commit history. Land bac
 say them.
 
 **🎙️ NARRATION:**
-> If I had another week — the most important thing isn't on a feature list. I'd put this in front of the
-> actual Grain sales team and watch them use it. Everything here is *my* hypothesis about what reps need;
-> the roadmap should come from them.
->
-> After that: close the HubSpot loop both ways, so the field briefing can warn a rep before they pitch an
-> existing customer. Live enrichment in the field, to auto-correct a garbled name against a real LinkedIn
-> profile. "Apply this plan" to turn a coverage draft into real commitments in one click. And outcome
-> tracking — meetings booked and pipeline per conference — so the scoring model learns from real results.
+> If I had another week, the most important thing isn't a feature: I'd put this in front of the actual
+> Grain sales team, watch them use it, and let that reprioritize everything. After that: a two-way
+> HubSpot sync, so the field briefing can warn a rep before they pitch an existing customer; live
+> enrichment to auto-correct a garbled name against a real profile; and outcome tracking, so the scoring
+> model learns from real results.
 
 ---
 
@@ -294,8 +248,8 @@ say them.
 **🎬 RECORD:** Avatar talking head. End card with the live URL + repo link.
 
 **🎙️ NARRATION:**
-> That's Lanyard — built for the rep on the floor, not for a database. The live app and the full source,
-> including that decision journal, are linked below. I'm Shai Aviv — thanks for watching, and I'd love to
+> That's Lanyard: built for the rep on the floor, not for a database. The live app and full source,
+> including that decision journal, are linked below. I'm Shai Aviv. Thanks for watching, and I'd love to
 > talk about it.
 
 ---
