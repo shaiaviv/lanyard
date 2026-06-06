@@ -8,11 +8,12 @@
 
 ## 🎥 Demo video - start here
 
-<video src="https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo-compressed.mp4" controls width="100%"></video>
+[![Watch the Lanyard demo](docs/images/video-poster.jpg)](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo-compressed.mp4)
 
-A 5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
-logic and why I chose it, how I approached cross-conference contact tracking (including the edge cases),
-how I used AI to build this and where it helped vs. got in the way, and what I'd build next.
+**▶️ Click the image above** for the 5-10 minute walkthrough: a live demo from a salesperson's perspective,
+the scoring and prioritization logic and why I chose it, how I approached cross-conference contact tracking
+(including the edge cases), how I used AI to build this and where it helped vs. got in the way, and what I'd
+build next.
 
 ---
 
