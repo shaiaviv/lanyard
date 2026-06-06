@@ -870,3 +870,7 @@ resolving the signed-in rep via a subquery so it's reproducible on a fresh DB; c
 - Normalized "Singapore FinTech Festival" → "...2026" (every event now has a year).
 - tsc/eslint/build clean; **verified live in production** (filters, full-width, 10 relationships,
   Reconcile inbox 200).
+- [fix] Coverage popover on conference cards was clipped by the card's `overflow-hidden` (rounded
+  tier stripe) — couldn't show >2 reps. Portaled it to `<body>` with fixed positioning + a
+  viewport-aware flip-up/height-cap + internal scroll. Verified all 6 reps visible + in-viewport for
+  cards at top and bottom of the list.
