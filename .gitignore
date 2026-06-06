@@ -47,4 +47,5 @@ next-env.d.ts
 .claude/skills/
 skills-lock.json
 *.png
+!docs/images/*.png
 .env*.local
