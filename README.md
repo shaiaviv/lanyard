@@ -12,7 +12,7 @@
 5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
 logic and why I chose it, how I approached cross-conference contact tracking (including the edge cases),
 how I used AI to build this and where it helped vs. got in the way, and what I'd build next.
-https://www.youtube.com/watch?v=_IZXYXBvUDw
+
 ---
 
 **A lanyard holds your badge - your identity on the show floor.** This tool is about that
