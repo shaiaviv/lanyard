@@ -49,6 +49,133 @@ function ScoreBar({ score }: { score: number }) {
 }
 
 /**
+ * Post-event outcome control — for past conferences. Shows only reps who were committed and
+ * lets the user record whether they actually attended or declined.
+ */
+function PastCoverageControl({
+  coverageForConf,
+  reps,
+  onAssign,
+}: {
+  coverageForConf: CoverageRow[];
+  reps: Rep[];
+  onAssign: (repId: string, status: CoverageStatus) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [pendingRepId, setPendingRepId] = useState<string | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxH: number } | null>(null);
+
+  // Only reps with a relevant past-event status.
+  const relevant = coverageForConf.filter((c) =>
+    c.status === 'committed' || c.status === 'attended' || c.status === 'declined',
+  );
+
+  if (relevant.length === 0) return null;
+
+  const attended = relevant.filter((c) => c.status === 'attended');
+  const committed = relevant.filter((c) => c.status === 'committed');
+
+  function place() {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const width = 240;
+    const margin = 8;
+    const left = Math.max(margin, Math.min(r.right - width, window.innerWidth - width - margin));
+    const spaceBelow = window.innerHeight - r.bottom - margin;
+    const spaceAbove = r.top - margin;
+    const up = spaceBelow < 260 && spaceAbove > spaceBelow;
+    const maxH = Math.min(Math.round(window.innerHeight * 0.7), up ? spaceAbove : spaceBelow);
+    setPos(up ? { left, width, maxH, bottom: window.innerHeight - r.top + 6 } : { left, width, maxH, top: r.bottom + 6 });
+  }
+
+  function toggle() {
+    if (!open) place();
+    setOpen((o) => !o);
+  }
+
+  function set(repId: string, status: CoverageStatus) {
+    setPendingRepId(repId);
+    startTransition(async () => {
+      await onAssign(repId, status);
+      setPendingRepId(null);
+    });
+  }
+
+  let summary: React.ReactNode;
+  if (attended.length > 0 && committed.length === 0) {
+    summary = <span className="text-success/70">✓ {attended.map((c) => firstName(c.repName)).join(', ')}</span>;
+  } else if (committed.length > 0) {
+    summary = <span className="text-text3">Awaiting outcome · {committed.map((c) => firstName(c.repName)).join(', ')}</span>;
+  } else {
+    summary = <span className="text-text3/50">Outcomes recorded</span>;
+  }
+
+  return (
+    <div className="flex-shrink-0">
+      <button
+        ref={btnRef}
+        onClick={toggle}
+        className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/3 transition-all hover:border-white/16"
+      >
+        {summary}
+        <ChevronDown size={11} className="opacity-40" />
+      </button>
+
+      {open && pos && createPortal(
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-50 bg-card rounded-xl py-2 border border-white/10 shadow-2xl overflow-y-auto"
+            style={{ top: pos.top, bottom: pos.bottom, left: pos.left, width: pos.width, maxHeight: pos.maxH }}
+          >
+            <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-white/6 sticky top-0 bg-card">
+              <span className="text-[11px] font-semibold text-text3">Record outcome</span>
+              <button onClick={() => setOpen(false)} className="text-text3 hover:text-text1"><X size={13} /></button>
+            </div>
+            {relevant.map((row) => {
+              const rowPending = isPending && pendingRepId === row.repId;
+              const isAttended = row.status === 'attended';
+              const isDeclined = row.status === 'declined';
+              const repInfo = reps.find((r) => r.id === row.repId);
+              return (
+                <div key={row.repId} className={`px-3 py-2 ${rowPending ? 'opacity-40 pointer-events-none' : ''}`}>
+                  <p className="text-xs font-medium text-text1 mb-1.5 truncate">{repInfo?.name ?? row.repName}</p>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => set(row.repId, isAttended ? 'committed' : 'attended')}
+                      className={`flex-1 text-[11px] font-semibold px-2 py-1 rounded-md border transition-all ${
+                        isAttended
+                          ? 'text-success bg-success/10 border-success/20'
+                          : 'text-text3 bg-white/3 border-white/8 hover:border-white/14'
+                      }`}
+                    >
+                      {isAttended ? '✓ Attended' : 'Attended'}
+                    </button>
+                    <button
+                      onClick={() => set(row.repId, isDeclined ? 'committed' : 'declined')}
+                      className={`flex-1 text-[11px] font-semibold px-2 py-1 rounded-md border transition-all ${
+                        isDeclined
+                          ? 'text-text2 bg-white/8 border-white/18'
+                          : 'text-text3 bg-white/3 border-white/8 hover:border-white/14'
+                      }`}
+                    >
+                      {isDeclined ? '✗ Declined' : 'Declined'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>,
+        document.body,
+      )}
+    </div>
+  );
+}
+
+/**
  * Team coverage control — assign ANY teammate a status. The heart of company-wide planning
  * ("who covers what"), not just the current rep's personal plan.
  */
@@ -258,7 +385,13 @@ function ConferenceCard({
             {isActive && <Badge variant="live" dot pulse>Live</Badge>}
             {conf.liveTier && <Badge variant={conf.liveTier as 'T1' | 'T2' | 'T3'}>{conf.liveTier}</Badge>}
           </div>
-          {!isPast && (
+          {isPast ? (
+            <PastCoverageControl
+              coverageForConf={coverageForConf}
+              reps={reps}
+              onAssign={(repId, status) => onAssign(repId, conf.id, status)}
+            />
+          ) : (
             <CoverageControl
               coverageForConf={coverageForConf}
               reps={reps}

@@ -14,8 +14,9 @@ interface Props {
 
 type Tier = 'T1' | 'T2' | 'T3';
 
-const COVERAGE_STYLE: Record<'committed' | 'considering' | 'uncovered' | 'suggested', { bg: string; border: string; dashed?: boolean }> = {
+const COVERAGE_STYLE: Record<'committed' | 'attended' | 'considering' | 'uncovered' | 'suggested', { bg: string; border: string; dashed?: boolean }> = {
   committed:  { bg: 'rgba(16,185,129,0.05)',  border: 'rgba(16,185,129,0.22)' },
+  attended:   { bg: 'rgba(16,185,129,0.03)',  border: 'rgba(16,185,129,0.14)' },
   considering:{ bg: 'rgba(96,165,250,0.05)',  border: 'rgba(96,165,250,0.28)', dashed: true },
   suggested:  { bg: 'rgba(244,168,37,0.05)',  border: 'rgba(244,168,37,0.28)', dashed: true },
   uncovered:  { bg: 'rgba(255,255,255,0.02)', border: 'rgba(255,255,255,0.18)' },
@@ -28,6 +29,10 @@ const TIMELINE_LEGEND = [
       {
         swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(16,185,129,0.08)', border: '1.5px solid rgba(16,185,129,0.45)' }} />,
         label: 'Committed', labelClass: 'text-success',
+      },
+      {
+        swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(16,185,129,0.04)', border: '1.5px solid rgba(16,185,129,0.2)' }} />,
+        label: 'Attended', labelClass: 'text-text2',
       },
       {
         swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(96,165,250,0.08)', border: '1.5px dashed rgba(96,165,250,0.5)' }} />,
@@ -71,10 +76,11 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
   const upcoming = conferences.filter((c) => !c.endDate || c.endDate >= today.slice(0, 7) + '-01');
 
   // When a rep is filtered, compute order numbers for that rep's assignments.
+  // Exclude 'declined' — those are not real itinerary stops.
   const repOrderMap = new Map<string, number>(); // conferenceId → order
   if (repFilter !== 'all') {
     const repAssignments = coverage
-      .filter((c) => c.repId === repFilter)
+      .filter((c) => c.repId === repFilter && c.status !== 'declined')
       .map((c) => ({ conferenceId: c.conferenceId, startDate: upcoming.find((u) => u.id === c.conferenceId)?.startDate ?? null }))
       .sort((a, b) => (a.startDate ?? '').localeCompare(b.startDate ?? ''));
     repAssignments.forEach((a, i) => repOrderMap.set(a.conferenceId, i + 1));
@@ -82,6 +88,9 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
 
   const committedConfIds = new Set(
     coverage.filter((c) => c.status === 'committed').map((c) => c.conferenceId),
+  );
+  const attendedConfIds = new Set(
+    coverage.filter((c) => c.status === 'attended').map((c) => c.conferenceId),
   );
   const consideringConfIds = new Set(
     coverage.filter((c) => c.status === 'considering').map((c) => c.conferenceId),
@@ -91,15 +100,15 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
   );
 
   const isCovered = (id: string) =>
-    committedConfIds.has(id) || consideringConfIds.has(id) || suggestedConfIds.has(id);
+    committedConfIds.has(id) || attendedConfIds.has(id) || consideringConfIds.has(id) || suggestedConfIds.has(id);
 
   const uncoveredCount = (t: Tier) =>
     upcoming.filter((c) => c.tier === t && !isCovered(c.id)).length;
 
   const shown = upcoming.filter((c) => {
-    // Rep filter: if set, only show conferences assigned to that rep.
+    // Rep filter: if set, only show conferences the rep is actively involved in (not declined).
     if (repFilter !== 'all') {
-      return coverage.some((cv) => cv.repId === repFilter && cv.conferenceId === c.id);
+      return coverage.some((cv) => cv.repId === repFilter && cv.conferenceId === c.id && cv.status !== 'declined');
     }
     return isCovered(c.id) || (c.tier != null && uncoveredTiers.has(c.tier as Tier));
   });
@@ -165,11 +174,16 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
               <div className="space-y-2">
                 {confs.map((conf) => {
                   const covered = committedConfIds.has(conf.id);
-                  const considering = !covered && consideringConfIds.has(conf.id);
-                  const suggested = !covered && !considering && suggestedConfIds.has(conf.id);
+                  const attended = !covered && attendedConfIds.has(conf.id);
+                  const considering = !covered && !attended && consideringConfIds.has(conf.id);
+                  const suggested = !covered && !attended && !considering && suggestedConfIds.has(conf.id);
 
                   const allCommitted = coverage.filter(
                     (c) => c.conferenceId === conf.id && c.status === 'committed' &&
+                      (repFilter === 'all' || c.repId === repFilter),
+                  );
+                  const allAttended = coverage.filter(
+                    (c) => c.conferenceId === conf.id && c.status === 'attended' &&
                       (repFilter === 'all' || c.repId === repFilter),
                   );
                   const allConsidering = coverage.filter(
@@ -186,10 +200,16 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
                     const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
                     return `${day} '${String(date.getFullYear()).slice(2)}`;
                   };
-                  const start = conf.startDate ? fmtDate(conf.startDate) : null;
+                  const dateStr = conf.startDate
+                    ? conf.endDate && conf.endDate !== conf.startDate
+                      ? `${fmtDate(conf.startDate)} – ${fmtDate(conf.endDate)}`
+                      : fmtDate(conf.startDate)
+                    : null;
 
                   const coverageStyle = covered
                     ? COVERAGE_STYLE.committed
+                    : attended
+                    ? COVERAGE_STYLE.attended
                     : considering
                     ? COVERAGE_STYLE.considering
                     : suggested
@@ -223,7 +243,7 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
                             <p className="text-sm font-semibold text-text1 truncate">{conf.name}</p>
                             <div className="flex items-center gap-3 mt-1 text-xs text-text3">
                               {conf.tier && <span>{conf.tier}</span>}
-                              {start && <span>{start}</span>}
+                              {dateStr && <span>{dateStr}</span>}
                               {conf.location && (
                                 <span className="flex items-center gap-1">
                                   <MapPin size={10} /> {conf.location}
@@ -247,7 +267,7 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
                         )}
                       </div>
 
-                      {(allCommitted.length > 0 || allConsidering.length > 0 || allSuggested.length > 0) && (
+                      {(allCommitted.length > 0 || allAttended.length > 0 || allConsidering.length > 0 || allSuggested.length > 0) && (
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {allCommitted.map((c) => (
                             <span
@@ -256,6 +276,15 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
                               style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}
                             >
                               {c.repName}
+                            </span>
+                          ))}
+                          {allAttended.map((c) => (
+                            <span
+                              key={c.id}
+                              className="text-xs font-medium px-2 py-0.5 rounded-full"
+                              style={{ color: 'rgba(16,185,129,0.65)', background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.12)' }}
+                            >
+                              {c.repName} ✓
                             </span>
                           ))}
                           {allConsidering.map((c) => (
