@@ -26,8 +26,8 @@ log in.
 ## Table of contents
 
 1. [The 60-second pitch](#the-60-second-pitch)
-2. [How it maps to the brief](#how-it-maps-to-the-brief) — every required component, where it lives
-3. [The three experiences](#the-three-experiences) — Field · Reconcile · Planning (with screenshots)
+2. [The three experiences](#the-three-experiences) — Field · Reconcile · Planning (with screenshots)
+3. [How it maps to the brief](#how-it-maps-to-the-brief) — every required component, where it lives
 4. [The ICP scoring methodology (defended)](#the-icp-scoring-methodology-defended)
 5. [Cross-conference intelligence (the signature feature)](#cross-conference-intelligence-the-signature-feature)
 6. [The AI features — and why AI is the right tool for each](#the-ai-features--and-why-ai-is-the-right-tool-for-each)
@@ -55,35 +55,6 @@ experiences**, each built for a different moment in the conference lifecycle:
 - **PLANNING** *(desktop)* — the sales lead's strategy hub. ICP-scored conference database,
   year-long team coverage on a timeline **and** a map, cross-conference relationship intelligence,
   AI coverage planning, AI event discovery, and a curated push into HubSpot.
-
----
-
-## How it maps to the brief
-
-Every required component, and exactly where to find it in the app:
-
-| # | Brief requirement | Where it lives | Status |
-|---|---|---|---|
-| 1 | **Conference list + filtering view** | Planning → **Conferences** tab — 190 real events; filter by tier, vertical (Fintech / Payments / Treasury / Travel / SaaS / Banking), and past/upcoming | ✅ |
-| 2 | **A scoring / tiering system** | Planning → **Conferences** — a real ICP-fit engine with **live, tunable weight sliders** and per-factor AI rationale; tiers T1 / T2 / T3 | ✅ |
-| 3 | **A planning view** (year coverage, under-investment, geo/temporal clustering) | Planning → **Coverage** tab — month timeline **+** world map, region/quarter gap bars, "under-invested" alerts, and trip clustering | ✅ |
-| 4 | **A field interface for capturing leads** | **Field** experience — voice-first capture, <10s, offline-tolerant; manual path as fallback | ✅ |
-| 5 | **Cross-conference contact tracking** (name variations, job changes, warming vs. tire-kicker, the right nudge) | Planning → **Relationships** tab + the matching engine + the AI arc summarizer + the Reconcile flow | ✅ |
-| 6 | **At least one meaningful AI feature** | **Seven** shipped — see [the AI section](#the-ai-features--and-why-ai-is-the-right-tool-for-each) | ✅ |
-| 7 | **A path to push leads into HubSpot** | Planning → **Follow-ups** — curated handoff (arc + ICP fit as a note), deduped by email, bulk push | ✅ |
-
-**Constraints from the brief, also met:**
-
-- ✅ **Deployable without a complex pipeline.** Push to `main` → Vercel auto-deploys. The whole
-  backend is one Supabase project + one SQL file (`supabase/setup.sql`). A non-developer can host
-  and update it.
-- ✅ **API keys configurable by the user, not hardcoded.** All service keys (Anthropic, Groq,
-  enrichment, HubSpot) are entered in the in-app **Settings** screen, **AES-256-GCM encrypted at
-  rest**, decrypted server-side only, and never sent to the browser. Only infrastructure keys
-  (Supabase, the encryption secret) live in env — you can't store the database's own credentials
-  inside the database.
-- ✅ **AI used throughout the build** — and documented. See
-  [How I worked with AI](#how-i-worked-with-ai-to-build-this) and `.claude/JOURNAL.md`.
 
 ---
 
@@ -152,6 +123,36 @@ The other four tabs are covered in detail in the sections below:
 [Coverage planning](#coverage-planning--timeline-map-and-gaps) ·
 [Relationships](#cross-conference-intelligence-the-signature-feature) ·
 [Follow-ups → HubSpot](#the-path-into-hubspot).
+
+---
+
+## How it maps to the brief
+
+Now that you've seen what got built, here's every required component from the brief mapped to
+exactly where it lives in the app:
+
+| # | Brief requirement | Where it lives | Status |
+|---|---|---|---|
+| 1 | **Conference list + filtering view** | Planning → **Conferences** tab — 190 real events; filter by tier, vertical (Fintech / Payments / Treasury / Travel / SaaS / Banking), and past/upcoming | ✅ |
+| 2 | **A scoring / tiering system** | Planning → **Conferences** — a real ICP-fit engine with **live, tunable weight sliders** and per-factor AI rationale; tiers T1 / T2 / T3 | ✅ |
+| 3 | **A planning view** (year coverage, under-investment, geo/temporal clustering) | Planning → **Coverage** tab — month timeline **+** world map, region/quarter gap bars, "under-invested" alerts, and trip clustering | ✅ |
+| 4 | **A field interface for capturing leads** | **Field** experience — voice-first capture, <10s, offline-tolerant; manual path as fallback | ✅ |
+| 5 | **Cross-conference contact tracking** (name variations, job changes, warming vs. tire-kicker, the right nudge) | Planning → **Relationships** tab + the matching engine + the AI arc summarizer + the Reconcile flow | ✅ |
+| 6 | **At least one meaningful AI feature** | **Seven** shipped — see [the AI section](#the-ai-features--and-why-ai-is-the-right-tool-for-each) | ✅ |
+| 7 | **A path to push leads into HubSpot** | Planning → **Follow-ups** — curated handoff (arc + ICP fit as a note), deduped by email, bulk push | ✅ |
+
+**Constraints from the brief, also met:**
+
+- ✅ **Deployable without a complex pipeline.** Push to `main` → Vercel auto-deploys. The whole
+  backend is one Supabase project + one SQL file (`supabase/setup.sql`). A non-developer can host
+  and update it.
+- ✅ **API keys configurable by the user, not hardcoded.** All service keys (Anthropic, Groq,
+  enrichment, HubSpot) are entered in the in-app **Settings** screen, **AES-256-GCM encrypted at
+  rest**, decrypted server-side only, and never sent to the browser. Only infrastructure keys
+  (Supabase, the encryption secret) live in env — you can't store the database's own credentials
+  inside the database.
+- ✅ **AI used throughout the build** — and documented. See
+  [How I worked with AI](#how-i-worked-with-ai-to-build-this) and `.claude/JOURNAL.md`.
 
 ---
 
