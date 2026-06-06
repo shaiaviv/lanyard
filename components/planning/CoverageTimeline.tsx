@@ -8,18 +8,19 @@ import { Legend } from '@/components/planning/Legend';
 interface Props {
   conferences: Conference[];
   coverage: CoverageRow[];
+  repFilter?: string;             // 'all' | repId
+  isSuggestionMode?: boolean;
 }
 
 type Tier = 'T1' | 'T2' | 'T3';
 
-// Coverage card colors — three clearly distinct hues, no overlap with each other
-const COVERAGE_STYLE: Record<'committed' | 'considering' | 'uncovered', { bg: string; border: string; dashed?: boolean }> = {
-  committed:  { bg: 'rgba(16,185,129,0.05)',  border: 'rgba(16,185,129,0.22)' },         // green
-  considering:{ bg: 'rgba(96,165,250,0.05)',  border: 'rgba(96,165,250,0.28)', dashed: true }, // blue
-  uncovered:  { bg: 'rgba(255,255,255,0.02)', border: 'rgba(255,255,255,0.18)' },         // grey
+const COVERAGE_STYLE: Record<'committed' | 'considering' | 'uncovered' | 'suggested', { bg: string; border: string; dashed?: boolean }> = {
+  committed:  { bg: 'rgba(16,185,129,0.05)',  border: 'rgba(16,185,129,0.22)' },
+  considering:{ bg: 'rgba(96,165,250,0.05)',  border: 'rgba(96,165,250,0.28)', dashed: true },
+  suggested:  { bg: 'rgba(244,168,37,0.05)',  border: 'rgba(244,168,37,0.28)', dashed: true },
+  uncovered:  { bg: 'rgba(255,255,255,0.02)', border: 'rgba(255,255,255,0.18)' },
 };
 
-// Legend — Coverage only. Tiers are shown as plain text labels on each card, no color.
 const TIMELINE_LEGEND = [
   {
     title: 'Coverage',
@@ -40,6 +41,22 @@ const TIMELINE_LEGEND = [
   },
 ];
 
+const SUGGESTION_LEGEND = [
+  {
+    title: 'Coverage',
+    items: [
+      {
+        swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(16,185,129,0.08)', border: '1.5px solid rgba(16,185,129,0.45)' }} />,
+        label: 'Committed (locked)', labelClass: 'text-success',
+      },
+      {
+        swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(244,168,37,0.08)', border: '1.5px dashed rgba(244,168,37,0.5)' }} />,
+        label: 'AI proposed', labelClass: 'text-accent',
+      },
+    ],
+  },
+];
+
 function monthKey(date: string) { return date.slice(0, 7); }
 
 function monthLabel(ym: string) {
@@ -47,14 +64,21 @@ function monthLabel(ym: string) {
   return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 }
 
-export function CoverageTimeline({ conferences, coverage }: Props) {
+export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isSuggestionMode = false }: Props) {
   const today = new Date().toISOString().split('T')[0];
-  // Which uncovered tiers to fold into the calendar. Default: none — the calendar shows only the
-  // events the team is already engaging (committed/considering), keeping it short. Reps opt into
-  // the uncovered backlog one tier at a time, instead of scrolling all ~190 events.
   const [uncoveredTiers, setUncoveredTiers] = useState<Set<Tier>>(new Set());
 
   const upcoming = conferences.filter((c) => !c.endDate || c.endDate >= today.slice(0, 7) + '-01');
+
+  // When a rep is filtered, compute order numbers for that rep's assignments.
+  const repOrderMap = new Map<string, number>(); // conferenceId → order
+  if (repFilter !== 'all') {
+    const repAssignments = coverage
+      .filter((c) => c.repId === repFilter)
+      .map((c) => ({ conferenceId: c.conferenceId, startDate: upcoming.find((u) => u.id === c.conferenceId)?.startDate ?? null }))
+      .sort((a, b) => (a.startDate ?? '').localeCompare(b.startDate ?? ''));
+    repAssignments.forEach((a, i) => repOrderMap.set(a.conferenceId, i + 1));
+  }
 
   const committedConfIds = new Set(
     coverage.filter((c) => c.status === 'committed').map((c) => c.conferenceId),
@@ -62,18 +86,23 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   const consideringConfIds = new Set(
     coverage.filter((c) => c.status === 'considering').map((c) => c.conferenceId),
   );
-  // "Covered" = at least one rep is committed OR considering. Everything else is the uncovered
-  // backlog, hidden by default and revealed per-tier via the toggles.
-  const isCovered = (id: string) => committedConfIds.has(id) || consideringConfIds.has(id);
+  const suggestedConfIds = new Set(
+    coverage.filter((c) => c.status === 'suggested').map((c) => c.conferenceId),
+  );
 
-  // Counts for the include-uncovered toggles.
+  const isCovered = (id: string) =>
+    committedConfIds.has(id) || consideringConfIds.has(id) || suggestedConfIds.has(id);
+
   const uncoveredCount = (t: Tier) =>
     upcoming.filter((c) => c.tier === t && !isCovered(c.id)).length;
 
-  // Calendar contents: always covered events, plus uncovered events for any opted-in tier.
-  const shown = upcoming.filter(
-    (c) => isCovered(c.id) || (c.tier != null && uncoveredTiers.has(c.tier as Tier)),
-  );
+  const shown = upcoming.filter((c) => {
+    // Rep filter: if set, only show conferences assigned to that rep.
+    if (repFilter !== 'all') {
+      return coverage.some((cv) => cv.repId === repFilter && cv.conferenceId === c.id);
+    }
+    return isCovered(c.id) || (c.tier != null && uncoveredTiers.has(c.tier as Tier));
+  });
 
   const byMonth = new Map<string, Conference[]>();
   for (const conf of shown) {
@@ -83,44 +112,47 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   }
   const months = [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b));
 
-  const anyUncoveredShown = uncoveredTiers.size > 0;
+  const isRepFiltered = repFilter !== 'all';
+  const totalStops = repOrderMap.size;
 
   return (
     <div className="space-y-6">
-      {/* Full calendar */}
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <p className="text-sm font-semibold text-text1">Full conference calendar</p>
-            {/* Include-uncovered toggles — default off so the list shows only covered events */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[11px] text-text3">Include uncovered:</span>
-              {(['T1', 'T2', 'T3'] as const).map((t) => {
-                const on = uncoveredTiers.has(t);
-                return (
-                  <button
-                    key={t}
-                    onClick={() =>
-                      setUncoveredTiers((prev) => {
-                        const next = new Set(prev);
-                        if (on) next.delete(t); else next.add(t);
-                        return next;
-                      })
-                    }
-                    aria-pressed={on}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all ${
-                      on
-                        ? 'bg-accent/15 border-accent/30 text-accent'
-                        : 'text-text3 bg-white/3 border-white/8 hover:text-text2 hover:border-white/14'
-                    }`}
-                  >
-                    {t} · {uncoveredCount(t)}
-                  </button>
-                );
-              })}
-            </div>
+            <p className="text-sm font-semibold text-text1">
+              {isRepFiltered ? `${conferences.find(() => true) ? '' : ''}Travel itinerary` : 'Full conference calendar'}
+            </p>
+            {!isRepFiltered && !isSuggestionMode && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] text-text3">Include uncovered:</span>
+                {(['T1', 'T2', 'T3'] as const).map((t) => {
+                  const on = uncoveredTiers.has(t);
+                  return (
+                    <button
+                      key={t}
+                      onClick={() =>
+                        setUncoveredTiers((prev) => {
+                          const next = new Set(prev);
+                          if (on) next.delete(t); else next.add(t);
+                          return next;
+                        })
+                      }
+                      aria-pressed={on}
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all ${
+                        on
+                          ? 'bg-accent/15 border-accent/30 text-accent'
+                          : 'text-text3 bg-white/3 border-white/8 hover:text-text2 hover:border-white/14'
+                      }`}
+                    >
+                      {t} · {uncoveredCount(t)}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          <Legend groups={TIMELINE_LEGEND} />
+          <Legend groups={isSuggestionMode ? SUGGESTION_LEGEND : TIMELINE_LEGEND} />
         </div>
 
         <div className="space-y-8 pt-1">
@@ -134,28 +166,38 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                 {confs.map((conf) => {
                   const covered = committedConfIds.has(conf.id);
                   const considering = !covered && consideringConfIds.has(conf.id);
+                  const suggested = !covered && !considering && suggestedConfIds.has(conf.id);
 
                   const allCommitted = coverage.filter(
-                    (c) => c.conferenceId === conf.id && c.status === 'committed',
+                    (c) => c.conferenceId === conf.id && c.status === 'committed' &&
+                      (repFilter === 'all' || c.repId === repFilter),
                   );
                   const allConsidering = coverage.filter(
-                    (c) => c.conferenceId === conf.id && c.status === 'considering',
+                    (c) => c.conferenceId === conf.id && c.status === 'considering' &&
+                      (repFilter === 'all' || c.repId === repFilter),
+                  );
+                  const allSuggested = coverage.filter(
+                    (c) => c.conferenceId === conf.id && c.status === 'suggested' &&
+                      (repFilter === 'all' || c.repId === repFilter),
                   );
 
                   const start = conf.startDate
                     ? new Date(conf.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                     : null;
 
-                  // shown ⊆ {covered, considering, opted-in uncovered}, so the else is always uncovered.
                   const coverageStyle = covered
                     ? COVERAGE_STYLE.committed
                     : considering
                     ? COVERAGE_STYLE.considering
+                    : suggested
+                    ? COVERAGE_STYLE.suggested
                     : COVERAGE_STYLE.uncovered;
 
                   const borderStyle = coverageStyle.dashed
                     ? `1px dashed ${coverageStyle.border}`
                     : `1px solid ${coverageStyle.border}`;
+
+                  const orderNum = repOrderMap.get(conf.id);
 
                   return (
                     <div
@@ -164,21 +206,35 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                       style={{ background: coverageStyle.bg, border: borderStyle }}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-text1 truncate">{conf.name}</p>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-text3">
-                            {conf.tier && <span>{conf.tier}</span>}
-                            {start && <span>{start}</span>}
-                            {conf.location && (
-                              <span className="flex items-center gap-1">
-                                <MapPin size={10} /> {conf.location}
-                              </span>
-                            )}
-                            {conf.estAudience && (
-                              <span className="flex items-center gap-1">
-                                <Users size={10} /> {conf.estAudience.toLocaleString()}
-                              </span>
-                            )}
+                        <div className="flex items-start gap-2 min-w-0">
+                          {/* Order number badge when a rep is filtered */}
+                          {orderNum != null && (
+                            <span
+                              className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                              style={{ background: 'rgba(244,168,37,0.15)', border: '1px solid rgba(244,168,37,0.3)', color: '#f4a825' }}
+                            >
+                              {orderNum}
+                            </span>
+                          )}
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-text1 truncate">{conf.name}</p>
+                            <div className="flex items-center gap-3 mt-1 text-xs text-text3">
+                              {conf.tier && <span>{conf.tier}</span>}
+                              {start && <span>{start}</span>}
+                              {conf.location && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin size={10} /> {conf.location}
+                                </span>
+                              )}
+                              {conf.estAudience && (
+                                <span className="flex items-center gap-1">
+                                  <Users size={10} /> {conf.estAudience.toLocaleString()}
+                                </span>
+                              )}
+                              {isRepFiltered && totalStops > 0 && orderNum != null && (
+                                <span className="text-accent font-medium">Stop {orderNum} of {totalStops}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                         {conf.icpScore != null && (
@@ -188,7 +244,7 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                         )}
                       </div>
 
-                      {(allCommitted.length > 0 || allConsidering.length > 0) && (
+                      {(allCommitted.length > 0 || allConsidering.length > 0 || allSuggested.length > 0) && (
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {allCommitted.map((c) => (
                             <span
@@ -208,6 +264,15 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                               {c.repName}?
                             </span>
                           ))}
+                          {allSuggested.map((c) => (
+                            <span
+                              key={c.id}
+                              className="text-xs text-accent font-medium px-2 py-0.5 rounded-full"
+                              style={{ background: 'rgba(244,168,37,0.08)', border: '1px dashed rgba(244,168,37,0.35)' }}
+                            >
+                              {c.repName} ✦
+                            </span>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -219,9 +284,9 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
 
           {months.length === 0 && (
             <div className="text-center py-16 text-sm text-text3">
-              {anyUncoveredShown
-                ? 'No conferences match. Try including more uncovered tiers above.'
-                : 'No covered conferences yet. Use “Include uncovered” above to show events the team hasn’t picked up.'}
+              {isRepFiltered
+                ? 'No conferences assigned to this rep in this view.'
+                : 'No covered conferences yet. Use "Include uncovered" above to show events the team hasn\'t picked up.'}
             </div>
           )}
         </div>

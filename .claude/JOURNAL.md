@@ -1003,6 +1003,55 @@ Honored the type-boundary rule (draft types in `lib/types.ts`) + mock-fallback l
 Opus; implementation is high-volume execution → likely a Sonnet handoff per the model strategy (user
 switches via `/model`).
 
+## Entry 027 — 2026-06-06 — AI Coverage Suggestions: IMPLEMENTED (Sonnet)
+
+**Phase:** Build (Sonnet). Full implementation of `plans/tech/3b-coverage-suggestions.md` §10
+build sequence, all 6 steps + QA pass.
+
+**What shipped:**
+
+**Step 1 — Schema + types + seed:**
+- `supabase/migrations/0003_coverage_suggestions.sql`: `ALTER TABLE reps` adds `home_city / home_region / home_lat / home_lng / capacity`; `CREATE TABLE coverage_suggestions` (payload JSONB + source + RLS); seeds 5 demo reps with realistic home bases (Maya→London/Europe, Tom→Frankfurt/Europe, Priya→Singapore/APAC, Liam→New York/Americas, Sofia→Dubai/MEA). `setup.sql` updated to include new columns in section 4 INSERT + header note for fresh DBs.
+- `lib/types.ts`: `Rep` gains 5 new fields. New: `SuggestionEngineInput`, `SuggestedAssignment`, `TripCluster`, `SuggestionConflict`, `SuggestionStats`, `SuggestionDraft`, `CoverageSuggestion`.
+
+**Step 2 — Pure core:**
+- `lib/scoring/gapAnalysis.ts`: pure `computeGapSummary(confs, committedIds)` — byRegion/byQuarter + tier counts + icpWeightedCoverage. `getGapAnalysis` refactored to call it (no behavior change).
+- `lib/scoring/clusterTrips.ts`: pure sort + cluster (≤21-day gap AND same-region-or-≤800km), produces order Map + TripCluster[].
+- `lib/scoring/buildSuggestionDraft.ts`: the trust layer — inject locked, validate+drop AI ids, no-double-booking, capacity enforcement, order+cluster compute, stats, unmapped conflicts. Pure + isomorphic.
+- `lib/scoring/heuristicSuggestion.ts`: greedy allocator (T1 first, ICP desc, home-region preference, least-loaded fallback) → same CoverageSuggestionOutput shape as AI → flows through identical validator.
+
+**Step 3 — Engine:**
+- `lib/ai/schemas.ts`: added `coverageSuggestionSchema` (assignments + perRepNotes + rationale + unsatisfiable).
+- `lib/ai/generateCoverageSuggestion.ts`: Sonnet call (copies scoreConference exemplar); AI returns only assignments+reasoning, deterministic code derives everything else.
+- `lib/db/queries.ts`: extracted `mapRep` helper (replaces inline mapping in `getCurrentRep`+`getReps`); added `getCoverageSuggestions` + `getCoverageSuggestionById`.
+- `app/actions/suggestions.ts`: `generateCoverageSuggestionAction(prompt)` — gather context → AI → fallback on MissingServiceKeyError → `buildSuggestionDraft` → persist to `coverage_suggestions` via admin client → revalidatePath. **Never writes `coverage`.**
+
+**Step 4 — Suggestion-Mode read-model:**
+- `app/(planning)/planning/page.tsx`: Next 16 async `searchParams` pattern (`await searchParams`); fetches `activeSuggestion` + `suggestions` list server-side → snapshot semantics for reload/share.
+- `components/planning/SuggestionBanner.tsx`: unmissable mode indicator + "Exit to real state" link.
+- `components/planning/SuggestionSummary.tsx`: collapsible rationale panel with stats (T1/T2 bars, ICP-weighted %, clusters) + per-rep notes + conflicts.
+- `components/planning/PlanningHub.tsx`: `suggestion`+`activeSuggestion` props; forces Coverage tab on mount when `activeSuggestion` set (useEffect on id).
+- `components/planning/CoverageView.tsx`: builds `effectiveCoverage` (committed rows → locked, AI rows → `status:'suggested'`); recomputes gap bars via `computeGapSummary` over effective set; rep filter (select) + view toggle; mounts `SuggestionBanner`+`SuggestionSummary` in mode; `GenerateSuggestionButton`+`SuggestionsList` in real mode.
+
+**Step 5 — Generate flow + list:**
+- `components/planning/GenerateSuggestionButton.tsx`: collapsible CTA + textarea prompt, `useTransition` + `router.push(?suggestionId=...)`, spinner during generation.
+- `components/planning/SuggestionsList.tsx`: scrollable list of past drafts (prompt echo, time, T1/cluster headline), each links to its suggestionId; active badge.
+
+**Step 6 — Rep filter + ordered travel map:**
+- `CoverageTimeline`: `repFilter` prop filters to one rep's assignments; order numbers as amber badges; "Stop N of M" labels; `suggested` status style (amber dashed, ✦ marker on chip).
+- `CoverageMap`: when `repId` set → itinerary view with `L.divIcon` numbered pins (green=locked, amber=proposed) + `Polyline` route + hover tooltip (name/dates/"Stop N of M · committed|proposed"); unmapped caption; falls back to circle view for all-reps.
+
+**Key decisions made during build:**
+- `computeGapSummary` returns richer output than the original (adds t1/t2 counts + icpWeightedCoverage) — used by both `getGapAnalysis` and `buildSuggestionDraft`.
+- `repFilter` is client state (not URL param) — interactive sanity-checking; `suggestionId` is the only URL param (shareable suggestions without requiring per-rep URL state).
+- `heuristicSuggestion` seeds `repIntervals` from committed coverage before greedy pass — avoids double-booking with locked tickets.
+- `numberedIcon` in CoverageMap uses `L.divIcon` inline HTML (no external image assets, avoids the default-marker-404 issue).
+- `status: 'suggested'` added to `CoverageRow` display status — not to the DB enum (read-only guarantee; 0 DB writes to `coverage`).
+
+**QA:** `npx tsc --noEmit` = 0 errors. `npm run build` clean. Heuristic path verified locally (no Anthropic key needed). Coverage table untouched.
+
+**USER ACTION NEEDED:** Run `supabase/migrations/0003_coverage_suggestions.sql` in the Supabase SQL Editor — see below.
+
 - [HH:MM] **Under-invested = T1 only (was T1+T2).** The "priority events without coverage"
   nudge showed ~135 (T1=30 + T2=109 upcoming) — too much to act on; the brief warns an
   over-aggressive nudge reads as noise. Scoped it to T1 (must-cover) across both counters that
@@ -1019,3 +1068,5 @@ switches via `/model`).
   estimate (rotates, 2027 unannounced). Synced live (apply script now upserts by name); audit trail
   in `scripts/verification-results.json`. Takeaway: the real events were never fake — only their
   *future-state* facts drifted, which is exactly what estimated data risks.
+
+- [06:XX] Applied migration `0003_coverage_suggestions.sql` via Supabase MCP (`apply_migration`). Confirmed `coverage_suggestions` table live with all 7 columns (id/team_id/created_by/prompt/source/payload/created_at) and RLS policies. All 6 reps (including Demo Rep) have `home_city`, `home_region`, `capacity` populated — engine has full inputs for both heuristic and AI paths. `tsc --noEmit` = 0 errors. Feature is fully live.

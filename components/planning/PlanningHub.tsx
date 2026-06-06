@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Fingerprint, Radio } from 'lucide-react';
 import { OverviewTab } from '@/components/planning/OverviewTab';
@@ -7,7 +7,7 @@ import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageView } from '@/components/planning/CoverageView';
 import { FollowUpQueue } from '@/components/planning/FollowUpQueue';
 import { RelationshipList } from '@/components/planning/RelationshipList';
-import type { Conference, Rep } from '@/lib/types';
+import type { Conference, Rep, CoverageSuggestion } from '@/lib/types';
 import type { CoverageRow, FollowUpRow, RelationshipRow, GapAnalysis } from '@/lib/db/queries';
 import type { ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
@@ -24,10 +24,18 @@ interface Props {
   weights: ScoringWeights;
   repId: string;
   repName: string;
+  suggestions: CoverageSuggestion[];
+  activeSuggestion: CoverageSuggestion | null;
 }
 
-export function PlanningHub({ conferences, coverage, followUps, relationships, gap, reps, weights, repId, repName }: Props) {
-  const [tab, setTab] = useState<Tab>('Overview');
+export function PlanningHub({ conferences, coverage, followUps, relationships, gap, reps, weights, repId, repName, suggestions, activeSuggestion }: Props) {
+  // Suggestion Mode forces the Coverage tab; switching tabs exits suggestion mode visually but
+  // the URL still has suggestionId — the banner + exit link handle the escape.
+  const [tab, setTab] = useState<Tab>(activeSuggestion ? 'Coverage' : 'Overview');
+
+  useEffect(() => {
+    if (activeSuggestion) setTab('Coverage');
+  }, [activeSuggestion?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const warmingNoFollowUp = relationships.filter(
     (r) => (r.verdict === 'warming' || r.verdict === 'nurturing') && !r.hasFollowUp,
   ).length;
@@ -117,6 +125,9 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
             conferences={conferences}
             coverage={coverage}
             gap={gap}
+            reps={reps}
+            activeSuggestion={activeSuggestion}
+            suggestions={suggestions}
           />
         )}
         {tab === 'Relationships' && <RelationshipList rows={relationships} />}

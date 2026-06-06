@@ -1,7 +1,7 @@
 // Server-side DB query helpers. All functions create a server Supabase client (RLS-scoped).
 import 'server-only';
 import { createSupabaseServerClient } from '@/lib/db/server';
-import type { Contact, Conference, Encounter, Rep, ArcSummary, ArcVerdict } from '@/lib/types';
+import type { Contact, Conference, Encounter, Rep, ArcSummary, ArcVerdict, CoverageSuggestion, SuggestionDraft } from '@/lib/types';
 import { DEFAULT_WEIGHTS, type ScoringWeights } from '@/lib/scoring/computeIcpScore';
 
 // ── Reps ─────────────────────────────────────────────────────────────────────
@@ -16,14 +16,7 @@ export async function getCurrentRep(): Promise<Rep | null> {
   const { data } = await supa.from('reps').select('*').eq('auth_user_id', user.id).single();
   if (!data) return null;
 
-  return {
-    id: data.id as string,
-    authUserId: data.auth_user_id as string,
-    teamId: data.team_id as string,
-    name: data.name as string,
-    email: data.email as string | null,
-    currentConferenceId: (data.current_conference_id as string | null) ?? null,
-  };
+  return mapRep(data);
 }
 
 // C4 scoring weights — team-level, non-secret config stored as plaintext JSON in app_settings.
@@ -48,6 +41,23 @@ export async function getScoringWeights(teamId: string): Promise<ScoringWeights>
   return DEFAULT_WEIGHTS;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapRep(d: any): Rep {
+  return {
+    id: d.id as string,
+    authUserId: d.auth_user_id as string | null,
+    teamId: d.team_id as string,
+    name: d.name as string,
+    email: d.email as string | null,
+    currentConferenceId: (d.current_conference_id as string | null) ?? null,
+    homeCity: (d.home_city as string | null) ?? null,
+    homeRegion: (d.home_region as string | null) ?? null,
+    homeLat: (d.home_lat as number | null) ?? null,
+    homeLng: (d.home_lng as number | null) ?? null,
+    capacity: (d.capacity as number | null) ?? 5,
+  };
+}
+
 // All reps on a team — the roster a sales lead assigns coverage across.
 export async function getReps(teamId: string): Promise<Rep[]> {
   const supa = await createSupabaseServerClient();
@@ -57,15 +67,7 @@ export async function getReps(teamId: string): Promise<Rep[]> {
     .eq('team_id', teamId)
     .order('name', { ascending: true });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((d: any) => ({
-    id: d.id as string,
-    authUserId: d.auth_user_id as string | null,
-    teamId: d.team_id as string,
-    name: d.name as string,
-    email: d.email as string | null,
-    currentConferenceId: (d.current_conference_id as string | null) ?? null,
-  }));
+  return (data ?? []).map(mapRep);
 }
 
 // ── Conferences ───────────────────────────────────────────────────────────────
@@ -328,52 +330,34 @@ export interface GapAnalysis {
 
 // Where the team is under-invested: high-value upcoming events with no committed rep, plus
 // coverage rates by region and quarter. Drives the Coverage view's gap callouts.
+// The byRegion/byQuarter computation is shared with buildSuggestionDraft via computeGapSummary.
 export async function getGapAnalysis(teamId: string): Promise<GapAnalysis> {
   const supa = await createSupabaseServerClient();
   const today = new Date().toISOString().split('T')[0];
+  const { computeGapSummary } = await import('@/lib/scoring/gapAnalysis');
 
   const [{ data: confs }, { data: cov }] = await Promise.all([
-    supa.from('conferences').select('id, name, tier, icp_score, start_date, region').gte('end_date', today),
+    supa.from('conferences').select('id, name, tier, icp_score, start_date, end_date, region').gte('end_date', today),
     supa.from('coverage').select('conference_id, status, reps!inner(team_id)').eq('reps.team_id', teamId).eq('status', 'committed'),
   ]);
 
   const committed = new Set((cov ?? []).map((r) => r.conference_id as string));
-  const upcoming = confs ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const upcoming = (confs ?? []) as any[];
 
   const uncovered = upcoming
     // Under-invested = T1 (must-cover) events with no committed rep. T2 is intentionally excluded:
     // counting T1+T2 drowned the signal (~135 events) and made the nudge noise, not action.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .filter((c: any) => c.tier === 'T1' && !committed.has(c.id))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((c: any) => ({ id: c.id, name: c.name, tier: c.tier, icpScore: c.icp_score, startDate: c.start_date, region: c.region }))
+    .filter((c) => c.tier === 'T1' && !committed.has(c.id))
+    .map((c) => ({ id: c.id, name: c.name, tier: c.tier, icpScore: c.icp_score, startDate: c.start_date, region: c.region }))
     .sort((a, b) => (b.icpScore ?? 0) - (a.icpScore ?? 0));
 
-  const regionMap = new Map<string, { total: number; covered: number }>();
-  const quarterMap = new Map<string, { total: number; covered: number }>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const c of upcoming as any[]) {
-    const region = (c.region as string) ?? 'Unknown';
-    const r = regionMap.get(region) ?? { total: 0, covered: 0 };
-    r.total += 1;
-    if (committed.has(c.id)) r.covered += 1;
-    regionMap.set(region, r);
+  const confLite = upcoming.map((c) => ({
+    id: c.id, tier: c.tier, icpScore: c.icp_score, startDate: c.start_date, region: c.region,
+  }));
+  const { byRegion, byQuarter } = computeGapSummary(confLite, committed);
 
-    if (c.start_date) {
-      const d = new Date(c.start_date);
-      const q = `${d.getUTCFullYear()} Q${Math.floor(d.getUTCMonth() / 3) + 1}`;
-      const qa = quarterMap.get(q) ?? { total: 0, covered: 0 };
-      qa.total += 1;
-      if (committed.has(c.id)) qa.covered += 1;
-      quarterMap.set(q, qa);
-    }
-  }
-
-  return {
-    uncovered,
-    byRegion: [...regionMap.entries()].map(([region, v]) => ({ region, ...v })).sort((a, b) => a.covered / a.total - b.covered / b.total),
-    byQuarter: [...quarterMap.entries()].map(([quarter, v]) => ({ quarter, ...v })).sort((a, b) => a.quarter.localeCompare(b.quarter)),
-  };
+  return { uncovered, byRegion, byQuarter };
 }
 
 // ── Cross-conference relationship intelligence (C7) ───────────────────────────
@@ -487,6 +471,42 @@ export async function searchContacts(q: string): Promise<Contact[]> {
     .limit(12);
 
   return (data ?? []).map(mapContact);
+}
+
+// ── Coverage Suggestions ──────────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapSuggestion(row: any): CoverageSuggestion {
+  return {
+    id: row.id as string,
+    teamId: row.team_id as string,
+    createdBy: (row.created_by as string | null) ?? null,
+    prompt: (row.prompt as string | null) ?? null,
+    source: row.source as 'ai' | 'heuristic',
+    draft: row.payload as SuggestionDraft,
+    createdAt: row.created_at as string,
+  };
+}
+
+export async function getCoverageSuggestions(teamId: string): Promise<CoverageSuggestion[]> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('coverage_suggestions')
+    .select('*')
+    .eq('team_id', teamId)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  return (data ?? []).map(mapSuggestion);
+}
+
+export async function getCoverageSuggestionById(id: string): Promise<CoverageSuggestion | null> {
+  const supa = await createSupabaseServerClient();
+  const { data } = await supa
+    .from('coverage_suggestions')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  return data ? mapSuggestion(data) : null;
 }
 
 // ── Mappers (snake_case → camelCase) ─────────────────────────────────────────

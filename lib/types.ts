@@ -17,6 +17,12 @@ export interface Rep {
   name: string;
   email: string | null;
   currentConferenceId: string | null;
+  // Coverage-suggestions additions (0003 migration)
+  homeCity: string | null;
+  homeRegion: string | null;  // Europe | Americas | APAC | MEA — matches conferences.region
+  homeLat: number | null;
+  homeLng: number | null;
+  capacity: number;           // soft max conferences per rep (default 5)
 }
 
 export interface Conference {
@@ -181,4 +187,74 @@ export interface PersonCandidate {
   company?: string;
   photoUrl?: string;
   email?: string;
+}
+
+// ── AI Coverage Suggestions (plans/product/3b-coverage-suggestions.md) ───────
+
+// Input shared by the AI call and the heuristic fallback.
+export interface SuggestionEngineInput {
+  conferences: {
+    id: string; name: string; startDate: string | null; endDate: string | null;
+    region: string | null; location: string | null; tier: string | null;
+    icpScore: number | null; latitude: number | null; longitude: number | null;
+  }[];
+  reps: { id: string; name: string; homeRegion: string | null; capacity: number }[];
+  committed: { repId: string; conferenceId: string }[];
+  considering: { repId: string; conferenceId: string }[];
+  prompt: string | null;
+}
+
+// One proposed assignment in a validated draft.
+export interface SuggestedAssignment {
+  repId: string;
+  conferenceId: string;
+  locked: boolean;    // true = carried-over committed ticket (immovable)
+  order: number;      // 1-based chronological visit order within the rep's itinerary
+  clusterId: string | null;
+}
+
+export interface TripCluster {
+  id: string;
+  repId: string;
+  label: string;          // e.g. "Europe · Mar"
+  conferenceIds: string[];
+}
+
+export interface SuggestionConflict {
+  kind: 'capacity' | 'double_booking' | 'prompt_unsatisfiable' | 'unmapped' | 'undated';
+  message: string;
+  repId?: string;
+  conferenceId?: string;
+}
+
+export interface SuggestionStats {
+  t1Covered: number; t1Total: number;
+  t2Covered: number; t2Total: number;
+  icpWeightedCoverage: number;  // 0..100: sum(icpScore covered) / sum(icpScore all upcoming) × 100
+  byRegion: { region: string; covered: number; total: number }[];
+  byQuarter: { quarter: string; covered: number; total: number }[];
+  clustersFormed: number;
+}
+
+// The VALIDATED draft persisted in coverage_suggestions.payload and rendered in Suggestion Mode.
+export interface SuggestionDraft {
+  assignments: SuggestedAssignment[];
+  clusters: TripCluster[];
+  rationale: string;
+  perRepNotes: { repId: string; note: string }[];
+  conflicts: SuggestionConflict[];
+  stats: SuggestionStats;
+  generatedAt: string;
+  conferenceCount: number;  // snapshot size — for staleness display
+  source: 'ai' | 'heuristic';
+}
+
+export interface CoverageSuggestion {
+  id: string;
+  teamId: string;
+  createdBy: string | null;
+  prompt: string | null;
+  source: 'ai' | 'heuristic';
+  draft: SuggestionDraft;
+  createdAt: string;
 }

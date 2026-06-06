@@ -68,6 +68,20 @@ export const conferenceFactorsSchema = z.object({
 });
 export type ConferenceFactorsOutput = z.infer<typeof conferenceFactorsSchema>;
 
+// Coverage Suggestions (Sonnet). AI proposes assignments + reasoning only — order/clusters/stats
+// are computed deterministically in buildSuggestionDraft (never trusted to the AI).
+export const coverageSuggestionSchema = z.object({
+  assignments: z.array(z.object({
+    repId: z.string(),
+    conferenceId: z.string(),
+    reason: z.string(), // short why-this-rep-here
+  })),
+  perRepNotes: z.array(z.object({ repId: z.string(), note: z.string() })),
+  rationale: z.string(), // overall narrative: coverage, gaps, clusters, prompt handling
+  unsatisfiable: z.array(z.object({ request: z.string(), why: z.string() })).default([]),
+});
+export type CoverageSuggestionOutput = z.infer<typeof coverageSuggestionSchema>;
+
 // C5 AI conference discovery (Sonnet). Surfaces real events not already in the DB.
 export const discoverConferencesSchema = z.object({
   candidates: z.array(

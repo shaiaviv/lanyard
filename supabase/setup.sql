@@ -1,5 +1,6 @@
 -- Lanyard — post-migration setup script.
--- Run this in the Supabase SQL Editor AFTER applying 0001_init.sql.
+-- Run this in the Supabase SQL Editor AFTER applying ALL migration files:
+--   0001_init.sql, 0002_rep_current_conference.sql, 0003_coverage_suggestions.sql
 -- 1. Creates the private recordings bucket
 -- 2. Seeds conference data (real fintech events)
 -- 3. Seeds your rep row (fill in YOUR_AUTH_USER_ID below)
@@ -75,12 +76,13 @@ values (
 on conflict (auth_user_id) do nothing;
 
 -- ── 4. Teammate reps (the wider sales team; no auth account — for coverage planning) ──
-insert into reps (id, auth_user_id, name, email, team_id) values
-  ('00000000-0000-0000-0000-0000000000a1', null, 'Maya Rodriguez', 'maya@grain.example', '00000000-0000-0000-0000-000000000001'),
-  ('00000000-0000-0000-0000-0000000000a2', null, 'Tom Becker', 'tom@grain.example', '00000000-0000-0000-0000-000000000001'),
-  ('00000000-0000-0000-0000-0000000000a3', null, 'Priya Nair', 'priya@grain.example', '00000000-0000-0000-0000-000000000001'),
-  ('00000000-0000-0000-0000-0000000000a4', null, 'Liam Walsh', 'liam@grain.example', '00000000-0000-0000-0000-000000000001'),
-  ('00000000-0000-0000-0000-0000000000a5', null, 'Sofia Costa', 'sofia@grain.example', '00000000-0000-0000-0000-000000000001')
+-- home_city/region/lat/lng + capacity added by 0003_coverage_suggestions migration.
+insert into reps (id, auth_user_id, name, email, team_id, home_city, home_region, home_lat, home_lng, capacity) values
+  ('00000000-0000-0000-0000-0000000000a1', null, 'Maya Rodriguez', 'maya@grain.example', '00000000-0000-0000-0000-000000000001', 'London',    'Europe',   51.5074,  -0.1278,  5),
+  ('00000000-0000-0000-0000-0000000000a2', null, 'Tom Becker',     'tom@grain.example',  '00000000-0000-0000-0000-000000000001', 'Frankfurt', 'Europe',   50.1109,   8.6821,  5),
+  ('00000000-0000-0000-0000-0000000000a3', null, 'Priya Nair',     'priya@grain.example','00000000-0000-0000-0000-000000000001', 'Singapore', 'APAC',      1.3521, 103.8198,  5),
+  ('00000000-0000-0000-0000-0000000000a4', null, 'Liam Walsh',     'liam@grain.example', '00000000-0000-0000-0000-000000000001', 'New York',  'Americas', 40.7128, -74.0060,  6),
+  ('00000000-0000-0000-0000-0000000000a5', null, 'Sofia Costa',    'sofia@grain.example','00000000-0000-0000-0000-000000000001', 'Dubai',     'MEA',      25.2048,  55.2708,  5)
 on conflict (id) do nothing;
 
 -- ── 5. Conference coverage (who covers what; deliberate gaps + clusters for the demo) ──
