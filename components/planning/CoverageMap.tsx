@@ -1,7 +1,7 @@
 'use client';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { MapContainer, TileLayer, CircleMarker, Tooltip, Marker, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Tooltip, Marker } from 'react-leaflet';
 import type { Conference, Rep, SuggestionDraft } from '@/lib/types';
 
 const TIER_COLOR: Record<string, string> = {
@@ -32,14 +32,8 @@ function dateRange(conf: Conference): string {
   return `${start} – ${fmt(conf.endDate)}`;
 }
 
-function gapDays(endDate: string | null | undefined, startDate: string | null | undefined): number {
-  if (!endDate || !startDate) return Infinity;
-  return (new Date(startDate).getTime() - new Date(endDate).getTime()) / 86_400_000;
-}
-
 const coordKey = (lat: number, lng: number) => `${lat.toFixed(4)},${lng.toFixed(4)}`;
 const OFFSET_R = 14; // px — radius of the scatter circle for colocated pins
-const TRIP_GAP = 31; // days — max gap between stops to draw a connecting line
 
 export default function CoverageMap({
   conferences,
@@ -108,23 +102,6 @@ export default function CoverageMap({
       });
     }
 
-    // ── Trip segments: only connect stops ≤31 days apart ───────────────────
-    // Reps travel home between trips. A line only makes sense within a single
-    // continuous trip (conference run), not across the full year.
-    const tripSegments: [number, number][][] = [];
-    let seg: [number, number][] = [];
-    itineraryConfs.forEach(({ conf }, i) => {
-      const pt: [number, number] = [conf.latitude as number, conf.longitude as number];
-      if (i === 0) { seg = [pt]; return; }
-      if (gapDays(itineraryConfs[i - 1].conf.endDate, conf.startDate) <= TRIP_GAP) {
-        seg.push(pt);
-      } else {
-        if (seg.length >= 2) tripSegments.push(seg);
-        seg = [pt];
-      }
-    });
-    if (seg.length >= 2) tripSegments.push(seg);
-
     const center: [number, number] =
       itineraryConfs.length > 0
         ? [
@@ -146,15 +123,6 @@ export default function CoverageMap({
               attribution='&copy; OpenStreetMap &copy; CARTO'
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
-
-            {/* Trip lines — only within a continuous trip (≤31-day gap) */}
-            {tripSegments.map((s, i) => (
-              <Polyline
-                key={i}
-                positions={s}
-                pathOptions={{ color: '#f59e0b', weight: 1.5, dashArray: '6,4', opacity: 0.55 }}
-              />
-            ))}
 
             {/* Markers — render descending order so pin 1 is topmost in the DOM */}
             {[...itineraryConfs]
@@ -208,11 +176,6 @@ export default function CoverageMap({
           {unmappedCount > 0 && (
             <span className="text-warn">
               {unmappedCount} unmapped (no coordinates)
-            </span>
-          )}
-          {tripSegments.length > 0 && (
-            <span>
-              {tripSegments.length} trip{tripSegments.length !== 1 ? 's' : ''} shown
             </span>
           )}
           <span className="flex items-center gap-1.5">
