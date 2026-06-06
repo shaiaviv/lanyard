@@ -10,7 +10,7 @@ import { computeIcpScore, type ScoringWeights, type Tier } from '@/lib/scoring/c
 import type { Conference, Rep } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
 
-const VERTICALS = ['All', 'Fintech', 'Payments', 'Travel', 'SaaS', 'Banking'];
+const VERTICALS = ['All', 'Fintech', 'Payments', 'Treasury', 'Travel', 'SaaS', 'Banking'];
 const TIERS: Array<'All' | 'T1' | 'T2' | 'T3'> = ['All', 'T1', 'T2', 'T3'];
 
 const FACTOR_LABELS: Record<string, string> = {
@@ -351,7 +351,7 @@ export function ConferenceList({ conferences, coverage, reps, repId, weights: in
   const filtered = scored
     .filter((c) => {
       if (!showPast && c.endDate && c.endDate < today) return false;
-      if (vertical !== 'All' && !c.verticals.includes(vertical)) return false;
+      if (vertical !== 'All' && !c.verticals.some((v) => v.toLowerCase() === vertical.toLowerCase())) return false;
       if (tier !== 'All' && c.liveTier !== tier) return false;
       return true;
     })
@@ -443,7 +443,7 @@ export function ConferenceList({ conferences, coverage, reps, repId, weights: in
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map((conf) => (
           <ConferenceCard
             key={conf.id}
