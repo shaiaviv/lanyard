@@ -13,8 +13,6 @@
 A 5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
 logic and why I chose it, how I approached cross-conference contact tracking (including the edge cases),
 how I used AI to build this and where it helped vs. got in the way, and what I'd build next.
-**[▶️ Open the video directly](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo-compressed.mp4)** if
-the player above doesn't load.
 
 ---
 
