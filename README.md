@@ -254,8 +254,8 @@ data.
   cluster, a Singapore/APAC cluster. That's where "send one rep for a week" beats five separate
   trips.
 - **One render path, two data sources** — the same timeline and map also render an
-  [AI coverage *draft*](#ai-coverage-planning-suggestion-mode) when one is loaded, so previewing a
-  proposed plan looks identical to the real one.
+  [AI coverage *draft*](#-core-feature-2--ai-coverage-planning-the-biggest-time-saver) when one is
+  loaded, so previewing a proposed plan looks identical to the real one.
 
 ---
 
@@ -316,8 +316,8 @@ Each card shows the verdict, the temperature, the meeting/event count and time s
   is one tap, and the count surfaces on the Overview dashboard. Harsh judgments are time-gated so
   they never fire prematurely.
 
-The **AI relationship-arc summarizer** (row 3 in
-[the AI features table](#the-ai-features--and-why-ai-is-the-right-tool-for-each), shown on the
+The **AI relationship-arc summarizer** (one of
+[the AI features](#the-ai-features--and-why-ai-is-the-right-tool-for-each), shown on the
 [contact arc page](#-field--capture-on-the-show-floor)) turns each arc into a one-line verdict +
 open threads + a suggested next move — the narrative a rep actually needs, not a data dump.
 
@@ -329,42 +329,91 @@ The brief asks for *one* meaningful AI feature and warns against "bolted-on." La
 **seven**, and each passes the same test: **AI is right here because the job is synthesis or
 judgment over messy, unstructured input — not something a rule or a form could do.**
 
-| # | Feature | Model | Why AI (and not a rule) |
-|---|---|---|---|
-| 1 | **Voice → structured lead** | Groq Whisper + Claude Haiku | Free-speech on a loud floor → name/company/title/topics/temperature. No form is fast enough to fill while talking; extraction from natural language is the whole point. |
-| 2 | **Lead-qualification (ICP fit) scoring** | Claude Haiku | Judging "is this a Grain-fit company *and* the right person" from a sparse note needs world knowledge + inference, and returns *Unclear* when the note is too thin (rather than guessing). |
-| 3 | **Relationship-arc summarizer** | Claude Sonnet | Reads a whole multi-event history and produces a verdict + open threads + next move. This is reading-between-the-lines synthesis, not arithmetic on a counter. |
-| 4 | **Cross-conference match adjudication** | Claude Haiku (floor) / Sonnet (reconcile) | Deciding if "Elena Fisher @ Adyen" is "Elena Fischer @ Adyen" with a confidence is fuzzy reasoning a `==` can't do. |
-| 5 | **ICP conference scoring** | Claude Sonnet | Estimating the fuzzy factors (how ICP-dense is this event?) is research + judgment; the deterministic formula then makes the score transparent and tunable. |
-| 6 | **AI conference discovery** | Claude Sonnet | "Find ICP-fit events we don't already know about" is open-ended discovery — exactly what the brief suggests as an example AI feature. |
-| 7 | **AI coverage planning** | Claude Sonnet + deterministic validator | Allocate the team across the year honoring committed tickets, no double-booking, trip clustering, and a free-text instruction. AI proposes; code enforces every hard constraint. |
+But they're not all equal. **Two are the core, golden features** — the ones that define how we
+think about applying AI to a sales team, and where the product genuinely shines. The other five are
+valuable supporting additions, and we treat them as exactly that: each is a knob to tune against
+the **value-vs-cost tradeoff** (swap in a cheaper model, cache more aggressively, or make it
+optional), not a pillar.
 
-A few worth showing:
+---
 
-### AI conference discovery
+### ⭐ Core feature 1 — Voice → structured lead *(the field rep's backbone)*
 
-![AI conference discovery results](docs/images/planning-discover.png)
+![Voice-first capture](docs/images/field-capture.png)
 
-Type a natural-language brief ("cross-border payments & treasury events in APAC"); the AI returns
-real events **not already in your database**, each **auto-scored with the same ICP engine** and a
-one-line rationale tied to Grain's ICP ("a direct match for Grain's embedded FX risk product"). It
-even flags events you already track ("Already excluded — skip"). One click adds an event to the
-database, fully scored.
+This is the AI decision we're proudest of, because it didn't come from "where can we bolt on an
+LLM" — it came from **putting ourselves in the rep's shoes and thinking through how they'd actually
+behave.** On a loud show floor a rep has seconds and split attention; asking them to tab through a
+form mid-conversation is something they simply *won't* do. The realistic behavior is a ten-second
+voice note as they turn to walk away.
 
-### AI coverage planning (Suggestion Mode)
+So that's the unlock: the rep says *"met Sarah at Stripe, head of payments, really keen on the FX
+stuff, wants a call next week,"* and the AI turns that throwaway sentence into a fully structured,
+**scored** lead — name, company, title, topics, temperature, follow-up flag — and runs the
+cross-conference "have I met them before?" check, all without the rep breaking stride. **A lot of
+data captured, fast, without stealing a second of valuable conference time.**
+
+This is where we best demonstrate how we think about core AI implementation: the value isn't "we
+used a model," it's recognizing the *exact moment* AI removes friction a human would otherwise
+refuse to tolerate. And it's load-bearing — **everything downstream** (matching, the relationship
+arc, follow-ups, the HubSpot handoff) is only ever as good as the data this one feature captures.
+It's the backbone of the entire field experience.
+
+> Transcription via **Groq Whisper Large v3 Turbo** (or the browser's free Web Speech API); parsing
+> + ICP-fit scoring via **Claude Haiku**.
+
+---
+
+### ⭐ Core feature 2 — AI coverage planning *(the biggest time-saver)*
 
 | The travel itinerary per rep | Non-destructive preview |
 |---|---|
 | ![AI coverage itinerary on map](docs/images/planning-ai-suggestion-itinerary.png) | ![Suggestion mode banner](docs/images/planning-ai-suggestion.png) |
 
-Ask in plain English ("send a senior rep to Money20/20 and optimize travel for the whole team") and
-the AI proposes a full year-long allocation. The split is the same hybrid stance as scoring:
-**the AI proposes assignments + reasoning; deterministic code disposes** — it injects locked
-committed tickets, drops any double-booking, enforces per-rep capacity, and computes the trip
-clusters and stats. The result opens in a **non-destructive Suggestion Mode**:
-an unmissable "you're viewing a draft — your real commitments are unchanged" banner, a numbered
-per-rep travel route on the map, and an "exit preview" out. Drafts persist, so they're shareable
-by URL.
+This is the single **most time-saving, highest-leverage** AI feature in the product. Planning a
+whole team's conference year by hand is hours of fiddly spreadsheet work — who goes where, honoring
+committed tickets, never double-booking a rep, clustering trips to cut travel cost, and balancing
+coverage across regions and quarters. Here a sales lead just **asks in plain English** ("send a
+senior rep to Money20/20 and optimize travel for the whole team") and gets a complete, validated,
+year-long allocation in seconds.
+
+What makes it genuinely unique is that it's **not a single button — it's unlimited AI plans from
+custom prompts.** Generate as many as you like, each from a different instruction — *"minimize total
+travel," "maximize T1 coverage in APAC," "cap everyone at four trips"* — and compare the drafts side
+by side; each is saved and shareable by URL. That turns conference planning from a one-shot guess
+into an interactive what-if tool.
+
+The engineering is the same hybrid stance as our scoring engine: **the AI proposes assignments +
+reasoning; deterministic code disposes** — it locks committed tickets, drops any double-booking,
+enforces per-rep capacity, and computes the trip clusters and stats, so the AI can never produce an
+impossible plan. Each draft opens in a **non-destructive Suggestion Mode** — an unmissable "you're
+viewing a draft, your real commitments are unchanged" banner, a numbered per-rep travel route on
+the map, and a one-click exit.
+
+---
+
+### The supporting AI features
+
+Genuinely useful, but secondary — each a candidate to dial up or down based on how a team weighs its
+value against its cost:
+
+| Feature | Model | Why AI (and not a rule) |
+|---|---|---|
+| **Lead-qualification (ICP fit) scoring** | Claude Haiku | Judging "is this a Grain-fit company *and* the right person" from a sparse note needs world knowledge + inference; returns *Unclear* when the note is too thin rather than guessing. |
+| **Relationship-arc summarizer** | Claude Sonnet | Reads a whole multi-event history → a verdict + open threads + next move. Reading-between-the-lines synthesis, not arithmetic on a counter. |
+| **Cross-conference match adjudication** | Claude Haiku / Sonnet | Deciding if "Elena Fisher @ Adyen" is "Elena Fischer @ Adyen" *with a confidence* is fuzzy reasoning a `==` can't do. |
+| **ICP conference scoring** | Claude Sonnet | Estimating the fuzzy factors (how ICP-dense is this event?) is research + judgment; the deterministic formula then makes the score transparent and tunable. |
+| **AI conference discovery** | Claude Sonnet | "Find ICP-fit events we don't already know about" — open-ended discovery, the brief's own example. |
+
+**AI conference discovery** is worth a quick look, since it's the example the brief itself names:
+
+![AI conference discovery results](docs/images/planning-discover.png)
+
+Type a natural-language brief ("cross-border payments & treasury events in APAC") and it returns
+real events **not already in your database**, each **auto-scored with the same ICP engine** and a
+one-line rationale tied to Grain's ICP ("a direct match for Grain's embedded FX risk product"); it
+even flags events you already track ("Already excluded — skip"). One click adds an event, fully
+scored.
 
 > **Graceful degradation everywhere.** Every AI feature has a labeled mock/heuristic fallback so
 > the app stays fully demoable with **no API keys configured** — discovery returns real sample
@@ -411,7 +460,14 @@ The brief says it grades five things, not code in isolation. Directly:
   applied across scoring, matching, lead-qual, and coverage planning. AI is used where there's
   genuine synthesis/judgment (parsing speech, reading an arc, finding unknown events) and
   deliberately *not* used where a formula is more honest (turning factors into a score, enforcing
-  no-double-booking). Cheap models for high volume, strong models for the hard calls.
+  no-double-booking). Cheap models for high volume, strong models for the hard calls. The two
+  features that best embody this are deliberately the most prominent:
+  [**Voice → structured lead**](#-core-feature-1--voice--structured-lead-the-field-reps-backbone) —
+  AI placed at the exact moment of rep friction, capturing rich data from a ten-second voice note —
+  and [**AI coverage planning**](#-core-feature-2--ai-coverage-planning-the-biggest-time-saver) —
+  the biggest time-saver, generating unlimited prompt-driven team plans while deterministic code
+  guarantees every plan is actually valid. The other five are intentionally framed as tunable
+  value-vs-cost additions, not pillars.
 
 - **Cross-conference intelligence — "robust matching… useful interpretation, not just a count?"**
   Two-stage matching (fuzzy retrieval → LLM adjudication with confidence), an Encounter/Contact
