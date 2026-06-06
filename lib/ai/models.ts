@@ -7,8 +7,8 @@ import { getServiceKey, MissingServiceKeyError } from '@/lib/config/getServiceKe
 // Model IDs — aliases resolve to the newest dated release. Verify against the current model list
 // if a call 404s (model IDs change). Tiering per plans/tech/00-tech-foundation.md §4.
 export const MODELS = {
-  HAIKU: 'claude-haiku-4.5', // cheap/high-volume: parse(+fit), match adjudication
-  SONNET: 'claude-sonnet-4.6', // rich: briefing/arc, discovery, follow-up emails, conference scoring
+  HAIKU: 'claude-haiku-4-5', // cheap/high-volume: parse(+fit), match adjudication
+  SONNET: 'claude-sonnet-4-6', // rich: briefing/arc, discovery, follow-up emails, conference scoring
 } as const;
 
 /** A Claude model bound to the configured Anthropic key. */
