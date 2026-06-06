@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
-import { Fingerprint } from 'lucide-react';
+import Link from 'next/link';
+import { Fingerprint, Radio } from 'lucide-react';
 import { OverviewTab } from '@/components/planning/OverviewTab';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageView } from '@/components/planning/CoverageView';
@@ -48,10 +49,19 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
             </div>
           </div>
 
-          {/* Conference count */}
-          <span className="text-xs text-text3 hidden sm:block">
-            {conferences.length} conferences
-          </span>
+          {/* Conference count + field app CTA */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-text3 hidden sm:block">
+              {conferences.length} conferences
+            </span>
+            <Link
+              href="/capture"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent text-black hover:bg-accent/90 transition-colors"
+            >
+              <Radio size={12} strokeWidth={2.25} />
+              In-Field App
+            </Link>
+          </div>
         </div>
 
         {/* Tab bar */}
@@ -107,8 +117,6 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
             conferences={conferences}
             coverage={coverage}
             gap={gap}
-            repId={repId}
-            repName={repName}
           />
         )}
         {tab === 'Relationships' && <RelationshipList rows={relationships} />}

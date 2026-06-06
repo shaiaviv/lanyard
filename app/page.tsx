@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// Root → field capture (primary experience)
+// Root → planning hub (primary experience)
 export default function RootPage() {
-  redirect('/capture');
+  redirect('/planning');
 }

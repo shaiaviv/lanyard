@@ -33,14 +33,10 @@ export function CoverageView({
   conferences,
   coverage,
   gap,
-  repId,
-  repName,
 }: {
   conferences: Conference[];
   coverage: CoverageRow[];
   gap: GapAnalysis;
-  repId: string;
-  repName: string;
 }) {
   const [view, setView] = useState<'timeline' | 'map'>('timeline');
 
@@ -108,7 +104,7 @@ export function CoverageView({
       </div>
 
       {view === 'timeline' ? (
-        <CoverageTimeline conferences={conferences} coverage={coverage} repId={repId} repName={repName} />
+        <CoverageTimeline conferences={conferences} coverage={coverage} />
       ) : (
         <>
           <CoverageMap conferences={conferences} committedByConf={committedByConf} />
