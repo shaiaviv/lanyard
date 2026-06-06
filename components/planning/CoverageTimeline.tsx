@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { MapPin, Users, AlertTriangle } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 import type { Conference } from '@/lib/types';
 import type { CoverageRow } from '@/lib/db/queries';
 import { Legend } from '@/components/planning/Legend';
@@ -66,10 +66,6 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   // backlog, hidden by default and revealed per-tier via the toggles.
   const isCovered = (id: string) => committedConfIds.has(id) || consideringConfIds.has(id);
 
-  // Under-invested alert — T1 (must-cover) events with no committed rep. T2/T3 excluded on purpose:
-  // the nudge is the short list of events the team genuinely can't afford to skip.
-  const uncoveredPriority = upcoming.filter((c) => c.tier === 'T1' && !committedConfIds.has(c.id));
-
   // Counts for the include-uncovered toggles.
   const uncoveredCount = (t: Tier) =>
     upcoming.filter((c) => c.tier === t && !isCovered(c.id)).length;
@@ -87,82 +83,10 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   }
   const months = [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b));
 
-  // Clustering opportunities — computed over ALL upcoming events (a discovery nudge that's
-  // independent of current coverage or the calendar's tier toggles).
-  const monthAll = new Map<string, Conference[]>();
-  for (const conf of upcoming) {
-    const key = conf.startDate ? monthKey(conf.startDate) : 'unknown';
-    if (!monthAll.has(key)) monthAll.set(key, []);
-    monthAll.get(key)!.push(conf);
-  }
-  const clusters: Record<string, { region: string; confs: Conference[] }> = {};
-  for (const [key, confs] of monthAll) {
-    const regionGroups = new Map<string, Conference[]>();
-    for (const c of confs) {
-      const r = c.region ?? c.country ?? 'Unknown';
-      if (!regionGroups.has(r)) regionGroups.set(r, []);
-      regionGroups.get(r)!.push(c);
-    }
-    for (const [region, rConfs] of regionGroups) {
-      if (rConfs.length >= 2) clusters[`${key}-${region}`] = { region, confs: rConfs };
-    }
-  }
-
   const anyUncoveredShown = uncoveredTiers.size > 0;
 
   return (
     <div className="space-y-6">
-      {/* Under-invested alert — T1 (must-cover) events with no committed rep */}
-      {uncoveredPriority.length > 0 && (
-        <div
-          className="rounded-xl p-4"
-          style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}
-        >
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle size={14} className="text-warn flex-shrink-0" />
-            <span className="text-sm font-semibold text-warn">
-              {uncoveredPriority.length} T1 event{uncoveredPriority.length !== 1 ? 's' : ''} without coverage
-            </span>
-          </div>
-
-          <div className="space-y-0.5">
-            {uncoveredPriority.map((c) => {
-              const date = c.startDate
-                ? new Date(c.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })
-                : null;
-              const meta = [c.location, date].filter(Boolean).join(' · ');
-              return (
-                <div key={c.id} className="flex items-center gap-2.5 py-0.5 text-xs" style={{ color: 'rgba(245,158,11,0.85)' }}>
-                  <span className="font-bold w-5 flex-shrink-0">T1</span>
-                  <span className="flex-1 min-w-0 truncate font-medium">{c.name}</span>
-                  {meta && <span className="flex-shrink-0" style={{ color: 'rgba(245,158,11,0.5)' }}>{meta}</span>}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Clustering opportunities */}
-      {Object.values(clusters).length > 0 && (
-        <div
-          className="rounded-xl p-4 space-y-2"
-          style={{ background: 'rgba(96,165,250,0.05)', border: '1px solid rgba(96,165,250,0.12)' }}
-        >
-          <p className="text-sm font-semibold text-blue-400">Trip clustering opportunities</p>
-          <p className="text-xs text-blue-400/60">
-            Same region, same month — one trip could cover multiple events:
-          </p>
-          {Object.entries(clusters).map(([key, { region, confs: clusterConfs }]) => (
-            <div key={key} className="text-xs text-blue-400/70 mt-1">
-              <span className="font-semibold">{region}:</span>{' '}
-              {clusterConfs.map((c) => c.name).join(' · ')}
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Full calendar */}
       <div className="space-y-4">
         <div className="space-y-2">
