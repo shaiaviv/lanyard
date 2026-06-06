@@ -46,21 +46,27 @@ export default function CoverageMap({
     let itineraryConfs: { conf: Conference; order: number; locked: boolean }[] = [];
 
     if (suggestion) {
+      // Sort by original order (chronological), keep only mapped stops, then renumber 1..N.
+      // The original a.order can have gaps (unmapped stops were numbered too), so renumber
+      // after filtering — otherwise the map shows "2, 4, 5" instead of "1, 2, 3".
       const repAssignments = suggestion.assignments
         .filter((a) => a.repId === repId)
         .sort((a, b) => a.order - b.order);
 
       itineraryConfs = repAssignments
-        .map((a) => {
+        .flatMap((a) => {
           const conf = located.find((c) => c.id === a.conferenceId);
-          if (!conf) return null;
-          return { conf, order: a.order, locked: a.locked };
-        })
-        .filter(Boolean) as typeof itineraryConfs;
+          return conf ? [{ conf, order: 0 /* renumbered below */, locked: a.locked }] : [];
+        });
+
+      // Renumber sequentially now that unmapped stops are gone
+      itineraryConfs.forEach((s, i) => { s.order = i + 1; });
     } else {
-      // Real mode: all assigned conferences for this rep, sorted by date.
+      // Real mode: conferences where THIS specific rep is committed/suggested, sorted by date.
+      // committedByConf values are rep names, so resolve repId → name first.
+      const repName = reps?.find((r) => r.id === repId)?.name ?? repId;
       const assigned = located
-        .filter((c) => (committedByConf[c.id] ?? []).length > 0)
+        .filter((c) => (committedByConf[c.id] ?? []).includes(repName))
         .sort((a, b) => (a.startDate ?? '').localeCompare(b.startDate ?? ''));
       itineraryConfs = assigned.map((conf, i) => ({ conf, order: i + 1, locked: true }));
     }
