@@ -246,8 +246,9 @@ say them.
 **🎬 RECORD:** Avatar talking head. End card with the live URL + repo link.
 
 **🎙️ NARRATION:**
-> That's Lanyard: built for the people who actually run conferences, the rep capturing leads on the floor
-> and the lead planning the whole year, not for a database. The live app and full source are linked
+> That's Lanyard: built for the sales team that turns conferences into pipeline, the rep capturing leads
+> on the floor and the lead planning the whole year, not for a database. The live app and full source are
+> linked
 > below, and for the full detail on how and why everything was built the way it is, please check out the
 > README. I'm Shai Aviv. Thanks for watching, and I'd love to talk about it.
 
