@@ -952,3 +952,16 @@ backfilling exact 2027 dates as organizers announce them (many marked dates_esti
 
 **AI-collab note:** parallel fan-out turned a long linear research slog into ~4 min wall-clock;
 the leverage was forcing structured factor output + a single deterministic scoring pass.
+
+- [HH:MM] **Dev-server OOM — real fix, not a band-aid.** `next dev` kept dying with V8
+  "heap out of memory" (~8GB). Prior fix (commit bc50062) just bumped `--max-old-space-size`
+  to 8GB — a ceiling raise, which can't stop an *unbounded* grower. Traced with live RSS
+  sampling: idle RSS flat (no timer leak), per-request middleware path plateaus, app code
+  bounded/GC-able (`saveScoringWeights` is save-on-click not on-drag), Supabase SSR clients
+  force `autoRefreshToken:false`. Conclusion: it's **Turbopack dev** accumulating memory while
+  repeatedly re-rendering the heavy authenticated `/planning` route (every planning action
+  `revalidatePath('/planning')`), aggravated by running on **Node 25.7** (non-LTS, unsupported
+  by Next 16). Fix: dev script → `next dev --webpack` (memory stays flat over long sessions),
+  heap cap right-sized 8192→4096, pinned Node via `.nvmrc=24` + `engines: <25`. Webpack baseline
+  1069MB vs Turbopack 1275MB. Production (Vercel `next start`) was never affected. Build script
+  left on Turbopack+8GB (separate concern, not the reported failure).
