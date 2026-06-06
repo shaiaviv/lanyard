@@ -1,40 +1,26 @@
 'use client';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import type { SuggestionDraft, SuggestionStats } from '@/lib/types';
+import { ChevronDown } from 'lucide-react';
+import type { SuggestionDraft } from '@/lib/types';
 
-function StatBar({ covered, total }: { covered: number; total: number }) {
+function StatBar({ label, covered, total }: { label: string; covered: number; total: number }) {
   const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
-  const tone = pct === 0 ? 'bg-warn' : pct < 50 ? 'bg-amber-400' : 'bg-success';
+  const toneClass = pct === 0 ? 'bg-warn' : pct < 50 ? 'bg-amber-400' : 'bg-success';
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1 rounded-full bg-white/6 overflow-hidden">
-        <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs text-text3">{label}</span>
+        <span className="text-xs tabular-nums">
+          <span className="text-text2 font-semibold">{covered}</span>
+          <span className="text-text3">/{total}</span>
+        </span>
       </div>
-      <span className="text-[11px] text-text3 tabular-nums w-8 text-right">{covered}/{total}</span>
-    </div>
-  );
-}
-
-function StatsPanel({ stats }: { stats: SuggestionStats }) {
-  return (
-    <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-xs">
-      <div>
-        <p className="text-text3 mb-1.5">T1 coverage</p>
-        <StatBar covered={stats.t1Covered} total={stats.t1Total} />
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <div
+          className={`h-full rounded-full ${toneClass}`}
+          style={{ width: `${pct}%`, transition: 'width 0.5s cubic-bezier(0.16,1,0.3,1)' }}
+        />
       </div>
-      <div>
-        <p className="text-text3 mb-1.5">T2 coverage</p>
-        <StatBar covered={stats.t2Covered} total={stats.t2Total} />
-      </div>
-      <div className="col-span-2">
-        <p className="text-text3 mb-1">ICP-weighted coverage <span className="text-text2 font-semibold">{stats.icpWeightedCoverage}%</span></p>
-      </div>
-      {stats.clustersFormed > 0 && (
-        <div className="col-span-2">
-          <p className="text-text3">Trip clusters formed <span className="text-accent font-semibold">{stats.clustersFormed}</span></p>
-        </div>
-      )}
     </div>
   );
 }
@@ -43,53 +29,99 @@ export function SuggestionSummary({ draft, reps }: { draft: SuggestionDraft; rep
   const [open, setOpen] = useState(true);
   const repName = (id: string) => reps.find((r) => r.id === id)?.name ?? id;
 
+  const t1Pct = draft.stats.t1Total > 0
+    ? Math.round((draft.stats.t1Covered / draft.stats.t1Total) * 100)
+    : 0;
+
   return (
     <div
-      className="rounded-xl border mb-4 overflow-hidden"
-      style={{ background: 'rgba(244,168,37,0.03)', border: '1px solid rgba(244,168,37,0.14)' }}
+      className="rounded-xl overflow-hidden"
+      style={{ background: 'rgba(244,168,37,0.03)', border: '1px solid rgba(244,168,37,0.15)' }}
     >
-      {/* Header row */}
+      {/* Header */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/2 transition-colors"
+        className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-white/2 transition-colors"
       >
-        <span className="text-sm font-semibold text-text1">Suggestion rationale</span>
-        {open ? <ChevronUp size={14} className="text-text3" /> : <ChevronDown size={14} className="text-text3" />}
+        <span className="text-sm font-semibold text-text1 flex-1">Suggestion rationale</span>
+
+        {/* Preview stats visible only when collapsed */}
+        {!open && (
+          <div className="flex items-center gap-3 mr-1">
+            <span className="text-[11px] text-text3 tabular-nums">
+              T1 <span className="text-accent font-semibold">{t1Pct}%</span>
+            </span>
+            {draft.stats.clustersFormed > 0 && (
+              <span className="text-[11px] text-text3 tabular-nums">
+                {draft.stats.clustersFormed} cluster{draft.stats.clustersFormed !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+        )}
+
+        <ChevronDown
+          size={14}
+          className="text-text3 flex-shrink-0 transition-transform duration-200"
+          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
       </button>
 
-      {open && (
-        <div className="px-4 pb-4 space-y-4">
-          {/* Stats */}
-          <StatsPanel stats={draft.stats} />
+      {/* Animated body */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: open ? '1fr' : '0fr',
+          transition: 'grid-template-rows 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        <div style={{ overflow: 'hidden' }}>
+          <div className="border-t border-white/6 px-4 pt-4 pb-4 space-y-4">
 
-          {/* Rationale text */}
-          <div>
-            <p className="text-[11px] text-text3 font-semibold mb-1.5">AI reasoning</p>
-            <p className="text-sm text-text2 leading-relaxed">{draft.rationale}</p>
-          </div>
+            {/* Coverage stats */}
+            <div className="space-y-3">
+              <StatBar label="T1 coverage" covered={draft.stats.t1Covered} total={draft.stats.t1Total} />
+              <StatBar label="T2 coverage" covered={draft.stats.t2Covered} total={draft.stats.t2Total} />
+              <div className="flex items-center justify-between pt-0.5">
+                <span className="text-xs text-text3">ICP-weighted coverage</span>
+                <span className="text-sm font-semibold text-text2 tabular-nums">{draft.stats.icpWeightedCoverage}%</span>
+              </div>
+              {draft.stats.clustersFormed > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-text3">Trip clusters formed</span>
+                  <span className="text-sm font-semibold text-accent tabular-nums">{draft.stats.clustersFormed}</span>
+                </div>
+              )}
+            </div>
 
-          {/* Per-rep notes */}
-          {draft.perRepNotes.length > 0 && (
-            <div>
-              <p className="text-[11px] text-text3 font-semibold mb-1.5">Per-rep notes</p>
-              <div className="space-y-1.5">
+            {/* Rationale */}
+            {draft.rationale && (
+              <div className="border-t border-white/6 pt-4">
+                <p className="text-sm text-text2 leading-relaxed">{draft.rationale}</p>
+              </div>
+            )}
+
+            {/* Per-rep notes */}
+            {draft.perRepNotes.length > 0 && (
+              <div className="border-t border-white/6 pt-4 space-y-3">
                 {draft.perRepNotes.map((n) => (
-                  <div key={n.repId} className="text-xs text-text2">
-                    <span className="font-semibold text-text1">{repName(n.repId)}: </span>
-                    {n.note}
+                  <div key={n.repId}>
+                    <p className="text-xs font-semibold text-text1 mb-0.5">{repName(n.repId)}</p>
+                    <p className="text-xs text-text2 leading-relaxed">{n.note}</p>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Snapshot info */}
-          <p className="text-[10px] text-text3">
-            Snapshot generated against {draft.conferenceCount} conferences ·{' '}
-            {draft.source === 'heuristic' ? 'Non-AI (heuristic) allocation' : 'AI-generated allocation'}
-          </p>
+            {/* Metadata footer */}
+            <div className="border-t border-white/6 pt-3 flex items-center justify-between">
+              <span className="text-[10px] text-text3">{draft.conferenceCount} conferences</span>
+              <span className="text-[10px] text-text3">
+                {draft.source === 'heuristic' ? 'Heuristic allocation' : 'AI-generated'}
+              </span>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
