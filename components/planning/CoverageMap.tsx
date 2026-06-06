@@ -26,10 +26,15 @@ function numberedIcon(order: number, locked: boolean, offset: [number, number] =
 
 function dateRange(conf: Conference): string {
   if (!conf.startDate) return 'Date TBD';
-  const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
   const start = fmt(conf.startDate);
   if (!conf.endDate || conf.endDate === conf.startDate) return start;
-  return `${start} – ${fmt(conf.endDate)}`;
+  // Only repeat the year on the end date if it differs from the start
+  const sameYear = conf.startDate.slice(0, 4) === conf.endDate.slice(0, 4);
+  const endFmt = sameYear
+    ? new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+    : fmt(conf.endDate);
+  return `${start} – ${endFmt}`;
 }
 
 const coordKey = (lat: number, lng: number) => `${lat.toFixed(4)},${lng.toFixed(4)}`;
