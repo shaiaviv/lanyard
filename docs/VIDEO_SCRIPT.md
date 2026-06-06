@@ -246,9 +246,9 @@ say them.
 **🎬 RECORD:** Avatar talking head. End card with the live URL + repo link.
 
 **🎙️ NARRATION:**
-> That's Lanyard: built for the rep on the floor, not for a database. The live app and full source,
-> including that decision journal, are linked below. I'm Shai Aviv. Thanks for watching, and I'd love to
-> talk about it.
+> That's Lanyard: built for the rep on the floor, not for a database. The live app and full source are
+> linked below, and for the full detail on how and why everything was built the way it is, please check
+> out the README. I'm Shai Aviv. Thanks for watching, and I'd love to talk about it.
 
 ---
 
