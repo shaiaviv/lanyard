@@ -56,17 +56,6 @@ experiences**, each built for a different moment in the conference lifecycle:
   year-long team coverage on a timeline **and** a map, cross-conference relationship intelligence,
   AI coverage planning, AI event discovery, and a curated push into HubSpot.
 
-Two principles run through all three (and explain most of the design decisions below):
-
-> **P1 — Be generous with hints, strict with records.** Inform freely on the floor (a wrong hint
-> is harmless and the rep shrugs it off); only *commit* data you're sure of (a wrong record is
-> corrosive — it kills trust and the tool dies). This is why capture and commit are separate
-> surfaces.
->
-> **P2 — Keep the source, not just the derivation.** Retain the raw input, not only the AI's
-> parse. You can always re-derive from the source; you can never recover the source from a lossy
-> derivation.
-
 ---
 
 ## How it maps to the brief
@@ -133,7 +122,9 @@ fit, and runs the cross-conference matcher — all in the background. Nothing bl
 
 ### 🔵 RECONCILE — turn maybes into confident records
 
-This is **P1 made literal.** Field is fast and forgiving; Reconcile is slow and strict. The day's
+Field is fast and forgiving; Reconcile is slow and strict — because a wrong hint on the floor is
+harmless (the rep shrugs it off), but a wrong *committed record* is corrosive (it kills trust and
+the tool dies). That's why capture and commit are deliberately separate surfaces. The day's
 uncertain captures land in an inbox, and the rep resolves them one at a time with full context.
 
 | The inbox | The resolve card |
@@ -340,7 +331,7 @@ judgment over messy, unstructured input — not something a rule or a form could
 | # | Feature | Model | Why AI (and not a rule) |
 |---|---|---|---|
 | 1 | **Voice → structured lead** | Groq Whisper + Claude Haiku | Free-speech on a loud floor → name/company/title/topics/temperature. No form is fast enough to fill while talking; extraction from natural language is the whole point. |
-| 2 | **Lead-qualification (ICP fit) scoring** | Claude Haiku | Judging "is this a Grain-fit company *and* the right person" from a sparse note needs world knowledge + inference, and returns *Unclear* when the note is too thin (P1). |
+| 2 | **Lead-qualification (ICP fit) scoring** | Claude Haiku | Judging "is this a Grain-fit company *and* the right person" from a sparse note needs world knowledge + inference, and returns *Unclear* when the note is too thin (rather than guessing). |
 | 3 | **Relationship-arc summarizer** | Claude Sonnet | Reads a whole multi-event history and produces a verdict + open threads + next move. This is reading-between-the-lines synthesis, not arithmetic on a counter. |
 | 4 | **Cross-conference match adjudication** | Claude Haiku (floor) / Sonnet (reconcile) | Deciding if "Elena Fisher @ Adyen" is "Elena Fischer @ Adyen" with a confidence is fuzzy reasoning a `==` can't do. |
 | 5 | **ICP conference scoring** | Claude Sonnet | Estimating the fuzzy factors (how ICP-dense is this event?) is research + judgment; the deterministic formula then makes the score transparent and tunable. |
@@ -361,7 +352,7 @@ database, fully scored.
 
 ### AI coverage planning (Suggestion Mode)
 
-| The travel itinerary per rep | Non-destructive preview (P1) |
+| The travel itinerary per rep | Non-destructive preview |
 |---|---|
 | ![AI coverage itinerary on map](docs/images/planning-ai-suggestion-itinerary.png) | ![Suggestion mode banner](docs/images/planning-ai-suggestion.png) |
 
@@ -369,7 +360,7 @@ Ask in plain English ("send a senior rep to Money20/20 and optimize travel for t
 the AI proposes a full year-long allocation. The split is the same hybrid stance as scoring:
 **the AI proposes assignments + reasoning; deterministic code disposes** — it injects locked
 committed tickets, drops any double-booking, enforces per-rep capacity, and computes the trip
-clusters and stats. The result opens in a **non-destructive Suggestion Mode** (P1 made literal):
+clusters and stats. The result opens in a **non-destructive Suggestion Mode**:
 an unmissable "you're viewing a draft — your real commitments are unchanged" banner, a numbered
 per-rep travel route on the map, and an "exit preview" out. Drafts persist, so they're shareable
 by URL.
@@ -447,7 +438,7 @@ one repo, one SQL file, push-to-deploy.
 | Layer | Choice | Why |
 |---|---|---|
 | **Framework** | Next.js 16 (App Router) on **Vercel** | Server Components + Server Actions; zero-config deploy; push `main` → live. |
-| **Backend** | **Supabase** (Postgres + Auth + Storage + Realtime) | One service covers DB, team auth, raw-audio storage (P2), and shared-memory realtime. |
+| **Backend** | **Supabase** (Postgres + Auth + Storage + Realtime) | One service covers DB, team auth, raw-audio storage (keep the original recording, not just the AI's parse), and shared-memory realtime. |
 | **AI** | **Vercel AI SDK v6** + **Claude** (Haiku 4.5 + Sonnet 4.6) | Haiku for high-volume parse / match / fit; Sonnet for briefing / scoring / discovery / planning. Structured output via `generateText` + `Output.object` with **Zod 4** contracts. |
 | **Voice** | Browser **Web Speech API** (free, keyless) **or** **Groq Whisper Large v3 Turbo** (server-side) | Two transcription paths; both feed the same parse pipeline. |
 | **Maps** | **react-leaflet** + Carto dark OSM tiles | Keyless — no extra API key to host. |
@@ -458,7 +449,7 @@ one repo, one SQL file, push-to-deploy.
 → enrich → match → draft → review → commit`. It's optimistic and asynchronous — **the rep never
 waits on it** — and every stage degrades gracefully (parse fail → manual form; no enrichment key →
 skip; zero match candidates → skip the LLM). The **commit** (writing the record) is always a
-separate, deliberate step (P1).
+separate, deliberate step.
 
 ```
 app/                     Next.js routes — (field) · (reconcile) · (planning) route groups + server actions
@@ -577,6 +568,11 @@ way · and what I'd build next.
 
 ## What I'd build next
 
+- **Most importantly — put it in front of the actual Grain sales team and listen.** Everything below
+  is *my* hypothesis about what reps need. Before building more, I'd sit with the people who live on
+  show floors, watch them use it, and collect real feedback on what works, what gets in the way, and
+  what they'd actually find useful — then let that reprioritize this whole list. A product is only as
+  valuable as the value it delivers to its real users; the roadmap should be driven by them, not by me.
 - **Close the HubSpot loop (two-way).** Today the push is one-way. Next: read back "already a
   customer / open deal?" so the field briefing can warn a rep before they pitch an existing account.
 - **Live enrichment in the field.** Wire a real provider (Clay / Apollo / PDL) behind the existing
