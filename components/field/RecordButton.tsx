@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, Square, MicOff, Loader2 } from 'lucide-react';
+import { Mic, Square, MicOff } from 'lucide-react';
 
 interface RecordButtonProps {
   onAudioReady: (blob: Blob) => void;

@@ -42,6 +42,11 @@
 html {
   color-scheme: dark;
   background: #07090F;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 button:not(:disabled), a, [role="button"], select, label[for], summary {
@@ -107,8 +112,9 @@ textarea.input-dark {
 }
 
 @keyframes ring-out {
-  0%   { transform: scale(1); opacity: 0.45; }
-  100% { transform: scale(2.6); opacity: 0; }
+  0%   { transform: scale(1);    opacity: 0; }
+  10%  { transform: scale(1.05); opacity: 0.4; }
+  100% { transform: scale(1.5);  opacity: 0; }
 }
 
 .record-idle   { background: #F4A825; animation: ambient-glow 3s ease-in-out infinite; }
