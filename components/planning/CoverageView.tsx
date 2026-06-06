@@ -9,6 +9,7 @@ import { GenerateSuggestionButton } from '@/components/planning/GenerateSuggesti
 import { SuggestionsList } from '@/components/planning/SuggestionsList';
 import type { Conference, Rep, CoverageSuggestion } from '@/lib/types';
 import type { CoverageRow, GapAnalysis } from '@/lib/db/queries';
+import type { SuggestionToastState } from '@/components/planning/SuggestionToast';
 import { computeGapSummary } from '@/lib/scoring/gapAnalysis';
 
 const CoverageMap = dynamic(() => import('@/components/planning/CoverageMap'), {
@@ -40,6 +41,8 @@ export function CoverageView({
   reps,
   activeSuggestion,
   suggestions,
+  onToastUpdate,
+  isGenerating,
 }: {
   conferences: Conference[];
   coverage: CoverageRow[];
@@ -47,6 +50,8 @@ export function CoverageView({
   reps: Rep[];
   activeSuggestion?: CoverageSuggestion | null;
   suggestions?: CoverageSuggestion[];
+  onToastUpdate: (state: SuggestionToastState) => void;
+  isGenerating: boolean;
 }) {
   const [view, setView] = useState<'timeline' | 'map'>('timeline');
   const [repFilter, setRepFilter] = useState<string>('all');
@@ -94,7 +99,7 @@ export function CoverageView({
       {/* Generate + past suggestions — top of view in real mode */}
       {!isSuggestionMode && (
         <div className="space-y-3">
-          <GenerateSuggestionButton />
+          <GenerateSuggestionButton onToastUpdate={onToastUpdate} isGenerating={isGenerating} />
           {suggestions && suggestions.length > 0 && (
             <SuggestionsList suggestions={suggestions} />
           )}

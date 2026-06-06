@@ -1,7 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Fingerprint, Radio, Settings } from 'lucide-react';
+import { SuggestionToast } from '@/components/planning/SuggestionToast';
+import type { SuggestionToastState } from '@/components/planning/SuggestionToast';
 import { OverviewTab } from '@/components/planning/OverviewTab';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageView } from '@/components/planning/CoverageView';
@@ -32,6 +34,10 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
   // Suggestion Mode forces the Coverage tab; switching tabs exits suggestion mode visually but
   // the URL still has suggestionId — the banner + exit link handle the escape.
   const [tab, setTab] = useState<Tab>(activeSuggestion ? 'Coverage' : 'Overview');
+  const [toastState, setToastState] = useState<SuggestionToastState | null>(null);
+  const handleToastUpdate = useCallback((state: SuggestionToastState) => setToastState(state), []);
+  const handleToastDismiss = useCallback(() => setToastState(null), []);
+  const isGenerating = toastState?.status === 'running';
 
   useEffect(() => {
     if (activeSuggestion) setTab('Coverage');
@@ -136,11 +142,17 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
             reps={reps}
             activeSuggestion={activeSuggestion}
             suggestions={suggestions}
+            onToastUpdate={handleToastUpdate}
+            isGenerating={isGenerating}
           />
         )}
         {tab === 'Relationships' && <RelationshipList rows={relationships} />}
         {tab === 'Follow-ups' && <FollowUpQueue followUps={followUps} repId={repId} />}
       </div>
+
+      {toastState && (
+        <SuggestionToast state={toastState} onDismiss={handleToastDismiss} />
+      )}
     </div>
   );
 }
