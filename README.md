@@ -6,6 +6,15 @@
 > *capture* leads on the show floor, *recognize* relationships that build across events, and
 > *sync* the qualified ones into HubSpot.
 
+## 🎥 Demo video - start here
+
+**▶️ [Watch the full walkthrough](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/0606.mov)** - a
+5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
+logic and why I chose it, how I approached cross-conference contact tracking (including the edge cases),
+how I used AI to build this and where it helped vs. got in the way, and what I'd build next.
+
+---
+
 **A lanyard holds your badge - your identity on the show floor.** This tool is about that
 identity: recognizing who you met, across events, and acting on the relationships that develop.
 
@@ -14,7 +23,7 @@ identity: recognizing who you met, across events, and acting on the relationship
 | 🔗 **Live app** | **https://grain-sooty.vercel.app** |
 | 🔑 **Demo login** | `demo@grain.com` · `LanyardDemo!2026` |
 | 💻 **Source** | https://github.com/shaiaviv/lanyard |
-| 🎥 **Video walkthrough** | _[see the Demo Video section below](#-demo-video)_ |
+| 🎥 **Video walkthrough** | **[Watch the 5-10 min walkthrough](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/0606.mov)** |
 
 The live app comes pre-seeded with **190 real, web-researched conferences**, a 6-person sales
 team with deliberate coverage gaps, and 20 contacts (10 of them recurring across multiple events,
@@ -36,8 +45,7 @@ log in.
 9. [Architecture & tech stack](#architecture--tech-stack)
 10. [How I worked with AI to build this](#how-i-worked-with-ai-to-build-this)
 11. [Run it locally / deploy your own](#run-it-locally--deploy-your-own)
-12. [Demo video](#-demo-video)
-13. [What I'd build next](#what-id-build-next)
+12. [What I'd build next](#what-id-build-next)
 
 ---
 
@@ -609,17 +617,6 @@ environment.** Only infra keys live in `.env`. With no service keys, every AI fe
 a labeled mock, so the app is fully explorable out of the box.
 
 **Deploy:** import the repo into Vercel, set the same env vars, and push - `main` auto-deploys.
-
----
-
-## 🎥 Demo video
-
-A 5–10 minute walkthrough covering: a live demo from a salesperson's perspective · the scoring and
-prioritization logic and why I chose it · how I approached cross-conference contact tracking
-(including the edge cases above) · how I used AI to build this and where it helped vs. got in the
-way · and what I'd build next.
-
-> **▶️ _Video link will be added here once recorded._**
 
 ---
 
