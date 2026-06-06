@@ -325,9 +325,7 @@ from each scene's 🎙️ NARRATION block, and use this **same instruction block
 scenes** — that consistency is what makes the clips read as one continuous person when intercut over
 the demo footage.
 
-> **Avatar direction:** A single presenter speaking directly to the camera, framed from the chest up
-> and centered, holding steady eye contact with the viewer. This is talking-head narration only — the
-> presenter calmly and confidently delivers the script to camera and does nothing else.
+> **Avatar direction:** A single presenter speaking directly to the camera.
 >
 > Delivery: warm, confident, and natural, like a founder personally walking someone through a product
 > they're proud of. Energy slightly up, conversational pacing, clear articulation. Subtle natural facial
