@@ -181,9 +181,12 @@ export function CoverageTimeline({ conferences, coverage, repFilter = 'all', isS
                       (repFilter === 'all' || c.repId === repFilter),
                   );
 
-                  const start = conf.startDate
-                    ? new Date(conf.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-                    : null;
+                  const fmtDate = (d: string) => {
+                    const date = new Date(d);
+                    const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    return `${day} '${String(date.getFullYear()).slice(2)}`;
+                  };
+                  const start = conf.startDate ? fmtDate(conf.startDate) : null;
 
                   const coverageStyle = covered
                     ? COVERAGE_STYLE.committed
