@@ -31,7 +31,7 @@ const TIMELINE_LEGEND = [
       },
       {
         swatch: <span className="w-4 h-3 rounded inline-block flex-shrink-0" style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.25)' }} />,
-        label: 'Priority, uncovered', labelClass: 'text-text2',
+        label: 'T1, uncovered', labelClass: 'text-text2',
       },
     ],
   },
@@ -62,11 +62,12 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
   const consideringConfIds = new Set(
     coverage.filter((c) => c.status === 'considering').map((c) => c.conferenceId),
   );
-  const uncoveredT1T2 = upcoming.filter(
-    (c) => (c.tier === 'T1' || c.tier === 'T2') && !committedConfIds.has(c.id),
+  // Under-invested = T1 (must-cover) events with no committed rep. T2 is intentionally excluded:
+  // counting T1+T2 surfaced ~135 events and drowned the signal — the nudge should be the short
+  // list of events the team genuinely can't afford to skip.
+  const uncoveredPriority = upcoming.filter(
+    (c) => c.tier === 'T1' && !committedConfIds.has(c.id),
   );
-  const t1Uncovered = uncoveredT1T2.filter((c) => c.tier === 'T1');
-  const t2Uncovered = uncoveredT1T2.filter((c) => c.tier === 'T2');
 
   const clusters: Record<string, { region: string; confs: Conference[] }> = {};
   for (const [key, confs] of byMonth) {
@@ -83,8 +84,8 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Under-invested alert */}
-      {uncoveredT1T2.length > 0 && (
+      {/* Under-invested alert — T1 (must-cover) events with no committed rep */}
+      {uncoveredPriority.length > 0 && (
         <div
           className="rounded-xl p-4"
           style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}
@@ -93,13 +94,12 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle size={14} className="text-warn flex-shrink-0" />
             <span className="text-sm font-semibold text-warn">
-              {uncoveredT1T2.length} priority event{uncoveredT1T2.length !== 1 ? 's' : ''} without coverage
+              {uncoveredPriority.length} T1 event{uncoveredPriority.length !== 1 ? 's' : ''} without coverage
             </span>
           </div>
 
-          {/* T1 group — full brightness */}
           <div className="space-y-0.5">
-            {t1Uncovered.map((c) => {
+            {uncoveredPriority.map((c) => {
               const date = c.startDate
                 ? new Date(c.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })
                 : null;
@@ -109,28 +109,6 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                   <span className="font-bold w-5 flex-shrink-0">T1</span>
                   <span className="flex-1 min-w-0 truncate font-medium">{c.name}</span>
                   {meta && <span className="flex-shrink-0" style={{ color: 'rgba(245,158,11,0.5)' }}>{meta}</span>}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Divider between T1 and T2 */}
-          {t1Uncovered.length > 0 && t2Uncovered.length > 0 && (
-            <div className="my-2.5 h-px" style={{ background: 'rgba(245,158,11,0.1)' }} />
-          )}
-
-          {/* T2 group — dimmed */}
-          <div className="space-y-0.5">
-            {t2Uncovered.map((c) => {
-              const date = c.startDate
-                ? new Date(c.startDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })
-                : null;
-              const meta = [c.location, date].filter(Boolean).join(' · ');
-              return (
-                <div key={c.id} className="flex items-center gap-2.5 py-0.5 text-xs" style={{ color: 'rgba(245,158,11,0.5)' }}>
-                  <span className="font-bold w-5 flex-shrink-0">T2</span>
-                  <span className="flex-1 min-w-0 truncate">{c.name}</span>
-                  {meta && <span className="flex-shrink-0" style={{ color: 'rgba(245,158,11,0.3)' }}>{meta}</span>}
                 </div>
               );
             })}
@@ -175,7 +153,7 @@ export function CoverageTimeline({ conferences, coverage }: Props) {
                 {confs.map((conf) => {
                   const isCovered = committedConfIds.has(conf.id);
                   const isConsidering = !isCovered && consideringConfIds.has(conf.id);
-                  const isUncoveredPriority = !isCovered && !isConsidering && (conf.tier === 'T1' || conf.tier === 'T2');
+                  const isUncoveredPriority = !isCovered && !isConsidering && conf.tier === 'T1';
 
                   const allCommitted = coverage.filter(
                     (c) => c.conferenceId === conf.id && c.status === 'committed',

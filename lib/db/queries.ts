@@ -341,8 +341,10 @@ export async function getGapAnalysis(teamId: string): Promise<GapAnalysis> {
   const upcoming = confs ?? [];
 
   const uncovered = upcoming
+    // Under-invested = T1 (must-cover) events with no committed rep. T2 is intentionally excluded:
+    // counting T1+T2 drowned the signal (~135 events) and made the nudge noise, not action.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .filter((c: any) => (c.tier === 'T1' || c.tier === 'T2') && !committed.has(c.id))
+    .filter((c: any) => c.tier === 'T1' && !committed.has(c.id))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .map((c: any) => ({ id: c.id, name: c.name, tier: c.tier, icpScore: c.icp_score, startDate: c.start_date, region: c.region }))
     .sort((a, b) => (b.icpScore ?? 0) - (a.icpScore ?? 0));

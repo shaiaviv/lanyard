@@ -965,3 +965,47 @@ the leverage was forcing structured factor output + a single deterministic scori
   heap cap right-sized 8192→4096, pinned Node via `.nvmrc=24` + `engines: <25`. Webpack baseline
   1069MB vs Turbopack 1275MB. Production (Vercel `next start`) was never affected. Build script
   left on Turbopack+8GB (separate concern, not the reported failure).
+
+## Entry 026 — 2026-06-06 — AI Coverage Suggestions — tech plan complete (Opus)
+
+(Numbered 026 to sit newest-at-bottom; the journal already has cross-session duplicate numbers, and
+the AI-Coverage-Suggestions *product*-plan note is the earlier "Entry 024" above.)
+
+Wrote `plans/tech/3b-coverage-suggestions.md` from the product plan, grounded in the live code
+(read `queries.ts`, `app/actions/planning.ts`, `schemas.ts`, `planning/page.tsx`, `PlanningHub.tsx`,
+`CoverageMap.tsx`, the migration). Three-layer design:
+
+1. **Data** — migration `0002`: `reps` += home_city/region/lat/lng + `capacity`; new
+   **`coverage_suggestions`** drafts table (prompt + `source` + validated `payload` JSONB) *isolated
+   from the `coverage` truth* (read-only guarantee, P1). Ship as a migration AND folded into
+   `setup.sql`/`gen-demo-data.mjs` (repo has no migration runner — JOURNAL 014/022).
+2. **Engine (the hybrid)** — `lib/ai/generateCoverageSuggestion.ts` (Sonnet, copies the
+   scoreConference exemplar; AI returns ONLY assignments+reasoning, NOT computed numbers) →
+   `lib/scoring/buildSuggestionDraft.ts` (pure validator: inject locked committed, drop unknown/
+   double-booked ids, enforce capacity, compute order/clusters/stats — where correctness lives) →
+   `heuristicSuggestion.ts` greedy fallback emitting the SAME shape so no-key still demos. Shared
+   `clusterTrips.ts` (time≤21d + region/≤800km) used by timeline AND map.
+3. **Read-model** — `?suggestionId=` read server-side in `page.tsx` (Next 16 async searchParams),
+   forces the Coverage tab + an unmissable banner; `CoverageView` overlays the draft as an *effective
+   CoverageRow[]* (committed + a new `suggested` display status) so the existing timeline/map/gap
+   render unchanged — ONE render path, two data sources. Extract pure `computeGapAnalysis` (refactor
+   the server query onto it) so gap recomputes over the overlaid set. Rep filter (client state) →
+   ordered numbered timeline + a `CoverageMap` **itinerary view** (L.divIcon numbered pins + Polyline
+   route + hover = name/dates/"Stop N of M").
+
+**Key decisions:** AI proposes, code disposes (AI never computes order/clusters/stats; validator owns
+every hard constraint + number — same hybrid stance as scoring/matching). Snapshot in `payload` →
+reload renders the exact draft + free staleness semantics. Build de-risk order: pure validator +
+heuristic make the feature demoable BEFORE the AI call exists (manual-path-first, like Field).
+Honored the type-boundary rule (draft types in `lib/types.ts`) + mock-fallback labeling (P1).
+
+**Both plans complete (product + tech).** Next = **implementation** (build sequence §10). Still on
+Opus; implementation is high-volume execution → likely a Sonnet handoff per the model strategy (user
+switches via `/model`).
+
+- [HH:MM] **Under-invested = T1 only (was T1+T2).** The "priority events without coverage"
+  nudge showed ~135 (T1=30 + T2=109 upcoming) — too much to act on; the brief warns an
+  over-aggressive nudge reads as noise. Scoped it to T1 (must-cover) across both counters that
+  must agree: `getGapAnalysis` (Overview card) and `CoverageTimeline` (alert + calendar
+  highlight + legend label "T1, uncovered"). Net: ~135 → ~30 actionable events. T2 still
+  appears in the full calendar, just no longer flagged under-invested.
