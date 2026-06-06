@@ -824,3 +824,24 @@ confirmed email for demo@grain.com; added the cross-conference seed (Entry 018);
 **MILESTONE: PLANNING REMEDIATION COMPLETE** — P0,P1,P2,P4,P5,P6,P7,P8 shipped (P3 cut). /planning
 is now a company-wide team hub with a real AI scoring engine, cross-conference intelligence, map +
 gaps, hardened HubSpot, AI discovery, detail + dashboard. All commits pushed (auto-deploys on main).
+
+## Entry 022 — 2026-06-06 — Conference DB expanded to 44 researched real events
+
+The brief wants a *sizable, publicly-researched* sample DB; we had only 10. Used a research subagent
+(web search, with source URLs) to compile ~43 real events, then integrated to **44 total** across
+fintech, payments, treasury/FX, cross-border, travel, and SaaS:
+- Added ~34 new real events (Money20/20 Asia, Finovate Spring/Fall/Europe 2026, Seamless x4, MPE,
+  PAY360, EBAday, EuroFinance, AFP, ACT, Nacha, Payments Canada, Hong Kong FinTech Week, MAG, FTT,
+  Africa Fintech, LEAP, ITB/WTM/ATM/Phocuswright x2/Arival, SaaStr, Slush, TechCrunch, + 2025
+  editions). Authored factor breakdowns on a consistent rubric; **icp_score/tier computed by the
+  same `computeIcpScore` formula** (so the new events use the real methodology, not hand-set scores).
+- **Corrected facts** the research surfaced on existing rows: Sibos 2026 is **Miami** (not Vienna) →
+  region Americas + geo factor adjusted; refreshed Money20/20 USA, Singapore, Web Summit, Sibos 2025
+  dates. Names unchanged so the demo coverage + cross-conf encounters still join.
+- Distribution: **T1:16 / T2:22 / T3:6** — treasury/payments-dense events top (EuroFinance 84, AFP/
+  MPE/Sibos ~79-80), broad fintech mid, travel borderline (ITB 52), generic tech bottom (Web Summit
+  48, SaaStr 44). Quality-over-headcount story holds at scale.
+- `scripts/gen-conference-seed.mjs` regenerates the `setup.sql` seed from the DB (accurate escaping);
+  seed fully regenerated, coords for all 44 (map plots every event). Demo data verified intact
+  (coverage 5/5 join, 20 encounters join, 0 unscored).
+- **Verified live in production** (grain-sooty.vercel.app): /planning shows 44, T1·16/T2·22/T3·6.
