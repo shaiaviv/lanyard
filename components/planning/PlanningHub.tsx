@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Fingerprint, Radio } from 'lucide-react';
+import { Fingerprint, Radio, Settings } from 'lucide-react';
 import { OverviewTab } from '@/components/planning/OverviewTab';
 import { ConferenceList } from '@/components/planning/ConferenceList';
 import { CoverageView } from '@/components/planning/CoverageView';
@@ -62,6 +62,14 @@ export function PlanningHub({ conferences, coverage, followUps, relationships, g
             <span className="text-xs text-text3 hidden sm:block">
               {conferences.length} conferences
             </span>
+            <Link
+              href="/settings"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-text3 border border-white/10 hover:text-text2 hover:border-white/18 transition-colors"
+              title="Settings"
+            >
+              <Settings size={12} strokeWidth={2} />
+              <span className="hidden sm:inline">Settings</span>
+            </Link>
             <Link
               href="/capture"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent text-black hover:bg-accent/90 transition-colors"

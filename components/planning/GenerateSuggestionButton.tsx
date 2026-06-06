@@ -1,6 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { generateCoverageSuggestionAction } from '@/app/actions/suggestions';
 
@@ -8,7 +9,7 @@ export function GenerateSuggestionButton() {
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; noKey?: boolean } | null>(null);
   const router = useRouter();
 
   function handleGenerate() {
@@ -16,7 +17,7 @@ export function GenerateSuggestionButton() {
     startTransition(async () => {
       const result = await generateCoverageSuggestionAction(prompt.trim() || null);
       if ('error' in result) {
-        setError(result.error);
+        setError({ message: result.error, noKey: result.noKey });
         return;
       }
       router.push(`/planning?suggestionId=${result.id}`);
@@ -45,7 +46,19 @@ export function GenerateSuggestionButton() {
             placeholder={'Optional: describe any strategic priorities\ne.g. "Send a senior rep to APAC. Keep Maya in Europe. Prioritize treasury events."'}
             className="w-full text-sm text-text2 bg-white/3 border border-white/10 rounded-lg px-3 py-2.5 resize-none placeholder:text-text3 focus:outline-none focus:border-accent/40 disabled:opacity-50"
           />
-          {error && <p className="text-xs text-warn">{error}</p>}
+          {error && (
+            <p className="text-xs text-warn">
+              {error.message}
+              {error.noKey && (
+                <>
+                  {' '}
+                  <Link href="/settings" className="underline hover:text-warn/80 transition-colors">
+                    Go to Settings →
+                  </Link>
+                </>
+              )}
+            </p>
+          )}
           <div className="flex items-center justify-between gap-3">
             <p className="text-[11px] text-text3">
               Generates a read-only draft · never modifies real coverage

@@ -6,13 +6,12 @@ import {
 } from '@/lib/db/queries';
 import { MissingServiceKeyError } from '@/lib/config/getServiceKey';
 import { generateCoverageSuggestion } from '@/lib/ai/generateCoverageSuggestion';
-import { heuristicSuggestion } from '@/lib/scoring/heuristicSuggestion';
 import { buildSuggestionDraft } from '@/lib/scoring/buildSuggestionDraft';
 import type { SuggestionEngineInput } from '@/lib/types';
 
 export async function generateCoverageSuggestionAction(
   prompt: string | null,
-): Promise<{ id: string; source: 'ai' | 'heuristic' } | { error: string }> {
+): Promise<{ id: string; source: 'ai' | 'heuristic' } | { error: string; noKey?: boolean }> {
   const me = await getCurrentRep();
   if (!me) return { error: 'Not authenticated' };
 
@@ -48,18 +47,16 @@ export async function generateCoverageSuggestionAction(
     prompt,
   };
 
-  let source: 'ai' | 'heuristic' = 'ai';
   let rawOutput;
   try {
     rawOutput = await generateCoverageSuggestion(ctx);
   } catch (err) {
-    if (err instanceof MissingServiceKeyError || err instanceof Error) {
-      rawOutput = heuristicSuggestion(ctx);
-      source = 'heuristic';
-    } else {
-      throw err;
+    if (err instanceof MissingServiceKeyError) {
+      return { error: 'No Anthropic API key configured. Add your key in Settings to use AI suggestions.', noKey: true };
     }
+    return { error: err instanceof Error ? err.message : 'AI generation failed. Please try again.' };
   }
+  const source: 'ai' | 'heuristic' = 'ai';
 
   const generatedAt = new Date().toISOString();
   const draft = buildSuggestionDraft(rawOutput, ctx, generatedAt, source);
