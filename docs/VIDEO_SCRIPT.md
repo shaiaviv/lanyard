@@ -56,15 +56,18 @@ cutaway of a messy spreadsheet / Slack thread / notebook montage on the word "me
 
 # SCENE 2 — The shape of the product  ·  ⏱️ 0:35–0:55
 
-**🎬 RECORD:** Screen-share. Show the app at a glance — ideally a quick pan: the **Field** capture
-screen on a phone frame, then the **Planning Overview** dashboard on desktop. Keep it to 3–4 seconds
-each.
+**🎬 RECORD:** Screen-share. Show the app at a glance — ideally a quick pan in the order the narration
+introduces them: the **Planning Overview** dashboard on desktop first, then the **Field** capture
+screen on a phone frame. Keep it to 3–4 seconds each.
 
 **🎙️ NARRATION:**
-> Lanyard is one app with three experiences, each built for a different moment. **Field** is the rep
-> on a loud show floor. **Reconcile** is that same rep back at the hotel, cleaning up the day. And
-> **Planning** is the sales lead, deciding strategy for the whole year. Same data, three views. Let's
-> start where the money is made — on the floor.
+> Lanyard is three connected experiences, one for each moment in the conference cycle. The first, and
+> the heart of the product, is the planning experience: the sales lead at their desk, choosing which
+> events are worth attending, who covers them, and how to map out the whole year. The second is the
+> field experience: the rep on a busy show floor, capturing the people they meet in seconds. And the
+> third is for that same rep back at the hotel that night, turning the day's messy notes into clean,
+> trustworthy records. Three moments, one shared set of data. It all starts with a single lead captured
+> on the floor, so that's where I'll begin.
 
 ---
 
