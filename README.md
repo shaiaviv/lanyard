@@ -8,10 +8,13 @@
 
 ## 🎥 Demo video - start here
 
-**▶️ [Watch the full walkthrough](https://drive.google.com/file/d/1rGoKYvaMZU6fXW51rLGeKWrQbhsU6IHs/view?usp=sharing)** - a
-5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
+<video src="https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo.mp4" controls width="100%"></video>
+
+A 5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
 logic and why I chose it, how I approached cross-conference contact tracking (including the edge cases),
 how I used AI to build this and where it helped vs. got in the way, and what I'd build next.
+**[▶️ Open the video directly](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo.mp4)** if
+the player above doesn't load.
 
 ---
 
@@ -23,7 +26,7 @@ identity: recognizing who you met, across events, and acting on the relationship
 | 🔗 **Live app** | **https://grain-sooty.vercel.app** |
 | 🔑 **Demo login** | `demo@grain.com` · `LanyardDemo!2026` |
 | 💻 **Source** | https://github.com/shaiaviv/lanyard |
-| 🎥 **Video walkthrough** | **[Watch the 5-10 min walkthrough](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/0606.mov)** |
+| 🎥 **Video walkthrough** | **[Watch the 5-10 min walkthrough](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo.mp4)** |
 
 The live app comes pre-seeded with **190 real, web-researched conferences**, a 6-person sales
 team with deliberate coverage gaps, and 20 contacts (10 of them recurring across multiple events,
