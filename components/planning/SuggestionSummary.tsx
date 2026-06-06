@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { SuggestionDraft, SuggestionStats } from '@/lib/types';
 
 function StatBar({ covered, total }: { covered: number; total: number }) {
@@ -79,23 +79,6 @@ export function SuggestionSummary({ draft, reps }: { draft: SuggestionDraft; rep
                     {n.note}
                   </div>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* Conflicts */}
-          {draft.conflicts.filter((c) => c.kind !== 'unmapped' && c.kind !== 'undated').length > 0 && (
-            <div>
-              <p className="text-[11px] text-text3 font-semibold mb-1.5">Notes &amp; constraints</p>
-              <div className="space-y-1.5">
-                {draft.conflicts
-                  .filter((c) => c.kind !== 'unmapped' && c.kind !== 'undated')
-                  .map((c, i) => (
-                    <div key={i} className="flex items-start gap-1.5 text-xs text-text2">
-                      <AlertTriangle size={11} className="text-warn flex-shrink-0 mt-0.5" />
-                      <span>{c.message}</span>
-                    </div>
-                  ))}
               </div>
             </div>
           )}
