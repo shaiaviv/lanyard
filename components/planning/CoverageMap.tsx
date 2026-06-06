@@ -98,27 +98,43 @@ export default function CoverageMap({
                 pathOptions={{ color: '#f59e0b', weight: 1.5, dashArray: '6,4', opacity: 0.55 }}
               />
             )}
-            {itineraryConfs.map(({ conf, order, locked }) => (
-              <Marker
-                key={conf.id}
-                position={[conf.latitude as number, conf.longitude as number]}
-                icon={numberedIcon(order, locked)}
-              >
-                <Tooltip direction="top" offset={[0, -14]} opacity={1}>
-                  <div style={{ fontSize: 12, lineHeight: 1.5 }}>
-                    <strong>{conf.name}</strong>
-                    <br />
-                    {conf.startDate
-                      ? `${new Date(conf.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}${conf.endDate && conf.endDate !== conf.startDate ? ` – ${new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : ''}`
-                      : 'Date TBD'}
-                    <br />
-                    <span style={{ color: locked ? '#10b981' : '#f4a825' }}>
-                      Stop {order} of {itineraryConfs.length}{locked ? ' · committed' : ' · proposed'}
-                    </span>
-                  </div>
-                </Tooltip>
-              </Marker>
-            ))}
+            {/* Render in reverse so pin 1 is on top when stops share the same coordinates */}
+            {[...itineraryConfs].reverse().map(({ conf, order, locked }) => {
+              const colocated = itineraryConfs.filter(
+                (s) => s.order !== order &&
+                  s.conf.latitude === conf.latitude &&
+                  s.conf.longitude === conf.longitude,
+              );
+              return (
+                <Marker
+                  key={conf.id}
+                  position={[conf.latitude as number, conf.longitude as number]}
+                  icon={numberedIcon(order, locked)}
+                >
+                  <Tooltip direction="top" offset={[0, -14]} opacity={1}>
+                    <div style={{ fontSize: 12, lineHeight: 1.5 }}>
+                      <strong>{conf.name}</strong>
+                      <br />
+                      {conf.startDate
+                        ? `${new Date(conf.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}${conf.endDate && conf.endDate !== conf.startDate ? ` – ${new Date(conf.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : ''}`
+                        : 'Date TBD'}
+                      <br />
+                      <span style={{ color: locked ? '#10b981' : '#f4a825' }}>
+                        Stop {order} of {itineraryConfs.length}{locked ? ' · committed' : ' · proposed'}
+                      </span>
+                      {colocated.length > 0 && (
+                        <>
+                          <br />
+                          <span style={{ color: '#6B82A0' }}>
+                            Also here: stop{colocated.length > 1 ? 's' : ''} {colocated.map((s) => s.order).sort((a, b) => a - b).join(', ')}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </Tooltip>
+                </Marker>
+              );
+            })}
           </MapContainer>
         </div>
         <div className="flex items-center gap-4 text-xs text-text3 flex-wrap">
