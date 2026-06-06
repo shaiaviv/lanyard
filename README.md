@@ -8,7 +8,7 @@
 
 ## 🎥 Demo video - start here
 
-[![Watch the Lanyard demo](docs/images/demo-poster-v2.jpg)](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo-compressed.mp4)
+<a href="https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/lanyard-demo-compressed.mp4" target="_blank" rel="noopener noreferrer"><img src="docs/images/demo-poster-v2.jpg" alt="Watch the Lanyard demo" width="100%"></a>
 
 **▶️ Click the image above** for the 5-10 minute walkthrough: a live demo from a salesperson's perspective,
 the scoring and prioritization logic and why I chose it, how I approached cross-conference contact tracking
