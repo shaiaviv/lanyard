@@ -1,13 +1,3 @@
-LANYARD — VIDEO NARRATION (plain text, copy-paste ready)
-
-This file is ONLY the words the avatar speaks. Each scene below is clean text with no
-markdown, no ">", and no mid-sentence line breaks. Copy one scene's text at a time into
-the avatar tool. The "SCENE N" labels are just markers — do not paste them.
-
-If the tool adds odd pauses at the blank lines between paragraphs, delete the blank lines
-and paste the scene as one continuous block.
-
-
 SCENE 1
 
 Hi — I'm Shai Aviv, and I built everything you're about to see. One quick note up front: the version of me talking to you right now is an AI avatar. For a role that's all about building with AI, presenting it this way felt like the honest move. Okay — let me show you what I made.
