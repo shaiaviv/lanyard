@@ -8,7 +8,7 @@
 
 ## 🎥 Demo video - start here
 
-**▶️ [Watch the full walkthrough](https://shai-aviv-assets.s3.eu-north-1.amazonaws.com/0606.mov)** - a
+**▶️ [Watch the full walkthrough](https://drive.google.com/file/d/1rGoKYvaMZU6fXW51rLGeKWrQbhsU6IHs/view?usp=sharing)** - a
 5-10 minute tour covering a live demo from a salesperson's perspective, the scoring and prioritization
 logic and why I chose it, how I approached cross-conference contact tracking (including the edge cases),
 how I used AI to build this and where it helped vs. got in the way, and what I'd build next.
