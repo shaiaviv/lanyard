@@ -845,3 +845,28 @@ fintech, payments, treasury/FX, cross-border, travel, and SaaS:
   seed fully regenerated, coords for all 44 (map plots every event). Demo data verified intact
   (coverage 5/5 join, 20 encounters join, 0 unscored).
 - **Verified live in production** (grain-sooty.vercel.app): /planning shows 44, T1·16/T2·22/T3·6.
+
+## Entry 023 — 2026-06-06 — Filter bug fix, full-width desktop, extensive demo data
+
+**Bug fix (vertical filter):** the Conferences filter compared capitalized labels ('Fintech') against
+lowercase stored verticals ('fintech') via `includes`, so ONLY 'SaaS' (stored capitalized) ever
+matched. Made it case-insensitive (`some(v => v.toLowerCase() === ...)`) + added a Treasury chip.
+Now every filter returns results (Payments 11, Fintech 10, Travel 4, Treasury 3, SaaS 4, Banking 9).
+
+**Layout:** /planning is the DESKTOP experience — removed the 960px mobile-width column; now
+full-width with a 1600px max (sane on ultra-wide) + 3-col conference grid on xl.
+
+**Extensive demo data** (`scripts/gen-demo-data.mjs` — applies to DB AND rewrites setup.sql §4-6,
+resolving the signed-in rep via a subquery so it's reproducible on a fresh DB; conferences untouched):
+- **Team:** 6 reps (you + Maya/Tom/Priya/Liam/Sofia).
+- **Coverage:** 23 rows (6 committed / 12 considering / 2 declined / 3 attended) with **10 uncovered
+  priority events** for the gap story + geo/temporal clusters; EuroFinance (treasury flagship) left
+  only "considering" as a deliberate under-investment.
+- **Leads:** 20 contacts / 38 encounters — 10 cross-conference arcs (4 warming, 2 tire-kicker,
+  2 cooling, 1 nurturing, 1 too-early), promotions + company switches, multi-rep shared memory,
+  full **fit×temperature 2×2** spread (chase/nurture/polite/deprioritize), 10 follow-ups across reps,
+  16 leads at Money20/20 Europe 2026 (detail + bulk-push demo).
+- **Reconcile:** 2 pending captures incl. a name-variation match ("Elena Fisher" → Elena Fischer).
+- Normalized "Singapore FinTech Festival" → "...2026" (every event now has a year).
+- tsc/eslint/build clean; **verified live in production** (filters, full-width, 10 relationships,
+  Reconcile inbox 200).
