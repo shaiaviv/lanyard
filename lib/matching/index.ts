@@ -16,23 +16,19 @@ interface CandidateContact {
   email: string | null;
 }
 
-/** Step 1 — narrow the full contact set to a small shortlist. Zero candidates ⇒ caller skips the LLM. */
+/** Step 1 — narrow the full contact set to a small shortlist. Zero candidates ⇒ caller skips the LLM.
+ *  Uses pg_trgm similarity() so name variants like "Fischer"/"Fisher" and "Adyen"/"Aden" are caught.
+ *  The old ILIKE approach only matched substrings, silently missing transpositions. */
 export async function retrieveCandidates(identity: IdentitySnapshot): Promise<CandidateContact[]> {
-  const supa = createAdminClient();
-  const filters: string[] = [];
-  // strong keys first
-  if (identity.linkedin) filters.push(`linkedin_url.eq.${identity.linkedin}`);
-  if (identity.email) filters.push(`email.eq.${identity.email}`);
-  // fuzzy keys (pg_trgm GIN supports ilike)
-  if (identity.name?.trim()) filters.push(`canonical_name.ilike.%${identity.name.trim()}%`);
-  if (identity.company?.trim()) filters.push(`current_company.ilike.%${identity.company.trim()}%`);
-  if (filters.length === 0) return [];
+  if (!identity.name && !identity.company && !identity.email && !identity.linkedin) return [];
 
-  const { data } = await supa
-    .from('contacts')
-    .select('id, canonical_name, current_company, current_title, linkedin_url, email')
-    .or(filters.join(','))
-    .limit(10);
+  const supa = createAdminClient();
+  const { data } = await supa.rpc('retrieve_contact_candidates', {
+    p_name:     identity.name?.trim()    ?? null,
+    p_company:  identity.company?.trim() ?? null,
+    p_email:    identity.email?.trim()   ?? null,
+    p_linkedin: identity.linkedin        ?? null,
+  });
   return (data as CandidateContact[]) ?? [];
 }
 

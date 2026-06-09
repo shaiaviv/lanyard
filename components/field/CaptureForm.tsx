@@ -55,7 +55,7 @@ export function CaptureForm({ conferenceId, repId, prefill = {} }: CaptureFormPr
         const result = await runMatch({
           name: name.trim(),
           company: company.trim() || null,
-          title: null,
+          title: title.trim() || null,
           email: email.trim() || null,
           linkedin: null,
         });
