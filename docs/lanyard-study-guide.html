@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lanyard — Interview Study Guide</title>
+<style>
+  :root {
+    --bg: #07090F;
+    --surface: #0F1520;
+    --elevated: #161E2E;
+    --border: rgba(255,255,255,0.07);
+    --accent: #F4A825;
+    --accent-dim: rgba(244,168,37,0.15);
+    --text1: #E8EDF5;
+    --text2: #A8B8CC;
+    --text3: #6B82A0;
+    --field: #3B82F6;
+    --field-dim: rgba(59,130,246,0.12);
+    --reconcile: #8B5CF6;
+    --reconcile-dim: rgba(139,92,246,0.12);
+    --planning: #10B981;
+    --planning-dim: rgba(16,185,129,0.12);
+    --t1: #F59E0B;
+    --t1-dim: rgba(245,158,11,0.15);
+    --t2: #6366F1;
+    --t2-dim: rgba(99,102,241,0.12);
+    --t3: rgba(255,255,255,0.3);
+    --principle: rgba(244,168,37,0.08);
+    --principle-border: rgba(244,168,37,0.25);
+    --why-bg: rgba(16,185,129,0.06);
+    --why-border: rgba(16,185,129,0.25);
+    --defend-bg: rgba(239,68,68,0.06);
+    --defend-border: rgba(239,68,68,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--bg); color: var(--text1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; }
+
+  /* Layout */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px; min-width: 260px; background: var(--surface);
+    border-right: 1px solid var(--border); position: sticky; top: 0;
+    height: 100vh; overflow-y: auto; padding: 20px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .main { flex: 1; max-width: 860px; padding: 40px 48px; overflow-x: hidden; }
+
+  /* Sidebar */
+  .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .sidebar-logo h1 { font-size: 17px; font-weight: 700; color: var(--text1); letter-spacing: -0.3px; }
+  .sidebar-logo p { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 600; color: var(--text3);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 12px 20px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 20px; cursor: pointer; transition: all 0.15s;
+    font-size: 13px; color: var(--text2); border-left: 2px solid transparent;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text1); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-dim); }
+  .nav-item .dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .nav-item .check { margin-left: auto; font-size: 11px; color: var(--planning); display: none; }
+  .nav-item.done .check { display: block; }
+  .nav-item.done { color: var(--text3); }
+  .nav-item.done .dot { opacity: 0.4; }
+
+  /* Progress bar */
+  .progress-bar { margin: 0 20px 16px; }
+  .progress-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+  .progress-bar-track { background: var(--border); border-radius: 4px; height: 4px; }
+  .progress-bar-fill { background: var(--accent); height: 4px; border-radius: 4px; transition: width 0.3s; }
+
+  /* Main content */
+  .section { display: none; }
+  .section.active { display: block; }
+  .section-header { margin-bottom: 32px; }
+  .section-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .badge-field { background: var(--field-dim); color: var(--field); border: 1px solid rgba(59,130,246,0.2); }
+  .badge-reconcile { background: var(--reconcile-dim); color: var(--reconcile); border: 1px solid rgba(139,92,246,0.2); }
+  .badge-planning { background: var(--planning-dim); color: var(--planning); border: 1px solid rgba(16,185,129,0.2); }
+  .badge-core { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(244,168,37,0.2); }
+  .badge-ai { background: rgba(168,85,247,0.1); color: #C084FC; border: 1px solid rgba(168,85,247,0.2); }
+  .section-title { font-size: 26px; font-weight: 700; color: var(--text1); letter-spacing: -0.5px; line-height: 1.2; }
+  .section-subtitle { font-size: 15px; color: var(--text2); margin-top: 8px; max-width: 600px; }
+
+  /* Cards */
+  .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text1); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .card-body { font-size: 14px; color: var(--text2); line-height: 1.7; }
+  .card-body p { margin-bottom: 8px; }
+  .card-body p:last-child { margin-bottom: 0; }
+  .card-body ul { padding-left: 18px; margin: 6px 0; }
+  .card-body li { margin-bottom: 4px; }
+  .card-body strong { color: var(--text1); font-weight: 600; }
+  .card-body code { font-family: 'SF Mono', monospace; font-size: 12px; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text1); }
+
+  /* Callout boxes */
+  .callout { border-radius: 10px; padding: 14px 18px; margin: 12px 0; }
+  .callout-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .callout-body { font-size: 13px; line-height: 1.65; }
+  .callout-why { background: var(--why-bg); border: 1px solid var(--why-border); }
+  .callout-why .callout-title { color: var(--planning); }
+  .callout-why .callout-body { color: var(--text2); }
+  .callout-defend { background: var(--defend-bg); border: 1px solid var(--defend-border); }
+  .callout-defend .callout-title { color: #F87171; }
+  .callout-defend .callout-body { color: var(--text2); }
+  .callout-principle { background: var(--principle); border: 1px solid var(--principle-border); }
+  .callout-principle .callout-title { color: var(--accent); }
+  .callout-principle .callout-body { color: var(--text2); }
+  .callout-info { background: var(--field-dim); border: 1px solid rgba(59,130,246,0.2); }
+  .callout-info .callout-title { color: var(--field); }
+  .callout-info .callout-body { color: var(--text2); }
+
+  /* Feature grid */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 700px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feature-card {
+    background: var(--elevated); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; cursor: pointer; transition: all 0.15s;
+  }
+  .feature-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.02); }
+  .feature-card.expanded { border-color: var(--accent); background: var(--accent-dim); }
+  .feature-card-header { display: flex; align-items: center; justify-content: space-between; }
+  .feature-card-name { font-size: 13px; font-weight: 600; color: var(--text1); }
+  .feature-card-tag { font-size: 10px; color: var(--text3); font-weight: 500; }
+  .feature-card-desc { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.6; display: none; }
+  .feature-card.expanded .feature-card-desc { display: block; }
+  .expand-icon { font-size: 12px; color: var(--text3); transition: transform 0.2s; }
+  .feature-card.expanded .expand-icon { transform: rotate(180deg); color: var(--accent); }
+
+  /* Score table */
+  .score-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  .score-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+  .score-table td { padding: 10px 12px; color: var(--text2); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+  .score-table tr:last-child td { border-bottom: none; }
+  .score-table .weight { color: var(--accent); font-weight: 700; font-size: 15px; }
+
+  /* Pipeline viz */
+  .pipeline { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+  .pipeline-step { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; }
+  .pipeline-step:last-child .pipeline-line { display: none; }
+  .pipeline-left { display: flex; flex-direction: column; align-items: center; min-width: 28px; }
+  .pipeline-num {
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;
+    background: var(--elevated); border: 1px solid var(--border); color: var(--text2);
+  }
+  .pipeline-num.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .pipeline-line { width: 1px; background: var(--border); flex: 1; min-height: 16px; margin: 2px 0; }
+  .pipeline-content { padding-top: 4px; flex: 1; }
+  .pipeline-title { font-size: 13px; font-weight: 600; color: var(--text1); }
+  .pipeline-detail { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* 2x2 matrix */
+  .matrix { display: grid; grid-template-columns: auto 1fr 1fr; gap: 3px; margin: 16px 0; font-size: 12px; }
+  .matrix-corner { background: transparent; }
+  .matrix-header { background: var(--elevated); padding: 8px 12px; text-align: center; font-size: 11px; font-weight: 600; color: var(--text3); border-radius: 6px; }
+  .matrix-row-label { background: var(--elevated); padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text3); border-radius: 6px; display: flex; align-items: center; }
+  .matrix-cell { background: var(--elevated); border: 1px solid var(--border); padding: 12px; border-radius: 6px; }
+  .matrix-cell strong { display: block; font-size: 12px; color: var(--text1); margin-bottom: 2px; }
+  .matrix-cell span { font-size: 11px; color: var(--text3); }
+  .matrix-cell.hot-strong { border-color: rgba(244,168,37,0.3); background: rgba(244,168,37,0.06); }
+  .matrix-cell.hot-strong strong { color: var(--accent); }
+  .matrix-cell.cold-strong { border-color: rgba(59,130,246,0.25); background: rgba(59,130,246,0.06); }
+  .matrix-cell.hot-weak { border-color: rgba(255,255,255,0.1); }
+  .matrix-cell.cold-weak { }
+
+  /* Verdict states */
+  .verdict-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .verdict-item { display: flex; align-items: flex-start; gap: 12px; background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .verdict-icon { font-size: 18px; flex-shrink: 0; padding-top: 1px; }
+  .verdict-name { font-size: 13px; font-weight: 600; color: var(--text1); }
+  .verdict-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .verdict-move { font-size: 11px; color: var(--accent); margin-top: 4px; font-style: italic; }
+
+  /* Temperature */
+  .temp-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+  .temp-item { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .temp-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+  .temp-name { font-size: 11px; font-weight: 600; color: var(--text1); }
+  .temp-desc { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* Numbers grid */
+  .numbers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .number-card { background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .number-value { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
+  .number-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* Know it button */
+  .know-it-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 28px; padding: 10px 20px; border-radius: 8px;
+    background: var(--elevated); border: 1px solid var(--border);
+    color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .know-it-btn:hover { border-color: var(--planning); color: var(--planning); background: var(--planning-dim); }
+  .know-it-btn.done { border-color: var(--planning); color: var(--planning); background: var(--planning-dim); }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* Inline chip */
+  .chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .chip-t1 { background: var(--t1-dim); color: var(--t1); }
+  .chip-t2 { background: var(--t2-dim); color: #818CF8; }
+  .chip-field { background: var(--field-dim); color: var(--field); }
+  .chip-reconcile { background: var(--reconcile-dim); color: var(--reconcile); }
+  .chip-planning { background: var(--planning-dim); color: var(--planning); }
+
+  /* Highlight quote */
+  .quote { border-left: 3px solid var(--accent); padding: 12px 18px; margin: 16px 0; background: var(--accent-dim); border-radius: 0 8px 8px 0; font-size: 14px; color: var(--text2); font-style: italic; line-height: 1.7; }
+  .quote strong { color: var(--text1); font-style: normal; }
+
+  /* Match confidence viz */
+  .match-tiers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .match-tier { background: var(--elevated); border-radius: 8px; padding: 12px; border: 1px solid var(--border); }
+  .match-tier-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .match-tier-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .tier-high .match-tier-label { color: var(--planning); }
+  .tier-high { border-color: rgba(16,185,129,0.2); }
+  .tier-medium .match-tier-label { color: var(--accent); }
+  .tier-medium { border-color: rgba(244,168,37,0.2); }
+  .tier-low .match-tier-label { color: var(--reconcile); }
+  .tier-low { border-color: rgba(139,92,246,0.2); }
+
+  /* Model strategy */
+  .model-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .model-card { background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .model-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .model-opus { color: #C084FC; }
+  .model-sonnet { color: var(--field); }
+  .model-use { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  /* Hub for section nav */
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .home-card {
+    background: var(--elevated); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; cursor: pointer; transition: all 0.15s;
+  }
+  .home-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.02); }
+  .home-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .home-card-title { font-size: 14px; font-weight: 700; color: var(--text1); margin-bottom: 4px; }
+  .home-card-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .home-card-count { font-size: 10px; color: var(--text3); margin-top: 8px; }
+
+  /* Scrollbar */
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>🪪 Lanyard</h1>
+    <p>Interview Study Guide</p>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-bar-label">
+      <span>Progress</span>
+      <span id="progress-text">0 / 14</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section-label">Start Here</div>
+  <div class="nav-item active" onclick="goTo('overview')" data-section="overview">
+    <span class="dot" style="background:#F4A825"></span> Big Picture
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('principles')" data-section="principles">
+    <span class="dot" style="background:#F4A825"></span> Core Principles
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('datamodel')" data-section="datamodel">
+    <span class="dot" style="background:#F4A825"></span> Data Model
+    <span class="check">✓</span>
+  </div>
+
+  <div class="sidebar-section-label">Field Experience</div>
+  <div class="nav-item" onclick="goTo('field')" data-section="field">
+    <span class="dot" style="background:#3B82F6"></span> Field Screens (F1–F8)
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('matching')" data-section="matching">
+    <span class="dot" style="background:#3B82F6"></span> Matching Engine
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('briefing')" data-section="briefing">
+    <span class="dot" style="background:#3B82F6"></span> Relationship Intelligence
+    <span class="check">✓</span>
+  </div>
+
+  <div class="sidebar-section-label">Reconcile & Planning</div>
+  <div class="nav-item" onclick="goTo('reconcile')" data-section="reconcile">
+    <span class="dot" style="background:#8B5CF6"></span> Reconcile Experience
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('planning')" data-section="planning">
+    <span class="dot" style="background:#10B981"></span> Planning Hub
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('scoring')" data-section="scoring">
+    <span class="dot" style="background:#10B981"></span> ICP Scoring Methodology
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('coverage')" data-section="coverage">
+    <span class="dot" style="background:#10B981"></span> Coverage & AI Suggestions
+    <span class="check">✓</span>
+  </div>
+
+  <div class="sidebar-section-label">AI & Integration</div>
+  <div class="nav-item" onclick="goTo('aifeatures')" data-section="aifeatures">
+    <span class="dot" style="background:#C084FC"></span> All AI Features
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('hubspot')" data-section="hubspot">
+    <span class="dot" style="background:#F4A825"></span> HubSpot Integration
+    <span class="check">✓</span>
+  </div>
+
+  <div class="sidebar-section-label">Interview Prep</div>
+  <div class="nav-item" onclick="goTo('modelstrategy')" data-section="modelstrategy">
+    <span class="dot" style="background:#F4A825"></span> Model Strategy / AI Use
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('numbers')" data-section="numbers">
+    <span class="dot" style="background:#F4A825"></span> Key Numbers
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('nextsteps')" data-section="nextsteps">
+    <span class="dot" style="background:#F4A825"></span> What I'd Build Next
+    <span class="check">✓</span>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div class="section active" id="section-overview">
+  <div class="section-header">
+    <div class="section-badge badge-core">🪪 Core</div>
+    <div class="section-title">The Big Picture</div>
+    <div class="section-subtitle">What Lanyard is, what problem it solves, and the organizing idea behind every feature.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">One-liner (memorize this)</div>
+    <div class="card-body">
+      <div class="quote">"Lanyard is a conference intelligence tool with three experiences — <strong>Field</strong> for show-floor capture, <strong>Reconcile</strong> for turning uncertain data into confident records, and <strong>Planning</strong> for company-wide conference strategy. The organizing idea is a relationship lifecycle: Decide → Plan → Capture → Track → Act → Sync."</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Problem (from the brief)</div>
+    <div class="card-body">
+      <p>Grain's BD team currently manages conference decisions, coverage, lead capture, and follow-up across <strong>spreadsheets, Slack threads, and individual notebooks</strong>. Nothing connects the rep on the show floor at Money20/20 to the realization they've now met this same person three times and it's time to close.</p>
+      <p>Three root problems Lanyard solves:</p>
+      <ul>
+        <li><strong>Where to go</strong> — no principled scoring of which conferences are worth it</li>
+        <li><strong>Who to meet and remember</strong> — no cross-conference identity tracking</li>
+        <li><strong>What to do next</strong> — no intelligence turning encounters into action</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">One App · Three Experiences · One Data Core</div>
+    <div class="card-body">
+      <p>Think of it like Gmail: Inbox, Search, Settings are three modes on the same database. Same here.</p>
+      <div class="feature-grid" style="margin-top:12px;">
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header">
+            <span class="feature-card-name">🟦 Field</span>
+            <span class="feature-card-tag">Mobile · Show floor</span>
+            <span class="expand-icon">▾</span>
+          </div>
+          <div class="feature-card-desc">Rep with a phone, 30s between conversations. Thumb-friendly, voice-first, forgiving of sparse input. Optimized for <strong>speed</strong>. This is the data <em>producer</em>.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header">
+            <span class="feature-card-name">🟣 Reconcile</span>
+            <span class="feature-card-tag">Desktop/tablet · Calm moment</span>
+            <span class="expand-icon">▾</span>
+          </div>
+          <div class="feature-card-desc">Rep at the hotel or office after the show floor rush. Optimized for <strong>correctness</strong>. Turns uncertain matches into high-confidence committed records.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header">
+            <span class="feature-card-name">🟢 Planning</span>
+            <span class="feature-card-tag">Desktop · Sales lead / ops</span>
+            <span class="expand-icon">▾</span>
+          </div>
+          <div class="feature-card-desc">Strategic, analytical view. Company-wide coverage, ICP scoring, relationship intelligence, HubSpot sync. Optimized for <strong>judgment and overview</strong>.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header">
+            <span class="feature-card-name">🗄️ Shared Data Core</span>
+            <span class="feature-card-tag">One Supabase DB</span>
+            <span class="expand-icon">▾</span>
+          </div>
+          <div class="feature-card-desc">Conferences · Contacts · Encounters · Reps · Coverage. All three experiences read and write the same tables. A Field capture is instantly visible in Planning.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Spine — Relationship Lifecycle</div>
+    <div class="card-body">
+      <p>Every feature hangs off one organizing idea. This keeps it from being seven disconnected screens.</p>
+      <div class="pipeline" style="margin-top:14px;">
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">1</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Decide</div><div class="pipeline-detail">Which conferences are worth attending? → Conference list + ICP scoring</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">2</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Plan</div><div class="pipeline-detail">Who covers what? Gaps? Clustering? → Planning coverage view</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">3</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Capture</div><div class="pipeline-detail">On the show floor, log a person in 30 seconds → Field experience</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">4</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Track</div><div class="pipeline-detail">Same person across multiple events → Cross-conference matching + arc</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">5</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Act</div><div class="pipeline-detail">AI-drafted follow-ups, relationship verdict, nudges → AI features</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">6</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Sync</div><div class="pipeline-detail">Push qualified leads into HubSpot → Curated CRM handoff</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-why">
+    <div class="callout-title">Why the Spine matters in the interview</div>
+    <div class="callout-body">If Ben asks "why did you build X?" — the answer is always "because it's the [stage] step in the relationship lifecycle." Every feature has a reason. Nothing is bolted on. The spine is your defense for the whole structure.</div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">Likely challenge: "Why not just use HubSpot or Notion for this?"</div>
+    <div class="callout-body">"HubSpot is a system of record. It's built for deals, pipelines, sequences — across every channel. We're a specialized system of engagement for the one context HubSpot does badly: the show floor and cross-conference relationship. We sit upstream, capture and qualify, then push the best leads in. Like Gong or Clay — we feed HubSpot, not replace it."</div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('overview', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== PRINCIPLES ===== -->
+<div class="section" id="section-principles">
+  <div class="section-header">
+    <div class="section-badge badge-core">Core</div>
+    <div class="section-title">Core Principles</div>
+    <div class="section-subtitle">P1 and P2 are the two principles that settle every design argument. Know them cold — they come up in every feature.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">P1 · Be generous with hints, strict with records</div>
+    <div class="card-body">
+      <p><strong>The insight:</strong> Informing the rep and committing to the system of record are different acts with different stakes. They get different confidence bars.</p>
+      <ul>
+        <li><strong>Committing data</strong> (confirmed match, encounter history) → requires <strong>high confidence</strong>. A wrong committed fact is corrosive. Once a rep catches the tool lying, they stop trusting all of it — and an untrusted sales tool is dead.</li>
+        <li><strong>A floor hint</strong> → can run on low/medium confidence. The "hint" is the <strong>F3 "Met before?" message</strong> that appears during capture — e.g. <em>"⚠️ Possibly Sarah Chen, Adyen — met at Money20/20 EU last year."</em> If that's wrong (different Sarah, common name), the rep taps No and moves on. Two seconds lost. The wrong hint costs nothing. A right hint saves the rep from looking lost in front of a returning contact. Asymmetric payoff.</li>
+      </ul>
+      <div class="callout callout-principle" style="margin-top:12px;">
+        <div class="callout-title">Corollary</div>
+        <div class="callout-body">Always frame a guess as a guess. "Marco logged a <em>maybe</em>…" not "Marco met this person." Confidence is explicit, not laundered.</div>
+      </div>
+      <p style="margin-top:14px; font-size:13px; font-weight:600; color:var(--text1);">P1 across all three experiences:</p>
+      <ul>
+        <li><span class="chip chip-field">Field</span> — the "Met before?" hint (F3) is low-confidence and clearly framed as such. The committed match in the DB is high-confidence only.</li>
+        <li><span class="chip chip-reconcile">Reconcile</span> — the entire experience exists because of P1. Uncertain links from the floor are hints until a human commits them here.</li>
+        <li><span class="chip chip-planning">Planning</span> — <strong>AI Coverage Suggestions is P1 made literal.</strong> The suggestion overlays as a visual hint on the timeline and map but <em>never writes a single row to the <code>coverage</code> table</em>. The team's committed travel is the strict record; the AI plan is the generous hint. Same principle, bigger canvas.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">P2 · Keep the source, not just the derivation</div>
+    <div class="card-body">
+      <p>Store raw inputs — the <strong>voice recording</strong>, the transcript — not only the AI's parsed interpretation.</p>
+      <ul>
+        <li>The source is ground truth: replay it, re-parse with a better model, or audit when a derivation looks wrong</li>
+        <li>You can always re-derive from source; you can never recover source from a lossy derivation</li>
+        <li>First application: retain <code>audioRecording</code> on every Encounter</li>
+      </ul>
+      <p style="margin-top:14px; font-size:13px; font-weight:600; color:var(--text1);">P2 across all three experiences:</p>
+      <ul>
+        <li><span class="chip chip-field">Field</span> — raw audio stored in Supabase Storage. If Whisper mis-transcribes, the source is there to replay or re-run.</li>
+        <li><span class="chip chip-reconcile">Reconcile</span> — audio playback in the resolve card (the gap we know about — see "What I'd Build Next"). The recording is the rep's own memory of the conversation.</li>
+        <li><span class="chip chip-planning">Planning</span> — <strong><code>score_breakdown</code> JSONB on every conference stores the AI's raw factor estimates</strong> (ICP density: 0.85, topic fit: 0.9…). The 0–100 score is a derivation of those factors. If Grain updates its ICP definition or the weights change, you can re-run <code>computeIcpScore</code> over the stored breakdown instantly — <em>no new AI call needed</em>. The breakdown is the source; the score is the derivation.</li>
+      </ul>
+      <div class="callout callout-why" style="margin-top:12px;">
+        <div class="callout-title">P2 in action — the Reconcile use case</div>
+        <div class="callout-body">In the Reconcile card (R2), the rep can <strong>play back the original recording</strong> while looking at the match candidates side-by-side. That 15-second audio is often what resolves an uncertain match — <em>"oh right, she said she just moved to Mollie last month"</em> — something the AI parse may have missed or lost. The recording is the rep's own memory of the conversation, surfaced exactly when they need it most: the calm moment after the floor rush, when they're deciding whether two captures are the same person.</div>
+      </div>
+      <div class="callout callout-defend" style="margin-top:8px;">
+        <div class="callout-title">How to use this in the interview</div>
+        <div class="callout-body">P2 isn't just a storage principle — it's a UX decision. The rep captured something in a noisy show floor. Hours later in Reconcile they can't remember if "Sarah Fischer" and "Sarah Chen" are the same person. Playing back their own voice saying "met Sarah from... she said she'd just left Adyen" resolves it instantly. No AI can replace that. The source IS the memory.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Capture vs. Commit — the central architectural decision</div>
+    <div class="card-body">
+      <p><strong>Separate capture (fast, in the field) from commit (correct, later).</strong></p>
+      <p>A captured lead is always saved immediately. Only its link to a known Contact can be provisional (<code>linkState = pending</code>). Uncertainty waits in a holding pen until it can be resolved honestly.</p>
+      <div class="feature-grid" style="margin-top:12px;">
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header">
+            <span class="feature-card-name">Field = Fast & Forgiving</span>
+            <span class="expand-icon">▾</span>
+          </div>
+          <div class="feature-card-desc">Capture anything, immediately. AI matches async. Link state = pending if uncertain. Rep moves on. Speed > completeness on the floor.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header">
+            <span class="feature-card-name">Reconcile = Slow & Exact</span>
+            <span class="expand-icon">▾</span>
+          </div>
+          <div class="feature-card-desc">Deliberate, calm moment. High-confidence committed data only. Never corrupt the record with floor guesses. Like a git staging area — draft → confirm.</div>
+        </div>
+      </div>
+      <div class="callout callout-defend" style="margin-top:12px;">
+        <div class="callout-title">Defend it: "Why not just commit everything on the floor?"</div>
+        <div class="callout-body">"Because the floor is the worst place to make identity decisions. You have 30 seconds, noisy environment, the person is right in front of you. If you auto-commit a wrong match, you corrupt the relationship history of a real contact in your system of record. The blast radius of a wrong committed fact is enormous — and it's completely avoidable by queuing uncertain links for a calm moment."</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('principles', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== DATA MODEL ===== -->
+<div class="section" id="section-datamodel">
+  <div class="section-header">
+    <div class="section-badge badge-core">Core</div>
+    <div class="section-title">Data Model</div>
+    <div class="section-subtitle">Five entities. The Encounter join is the insight that makes everything else possible.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Core Insight: Contact ≠ Encounter</div>
+    <div class="card-body">
+      <p>The most important modeling decision: <strong>separate the durable person from each meeting.</strong></p>
+      <ul>
+        <li><strong>Contact</strong> — the identity we deduplicate. Durable, evolves across encounters. <em>Who</em> they are.</li>
+        <li><strong>Encounter</strong> — "Rep X met Contact Y at Conference Z on date D." One row per meeting. Multiple encounters per contact, multiple per conference. <em>What happened.</em></li>
+      </ul>
+      <div class="callout callout-why" style="margin-top:12px;">
+        <div class="callout-title">Why this matters</div>
+        <div class="callout-body">Without this split, "met them 3 times" is unrepresentable. With it, you can track a relationship across years, conferences, and job changes. This is the foundation for everything: arc summarizer, tire-kicker detection, cross-conference briefings.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Contact — the durable identity</div>
+    <div class="card-body">
+      <ul>
+        <li><code>linkedinUrl</code> — <strong>primary identity anchor by design</strong> (verifiable by photo+title at a glance)</li>
+        <li><code>canonicalName</code>, <code>currentCompany</code>, <code>currentTitle</code> — latest known (NOT per-meeting)</li>
+        <li><code>email</code> — used for HubSpot dedupe</li>
+        <li>Derived: relationship arc, verdict status</li>
+      </ul>
+      <p style="margin-top:8px;">LinkedIn is the anchor because a rep can <em>verify</em> it in 2 seconds (photo + title match the person in front of them). No other identifier is human-verifiable on the show floor.</p>
+      <div class="callout callout-defend" style="margin-top:10px;">
+        <div class="callout-title">⚠️ Be honest — this is mocked in the current build</div>
+        <div class="callout-body">The enrichment provider that surfaces LinkedIn candidates (<code>EnrichmentProvider</code>) is currently a <strong>mock</strong> — it returns seeded fake profiles unless a real Clay or Apollo API key is configured. The interface, the UI flow (rep taps a profile → fields overwrite ASR), and the architecture are all fully built. The live data isn't wired yet. If Ben asks "can I see LinkedIn profiles in the demo?" — the honest answer is: "The flow is built and the interface is designed for it, but the live enrichment requires a Clay/Apollo key. It's in 'What I'd Build Next' as the first real wiring task."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Encounter — immutable per-meeting record</div>
+    <div class="card-body">
+      <ul>
+        <li>Auto-stamped: <code>conference</code>, <code>rep</code>, <code>timestamp</code></li>
+        <li><code>audioRecording</code> — raw voice capture (P2, source of truth)</li>
+        <li><code>note</code> — transcript / rich context</li>
+        <li><code>temperature</code> — 5-point warmth ladder (their interest/intent)</li>
+        <li><code>leadScore</code> — ICP fit (our assessment)</li>
+        <li><code>topics[]</code> — AI-extracted, e.g. ["FX hedging", "travel merchants"]</li>
+        <li><strong>identity snapshot</strong>: name/company/title/email/linkedin as told at this event → a changed title vs. prior = job-change signal, not error</li>
+        <li><code>linkState</code> — <code>confirmed</code> | <code>pending</code></li>
+      </ul>
+      <div class="callout callout-principle" style="margin-top:10px;">
+        <div class="callout-title">The identity snapshot trick</div>
+        <div class="callout-body">Each Encounter stores who they said they were <em>at that moment</em>. "VP Treasury @Adyen '24 → Head of Payments @Stripe '25" is captured by diffing snapshots — it becomes a job-change signal, surfaced in the relationship briefing.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Conference, Coverage, Rep</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Conference</strong> — name, dates, location, vertical, audience size, <code>icp_score</code>, <code>tier</code>, <code>score_breakdown</code> JSONB, lat/lng</li>
+        <li><strong>Coverage</strong> — "Rep R plans to attend Conference C." Join with status: <code>considering | committed | attended | declined</code>. <em>Distinct from Encounter</em> — a planned attendance is not an actual meeting.</li>
+        <li><strong>Rep</strong> — team member. Carries <code>home_city</code>, <code>home_region</code>, <code>capacity</code> for the AI Coverage Suggestions feature. All reps in one shared team pool.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">CQRS — reads ≠ writes</div>
+    <div class="card-body">
+      <p><strong>Looking someone up (F7 pre-brief) is a read-only operation. It must NOT create an Encounter.</strong></p>
+      <p>Only an actual capture creates an Encounter. This keeps the encounter history honest — searching for someone doesn't pollute their relationship record with a fake "meeting."</p>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('datamodel', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== FIELD ===== -->
+<div class="section" id="section-field">
+  <div class="section-header">
+    <div class="section-badge badge-field">Field</div>
+    <div class="section-title">Field Experience — F1–F8</div>
+    <div class="section-subtitle">Mobile-first. Rep with a phone, 30 seconds between conversations. Speed and forgiveness over completeness.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Capture Pipeline (core of the Field experience)</div>
+    <div class="card-body">
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">1</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Record</div><div class="pipeline-detail">MediaRecorder → audio Blob. Rep speaks for 15–30 seconds, walks away.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">2</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Persist (offline-safe)</div><div class="pipeline-detail">Saved to IndexedDB immediately. Rep is free to move on. Never blocked on AI or wifi.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num">3</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Upload</div><div class="pipeline-detail">Audio → Supabase Storage when online. Source of truth stored (P2).</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num">4</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">STT (Whisper)</div><div class="pipeline-detail">Audio → transcript. OpenAI Whisper via AI SDK.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num">5</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Parse + Fit (Haiku)</div><div class="pipeline-detail">One LLM call: name/company/topics/temperature/followUp/confidencePerField + ICP fit score. Cheap model, short prompt.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num">6</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Enrich</div><div class="pipeline-detail">EnrichmentProvider (Clay/Apollo) → LinkedIn candidates. Mock fallback if no key.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num">7</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Match</div><div class="pipeline-detail">Retrieval (pg_trgm) + Haiku adjudication → match resolution.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num">8</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Draft → Review</div><div class="pipeline-detail">Assembled CaptureDraft surfaces for rep. Confidence-highlighted fields.</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">9</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Commit</div><div class="pipeline-detail">Rep confirms → Encounter row written, queue item removed. linkState = confirmed or pending.</div></div>
+        </div>
+      </div>
+      <div class="callout callout-defend" style="margin-top:4px;">
+        <div class="callout-title">Key defend point: "Why async?"</div>
+        <div class="callout-body">Show-floor wifi is unreliable. If capture blocked on AI, a dead wifi spot loses the lead entirely. The async pipeline means the rep always gets a confirmation in ~1 second. AI runs in the background, catches up on reconnect. The rep never waits.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All 8 Field Screens</div>
+    <div class="card-body">
+      <div class="feature-grid">
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F1 · Active Event Bar</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">App knows which conference you're at (auto from date, or one-tap switch). Persistent: "📍 You're at: Money20/20 Europe." Every capture auto-tagged. Removes #1 friction source — re-tagging every lead manually.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F2 · Fast Capture — Hero</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Voice-first: big record button, rep talks, AI fills the form. Three magic behaviors: (1) confidence-flagged review (eye goes to ONE risky field, not a re-read), (2) names lean on the matcher (ASR mangles "Adyen" → matcher normalizes it), (3) optimistic/async (never block). Manual form always one tap away.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F3 · "Met Before?" Hint</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Inline match result during capture. Shows: "⚠️ Possibly Sarah Chen, Adyen — met at Money20/20 EU (Jun '25)." Three-way resolution: auto-Match (high, your own) / prompt (medium) / Save-for-later (low or cross-rep). Cross-rep NEVER auto-merges.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F4 · My Leads</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Running list of who you've captured today, newest first. Prevents double-logging. Shows temperature chip + "new vs. returning" tag. Pending badge shows unreconciled count. ⚠️ <strong>No delete/undo built yet</strong> — that's a known gap (see "What I'd Build Next").</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F5 · Contact Card (lite)</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Tap a lead → AI relationship-arc summary (1 paragraph), all past encounters (all reps), quick actions: flag follow-up · draft follow-up email · edit.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F6 · Follow-up Flag</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">One tap adds to the shared follow-up queue. Optional one-line reminder. Feeds the Planning follow-ups tab and the HubSpot push.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F7 · Look Up & Pre-Brief</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Proactive flow. Rep sees a badge/hears a name → searches → gets briefing BEFORE walking up. Read-only (CQRS, no Encounter created). Two cases: known contact → relationship briefing; unknown → light cold pre-brief (stretch).</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">F8 · Save-for-later</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">"N unresolved" counter in UI. End-of-day nudge: "You have 6 unresolved contacts — reconcile now?" → deep link to Reconcile inbox. Keeps field fast while protecting data quality.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">LinkedIn as Identity Anchor</div>
+    <div class="card-body">
+      <p>From the parsed name+company, the system surfaces likely LinkedIn profiles (photo + name + title) for the rep to tap. That one tap does three jobs:</p>
+      <ul>
+        <li><strong>Verifies</strong> the parse caught the right person (visual confirmation)</li>
+        <li><strong>Locks</strong> the strongest identity key (LinkedIn URL)</li>
+        <li><strong>Auto-corrects ASR mangling</strong> — "AD in" → "Adyen, Treasury Lead" (confirmed profile overwrites garbled fields)</li>
+      </ul>
+      <p style="margin-top:8px;">NOT mandatory — capture proceeds on name+company if no clean match. Works without LinkedIn at every step; LinkedIn just raises confidence dramatically.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Offline-First Architecture</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>IndexedDB queue</strong> (<code>lib/offline/queue.ts</code>): capture stages 1–2 always succeed, even with no connection</li>
+        <li><strong>Sync manager</strong>: drains queue on reconnect (navigator.onLine / Background Sync API)</li>
+        <li>Audio Blob is source of truth — never discarded until Encounter row + uploaded audio confirmed</li>
+        <li>Status per item: <code>recorded → uploading → processing → draft → committed</code></li>
+        <li>PWA manifest + service worker = app shell loads offline</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('field', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== MATCHING ===== -->
+<div class="section" id="section-matching">
+  <div class="section-header">
+    <div class="section-badge badge-field">Field + Reconcile</div>
+    <div class="section-title">The Matching Engine</div>
+    <div class="section-subtitle">The hardest part — conceptually. Cross-conference identity recognition with graceful handling of name variations, job changes, and cross-rep encounters.</div>
+  </div>
+
+  <div class="callout callout-principle">
+    <div class="callout-title">The fundamental tradeoff</div>
+    <div class="callout-body"><strong>False split</strong> (miss a repeat — silently fails, worst outcome) vs. <strong>false merge</strong> (fuse two people — embarrassing wrong nudges). We lean toward recall (catch more repeats) but guard merges with confirmation. Asymmetric blast radius.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Three-Stage Pipeline</div>
+    <div class="card-body">
+      <div class="pipeline" style="margin-top:8px;">
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">1</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Candidate Retrieval (cheap, deterministic)</div>
+            <div class="pipeline-detail">pg_trgm fuzzy search on name+company, exact match on linkedin_url/email when present. Returns ~10 candidates max. <strong>Zero candidates → no LLM call at all.</strong> This is what keeps cost near-zero at scale.</div>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">2</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">LLM Adjudication (Haiku)</div>
+            <div class="pipeline-detail">Sends new capture + shortlist (NOT the full DB) to a cheap model. Returns per-candidate: verdict (same/different/unsure), confidence score, reasoning text, jobChange boolean, crossRep boolean. Judgment rules can't easily encode job changes or nickname variations.</div>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">3</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Three-Way Resolution</div>
+            <div class="pipeline-detail">Driven by confidence. See below.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Three-Way Resolution by Confidence</div>
+    <div class="card-body">
+      <div class="match-tiers">
+        <div class="match-tier tier-high">
+          <div class="match-tier-label">High + Your Own</div>
+          <div class="match-tier-desc">Auto-Match. Shows "🔗 3rd meeting" (undoable). No friction on the floor for clear repeats.</div>
+        </div>
+        <div class="match-tier tier-medium">
+          <div class="match-tier-label">Medium</div>
+          <div class="match-tier-desc">Prompt: "Is this Sarah Chen from Money20/20 EU? [Yes / No / Save for later]" + engine reasoning shown.</div>
+        </div>
+        <div class="match-tier tier-low">
+          <div class="match-tier-label">Low / Unsure / Cross-Rep</div>
+          <div class="match-tier-desc">Save for later → Reconcile inbox. linkState = pending. NEVER auto-merges cross-rep encounters.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Edge Cases — Know All Four</div>
+    <div class="card-body">
+      <div class="feature-grid">
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">ASR Mangling</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">"Adyen" → "AD in". The matcher is designed to absorb this — it's just another name variation. Fuzzy retrieval catches phonetic similarity. If LinkedIn confirmed: profile fields overwrite garbled ASR output entirely. One feature's weakness is another feature's job.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Job Changes</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">"VP Treasury @Adyen '24 → Head of Payments @Stripe '25." The LLM specifically detects this (jobChange:true in output). Identity snapshot per Encounter captures it as signal. Surfaced in briefing: "Promoted since last meeting."</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Cross-Rep Encounters</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">If a colleague (Marco) met this person: system INFORMS you richly ("Marco logged a maybe here") but NEVER auto-merges. You can even ask the prospect to confirm. Linking only happens in Reconcile. P1 in action: "weakest link, don't launder."</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Same-Event Duplicates</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Logging someone already captured today (rep forgot). Detected via My Leads + matcher. Offer "add another encounter" (fully supported — multiple Encounters per Contact per conference) or "update the earlier one." Default: add new Encounter.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">The question you'll get: "How do you handle false merges?"</div>
+    <div class="callout-body">"Two things. First, the confidence threshold for auto-match is high — only your own firsthand repeat at high confidence auto-links. Anything else prompts. Second, linkState = pending means a wrong link hasn't contaminated the system of record yet. It goes to Reconcile, where a human with full context (audio playback, LinkedIn side-by-side, engine reasoning) makes the call. P1: be strict with records."</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Signal Reliability Hierarchy</div>
+    <div class="card-body">
+      <p>When matching, signal quality matters:</p>
+      <ol style="padding-left:18px; color: var(--text2);">
+        <li style="margin-bottom:6px;"><strong style="color:#10B981;">LinkedIn URL</strong> — near-deterministic, survives job changes, human-verifiable</li>
+        <li style="margin-bottom:6px;"><strong>Email</strong> — strong, but not always available on the floor</li>
+        <li style="margin-bottom:6px;"><strong>Name + company</strong> — common, breaks on job change</li>
+        <li style="margin-bottom:6px;"><strong>Name + topics</strong> — weaker but useful for niche contexts</li>
+        <li style="margin-bottom:6px;"><strong>Name alone</strong> — weakest, many false positives</li>
+      </ol>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('matching', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== BRIEFING ===== -->
+<div class="section" id="section-briefing">
+  <div class="section-header">
+    <div class="section-badge badge-field">Field + Planning</div>
+    <div class="section-title">Relationship Intelligence</div>
+    <div class="section-subtitle">The arc summarizer, field briefing, and verdict states. The signature feature and most-weighted rubric criterion.</div>
+  </div>
+
+  <div class="callout callout-principle">
+    <div class="callout-title">Key reframe (know this cold)</div>
+    <div class="callout-body">The briefing's PRIMARY job is to <strong>catch the rep up instantly</strong> on a returning contact they've bumped into unexpectedly — "who is this, what's been discussed, how do I approach them" — in seconds. The warming/tire-kicker verdict is embedded as one line, not the headline. The show floor is ambush territory: ~3 seconds to not look lost.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Briefing-First vs. Verdict-First</div>
+    <div class="card-body">
+      <p><strong>Briefing-first wins because:</strong> it shifts the feature from evaluative (serves the manager: "how good is this lead?") to enabling (serves the rep: "help me win the next 60 seconds"). Higher sales empathy.</p>
+      <p>It also dissolves the nudge-noise problem — a briefing is information, always welcome; a pushed judgment nags.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Glance Line + Expandable Briefing</div>
+    <div class="card-body">
+      <p><strong>Glance line (always visible, deterministic — renders even if AI call fails):</strong></p>
+      <div class="quote">"Sarah Chen · Adyen · 3rd meeting (you 2×, Marco 1×) · 🌱 warming"</div>
+      <p><strong>Tap to expand (AI-generated arc):</strong></p>
+      <ul>
+        <li><strong>Last time:</strong> most recent encounter — when, which conf, which rep, what was discussed</li>
+        <li><strong>Open threads:</strong> unresolved asks / promises ("wanted a pricing example; never got a pilot")</li>
+        <li><strong>How to approach:</strong> their style + interests → what to lead with</li>
+        <li><strong>Suggested move:</strong> the embedded verdict's recommended next step</li>
+      </ul>
+      <p style="margin-top:8px;">Folds in <strong>all reps' encounters</strong> — shared team memory. The rep catches up on the team's relationship, not just their own.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Temperature — 5-Point Warmth Ladder</div>
+    <div class="card-body">
+      <p>Interest/intent (THEIRS). Distinct from fit (OURS). AI pre-selects, rep confirms with one tap.</p>
+      <div class="temp-list" style="margin-top:12px;">
+        <div class="temp-item"><span class="temp-icon">🔥</span><span class="temp-name">Hot</span><div class="temp-desc">Active intent, wants next step now</div></div>
+        <div class="temp-item"><span class="temp-icon">🙂</span><span class="temp-name">Warm</span><div class="temp-desc">Genuine interest, worth nurturing</div></div>
+        <div class="temp-item"><span class="temp-icon">😐</span><span class="temp-name">Lukewarm</span><div class="temp-desc">Polite, non-committal</div></div>
+        <div class="temp-item"><span class="temp-icon">🥶</span><span class="temp-name">Cool</span><div class="temp-desc">Low interest / not now</div></div>
+        <div class="temp-item"><span class="temp-icon">❄️</span><span class="temp-name">Cold</span><div class="temp-desc">No interest / brush-off</div></div>
+      </div>
+      <p style="margin-top:10px;">Why 5-point over 3-point: gives the cross-conference arc real <strong>trajectory resolution</strong>. "Warm→Warm→Lukewarm→Cool" = a cooling tire-kicker. A 3-point scale can't show that gradient.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Verdict — Five Arc States</div>
+    <div class="card-body">
+      <p><strong>"Measure movement, not mood."</strong> A perpetually-warm contact who never advances = tire-kicker.</p>
+      <div class="verdict-list" style="margin-top:10px;">
+        <div class="verdict-item">
+          <div class="verdict-icon">🌱</div>
+          <div><div class="verdict-name">Warming → Close</div><div class="verdict-desc">Rising engagement + concrete progression (topic specificity deepening, next steps taken)</div><div class="verdict-move">→ Push for next step / pilot</div></div>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-icon">🤝</div>
+          <div><div class="verdict-name">Nurturing</div><div class="verdict-desc">Genuine, steady, still early</div><div class="verdict-move">→ Keep delivering value</div></div>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-icon">♻️</div>
+          <div><div class="verdict-name">Tire-Kicker</div><div class="verdict-desc">Many meetings, long time, warm-but-flat, no next steps taken</div><div class="verdict-move">→ Qualify hard or deprioritize</div></div>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-icon">🧊</div>
+          <div><div class="verdict-name">Cooling</div><div class="verdict-desc">Engagement declining over time</div><div class="verdict-move">→ Re-engage deliberately or let go</div></div>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-icon">⏳</div>
+          <div><div class="verdict-name">Too Early</div><div class="verdict-desc">Only 1–2 touches — no verdict yet</div><div class="verdict-move">→ Just show facts</div></div>
+        </div>
+      </div>
+      <p style="margin-top:10px; font-size:13px; color: var(--text3);">Harsher labels (tire-kicker/cooling) gated by meeting-count + elapsed time. A 2nd warm meeting is "Nurturing," not a flag. Don't judge too early.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Lead Qualification — Fit × Temperature 2×2</div>
+    <div class="card-body">
+      <p><strong>Fit</strong> (company ICP + person role) × <strong>Temperature</strong> (their interest) = the prioritization grid:</p>
+      <div class="matrix" style="margin-top:12px;">
+        <div class="matrix-corner"></div>
+        <div class="matrix-header">🔥 Hot</div>
+        <div class="matrix-header">❄️ Cold</div>
+        <div class="matrix-row-label">⭐ Strong Fit</div>
+        <div class="matrix-cell hot-strong"><strong>Chase hard</strong><span>Priority — ideal customer, active intent</span></div>
+        <div class="matrix-cell cold-strong"><strong>Nurture</strong><span>Ideal customer, not ready yet — don't drop</span></div>
+        <div class="matrix-row-label">Weak Fit</div>
+        <div class="matrix-cell hot-weak"><strong>Be polite</strong><span>Enthusiastic but wrong company</span></div>
+        <div class="matrix-cell cold-weak"><strong>Deprioritize</strong><span>Move on</span></div>
+      </div>
+      <p style="margin-top:10px; font-size:13px; color:var(--text2);">Fit = AI computes, optional override (inferred, not witnessed). Temperature = AI suggests, rep confirms (witnessed). Different epistemics → different ownership.</p>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('briefing', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== RECONCILE ===== -->
+<div class="section" id="section-reconcile">
+  <div class="section-header">
+    <div class="section-badge badge-reconcile">Reconcile</div>
+    <div class="section-title">Reconcile Experience</div>
+    <div class="section-subtitle">The correctness layer. Turning uncertain floor matches into confident committed records. "Strict with records" made literal.</div>
+  </div>
+
+  <div class="callout callout-principle">
+    <div class="callout-title">The role of Reconcile</div>
+    <div class="callout-body">Reconcile is mostly assembly — P1 + P2 + the matching engine converge here. It's where "pending" links get resolved into "confirmed." No new machinery, just deliberate humans with full context.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">R1 · Pending Inbox</div>
+    <div class="card-body">
+      <ul>
+        <li>List of pending encounters (count, progress, match-confidence badges)</li>
+        <li>End-of-day nudge deep-links here from Field F8 ("N unresolved contacts")</li>
+        <li>Satisfying empty state when all resolved</li>
+        <li>Scope: pending field items only (one rep's own captures, bounded ~10–30 per conference)</li>
+      </ul>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">Why one-at-a-time inbox (not bulk)</div>
+        <div class="callout-body">Volume is bounded (one conference, one rep = ~10-30 items). One-at-a-time keeps "strict with records" deliberate — friction is a FEATURE on the surface where being wrong is corrosive. Bulk review invites rubber-stamping.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">R2 · Resolve Card</div>
+    <div class="card-body">
+      <p>Full context for a confident decision:</p>
+      <ul>
+        <li><strong>This capture:</strong> transcript, note, temperature, topics</li>
+        <li><strong>Audio playback</strong> (P2 — replay the original recording). This is the practical payoff of P2: the rep's own voice, captured on the show floor, becomes the tie-breaker when they're uncertain in Reconcile hours later.</li>
+        <li><strong>Candidate(s):</strong> existing contact(s) with their full prior encounter history</li>
+        <li><strong>LinkedIn side-by-side:</strong> visual comparison</li>
+        <li><strong>"Re-analyze with Sonnet"</strong> — re-runs the matcher at full quality (Sonnet vs. Haiku on the floor). The richer model for a deliberate moment.</li>
+      </ul>
+      <p style="margin-top:10px;"><strong>Four outcomes:</strong></p>
+      <ul>
+        <li><strong>Match</strong> → linkState flips pending → confirmed (atomic DB transaction — no half-links)</li>
+        <li><strong>New Contact</strong> → create fresh Contact row</li>
+        <li><strong>Loop In</strong> → flag colleague (cross-rep: link shared Contact + create notification row)</li>
+        <li><strong>Defer</strong> → stay pending (rare)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">Defend: "Why a separate Reconcile experience at all?"</div>
+    <div class="callout-body">"Because the show floor and the hotel room require different UX and different confidence bars. On the floor: 30 seconds, noisy, context-limited. In a calm moment: full context, audio playback, Sonnet-quality reasoning. Forcing both into one experience either slows capture or rushes commits. Separation is what makes both great."</div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('reconcile', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== PLANNING ===== -->
+<div class="section" id="section-planning">
+  <div class="section-header">
+    <div class="section-badge badge-planning">Planning</div>
+    <div class="section-title">Planning Hub</div>
+    <div class="section-subtitle">Company-wide, desktop-first. Every planning tab, what it shows, and why it exists.</div>
+  </div>
+
+  <div class="callout callout-principle">
+    <div class="callout-title">Planning is company-wide, not personal</div>
+    <div class="callout-body">One early mistake: the planning hub planned MY conferences, not THE TEAM's. Fixed: every view shows all reps' coverage. Assign any teammate, see the whole team's follow-up queue, get under-invested alerts for the team — not just yourself.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Five Tabs (+ Conference Detail)</div>
+    <div class="card-body">
+      <div class="feature-grid">
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Overview Dashboard</span><span class="feature-card-tag">Default landing</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">What needs your attention right now: warming contacts with no follow-up, under-invested T1 conferences, next events up, follow-up queue size, region coverage. Each card deep-links to the relevant tab. Aggregates everything — built last, because it aggregates all the other data.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Conferences Tab</span><span class="feature-card-tag">ICP scoring + discovery</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">190 real events sorted by ICP score. Tier badges (T1/T2/T3). Live weight sliders that re-rank instantly (no AI call). Filter by vertical/tier. "Re-score with AI" per card. Expandable score breakdown. AI Discovery panel: generate candidates from world knowledge, auto-score via C4 formula.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Coverage Tab</span><span class="feature-card-tag">Timeline + Map</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Month-by-month timeline of upcoming conferences. T1 uncovered = under-invested alert. CoverageControl popover: assign any rep to any conference (considering/committed/declined). Map view: react-leaflet, colored circle markers by tier, green ring = committed. Gap analysis by region/quarter. AI Coverage Suggestions overlay.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Relationships Tab</span><span class="feature-card-tag">Signature feature in Planning</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">All contacts with 2+ confirmed encounters, ranked by verdict. Job-change detection (identity snapshot diff). Conference trail. Key filter: "Warming · no follow-up" — the highest-value signal. Links to the contact's full arc page (C8).</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Follow-Ups Tab</span><span class="feature-card-tag">HubSpot push</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Team/Mine toggle. All flagged contacts with owning-rep attribution. Sort by date or heat. Per-contact HubSpot push + "Push all qualified" bulk. Shows push status (created/updated/demo per row). The curated CRM handoff.</div>
+        </div>
+        <div class="feature-card" onclick="this.classList.toggle('expanded')">
+          <div class="feature-card-header"><span class="feature-card-name">Conference Detail /conference/[id]</span><span class="feature-card-tag">Per-event deep-dive</span><span class="expand-icon">▾</span></div>
+          <div class="feature-card-desc">Per-factor override sliders (recompute + persist ICP score for this event). Team coverage assignment. All leads captured at this conference. Other editions of the same event. "Push all qualified to HubSpot" bulk action.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('planning', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== SCORING ===== -->
+<div class="section" id="section-scoring">
+  <div class="section-header">
+    <div class="section-badge badge-planning">Planning</div>
+    <div class="section-title">ICP Scoring Methodology</div>
+    <div class="section-subtitle">The marquee feature. You must defend every number and design choice. Know this cold.</div>
+  </div>
+
+  <div class="callout callout-principle">
+    <div class="callout-title">The core design: AI estimates inputs · formula computes score</div>
+    <div class="callout-body">AI does the fuzzy reasoning (what's the ICP density at this event? how topic-relevant is it?). A transparent, tunable formula turns those estimates into a 0–100 score and tier. Drag a slider → instant re-rank, zero AI calls. The user sees and can modify every input.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Five Factors (memorize weights and rationale)</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead>
+          <tr><th>Factor</th><th>Default</th><th>Why this weight</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>ICP Density</strong></td><td class="weight">40%</td><td>How many PSPs/treasury/FX desks are in the room. Quality &gt; headcount. The most important factor — a 600-person treasury summit beats a 40k generic expo.</td></tr>
+          <tr><td><strong>Topic Fit</strong></td><td class="weight">25%</td><td>Is FX/cross-border payments the primary agenda, or a side track? A payments-themed conference where FX is a keynote topic beats a "fintech" conference where it's a 20-min slot.</td></tr>
+          <tr><td><strong>Scale</strong></td><td class="weight">15%</td><td>Raw audience size, but capped influence. Scale amplifies density; it can't replace it. Highest weight when combined with high density.</td></tr>
+          <tr><td><strong>Geo Relevance</strong></td><td class="weight">10%</td><td>EU is Grain's primary market. APAC/MEA weighted lower. Reflects actual travel ROI.</td></tr>
+          <tr><td><strong>Historical Perf.</strong></td><td class="weight">10%</td><td>Repeat ROI from previous years. Redistributed to ICP Density when null (new events aren't penalized for having no track record).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tiers and Example Scores</div>
+    <div class="card-body">
+      <p><span class="chip chip-t1">T1 ≥ 75</span> Must-attend · <span class="chip chip-t2">T2 ≥ 50</span> Consider · <span class="chip" style="background:rgba(255,255,255,0.05); color:var(--text3);">T3 &lt; 50</span> Skip</p>
+      <table class="score-table" style="margin-top:12px;">
+        <thead><tr><th>Conference</th><th>Score</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Money20/20 Europe</strong></td><td class="weight">89</td><td>PSP/FX-desk concentration unmatched. The room IS Grain's ICP.</td></tr>
+          <tr><td><strong>EuroFinance</strong></td><td class="weight">84</td><td>Global treasury and FX. Attendees ARE corporate treasurers and heads of FX. Near 100% ICP density.</td></tr>
+          <tr><td><strong>Sibos</strong></td><td class="weight">80</td><td>Top cross-border payments event. High ICP density despite broad SWIFT audience.</td></tr>
+          <tr><td><strong>FinovateEurope</strong></td><td class="weight">69</td><td>Good topic fit, decent density, smaller scale.</td></tr>
+          <tr><td><strong>Web Summit</strong></td><td class="weight">48 (T3)</td><td>70k attendees — but ~95% are non-ICP (mostly general tech/startup). Scale without fit is noise.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Live Slider Demo</div>
+    <div class="card-body">
+      <p>Drag Scale from 15% → 50%:</p>
+      <ul>
+        <li>Web Summit: 48 → 61 (its 70k attendees now dominate the score)</li>
+        <li>Singapore FinTech Festival: 66 → 73</li>
+        <li>Sibos: 80 → 78 (small adjustment; its strength is density, not scale)</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>Zero AI calls. Instant re-rank.</strong> This is the defensible design: the formula is the source of truth; the AI estimates are just inputs.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">Defend: "Why these weights specifically?"</div>
+    <div class="callout-body">"ICP Density at 40% because quality of audience completely dominates quantity for Grain's sales cycle — a relationship-heavy B2B FX sale needs the RIGHT people in the room, not just many people. Scale at 15% because a 70k generic tech conference at 15% still outsizes a 500-person FX summit at scale — but density at 40% correctly overrides it. These are defensible starting defaults; the whole point of tunable sliders is that a sales leader can adjust them based on what's worked historically."</div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('scoring', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== COVERAGE SUGGESTIONS ===== -->
+<div class="section" id="section-coverage">
+  <div class="section-header">
+    <div class="section-badge badge-planning">Planning</div>
+    <div class="section-title">Coverage Map & AI Suggestions</div>
+    <div class="section-subtitle">The geographic view and the AI rep-allocation feature — the active counterpart to the gap analysis panels.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Coverage Map</div>
+    <div class="card-body">
+      <ul>
+        <li>react-leaflet + Carto dark OSM tiles — <strong>completely keyless</strong> (no Google Maps API key)</li>
+        <li>Circle markers: color = tier (T1=amber, T2=blue), size = ICP score</li>
+        <li>Green ring = at least one committed rep</li>
+        <li>Hover tooltip: conference name, dates, tier</li>
+        <li>190 events plotted with latitude/longitude</li>
+        <li>Timeline/Map toggle on Coverage tab</li>
+      </ul>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">Why map matters for the brief</div>
+        <div class="callout-body">The brief explicitly asks for geographic clustering — finding where multiple events cluster so the team can plan trip efficiency. The map makes this visual instantly. "EuroFinance and Sibos both in Europe in October" is a trip to plan, not two separate expenses.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">AI Coverage Suggestions</div>
+    <div class="card-body">
+      <p>The user writes a free-text instruction: "Prioritize EU treasury events, send Priya to APAC, keep London-based reps close to home." The AI generates a full rep-allocation across the year.</p>
+      <p style="margin-top:8px;"><strong>Key design decisions:</strong></p>
+      <ul>
+        <li><code>committed</code> tickets are LOCKED — AI can't override already-booked travel</li>
+        <li><code>considering</code> = soft — AI can keep, move, or drop them</li>
+        <li>Reps have <code>home_city</code> + <code>capacity</code> so clustering is grounded</li>
+        <li>Double-booking enforced by code, not AI (hard constraint)</li>
+        <li>AI proposes; deterministic validator disposes (same hybrid philosophy as scoring + matching)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Suggestion Mode</div>
+    <div class="card-body">
+      <ul>
+        <li>Suggestions stored in <code>coverage_suggestions</code> table — shareable by URL (<code>/planning?suggestionId=uuid</code>)</li>
+        <li>Overlay renders as <code>status:'suggested'</code> on the timeline/map — NOT a DB write to <code>coverage</code></li>
+        <li>Unmissable banner: "You're viewing a suggestion — exit to real state"</li>
+        <li>Rep filter + ordered numbered travel itinerary (Stop 1 of 5…)</li>
+        <li>Heuristic fallback: greedy allocator works with no Anthropic key</li>
+        <li>This is <strong>P1 made literal</strong>: generous suggestion hint, never touches the committed record</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('coverage', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== AI FEATURES ===== -->
+<div class="section" id="section-aifeatures">
+  <div class="section-header">
+    <div class="section-badge badge-ai">AI</div>
+    <div class="section-title">All AI Features — Why Each One Is Justified</div>
+    <div class="section-subtitle">The rubric is "AI judgment, not bolted-on." For each feature: remove it and the core value prop breaks, or the job requires world knowledge / synthesis that rules can't do.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">1 · Voice Capture → Parse + Fit Scoring</div>
+    <div class="card-body">
+      <p><strong>Why AI is right:</strong> The rep speaks 15 seconds of unstructured speech. You can't extract name/company/title/topics/temperature/fit/follow-up from that with rules. The LLM is the parsing layer that turns speech into structure — and it flags its own uncertainty via <code>confidencePerField</code>.</p>
+      <p><strong>Why not bolted on:</strong> Remove it and the core Field value prop (voice-first capture) doesn't work. AI is load-bearing.</p>
+      <p><strong>Cost control:</strong> Haiku (cheap model). Parse + fit in ONE LLM call (zero incremental cost for fit).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">2 · Relationship Arc Summarizer</div>
+    <div class="card-body">
+      <p><strong>Why AI is right:</strong> Synthesizing 5 encounters across 3 conferences over 18 months into "Last time at Sibos she asked for a pricing example, never got it. She's now VP. Lead with that." requires reasoning over messy, variable-length text. Rules can't do this.</p>
+      <p><strong>Why not bolted on:</strong> Knowing "3 encounters" is a number. Knowing "warming relationship with an unmet ask — close now" is the insight. The value of cross-conference tracking is useless without interpretation.</p>
+      <p><strong>Model:</strong> Sonnet (deliberate and high-quality; this is the briefing a rep stakes a conversation on).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">3 · ICP Scoring Engine (AI Estimates Factors)</div>
+    <div class="card-body">
+      <p><strong>Why AI is right:</strong> "What % of Money20/20 Europe attendees are PSPs or platforms with FX exposure?" isn't in a spreadsheet. The LLM knows the conference world and can estimate ICP density, decision-maker presence, and topic alignment from public knowledge.</p>
+      <p><strong>Why not bolted on:</strong> The alternative is a human manually researching 190 conferences. AI handles the fuzzy estimation; the transparent formula handles the scoring. Division of labor is honest and auditable.</p>
+      <p><strong>Important design:</strong> AI estimates factors ONCE (stored), formula recomputes LIVE (no AI call on slider drag). Respects both the UX and the credit budget.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">4 · Conference Discovery</div>
+    <div class="card-body">
+      <p><strong>Why AI is right:</strong> Finding conferences you don't already know about — the brief's named example feature. "What payments/fintech/FX events should Grain's BD team know about in APAC in H2 2026?" requires world knowledge + synthesis. A search engine gives you links; the LLM gives you structured, pre-scored candidates.</p>
+      <p><strong>Workflow:</strong> AI generates candidates → each is auto-scored via the C4 formula → user reviews and adds. Same hybrid pipeline, consistent methodology.</p>
+      <p><strong>Mock fallback:</strong> 4 real pre-baked candidates when no API key. Feature demos offline.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">5 · AI Coverage Suggestions</div>
+    <div class="card-body">
+      <p><strong>Why AI is right:</strong> "Given 6 reps in different home cities, 190 conferences, committed travel, and the instruction 'prioritize EU treasury' — allocate who goes where." This is a global soft-optimization over natural-language goals. Deterministic code can enforce hard constraints; only AI can interpret the instruction and balance soft objectives (clustering, fairness, ICP coverage).</p>
+      <p><strong>Why not bolted on:</strong> This replaces a multi-hour planning exercise. The counterfactual (manual spreadsheet) is obvious and painful.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">The "AI judgment" test — apply to any feature</div>
+    <div class="callout-body">Ask: does this job require (a) world knowledge, (b) synthesis over messy unstructured inputs, or (c) soft judgment that rules can't encode? If yes to any → AI is right. If it's deterministic, computable, or rules-based → DON'T use AI (see: the formula recomputing on slider drag).</div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('aifeatures', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== HUBSPOT ===== -->
+<div class="section" id="section-hubspot">
+  <div class="section-header">
+    <div class="section-badge badge-core">Integration</div>
+    <div class="section-title">HubSpot Integration</div>
+    <div class="section-subtitle">The CRM handoff. Know the positioning cold — it's the answer to "why isn't this just a worse HubSpot?"</div>
+  </div>
+
+  <div class="quote">"We are NOT a CRM. HubSpot is the system of record — deals, pipelines, sequences, reporting. We are the system of engagement for the one context HubSpot does badly: the show floor and the cross-conference relationship."</div>
+
+  <div class="card">
+    <div class="card-title">Not a dumb export — a curated handoff</div>
+    <div class="card-body">
+      <p>The difference between a data dump and a curated handoff:</p>
+      <ul>
+        <li><strong>What gets pushed:</strong> Contact (name/company/title/email/LinkedIn) + <strong>arc summary as a note</strong> + fit/temperature as properties + "met at [conference]" context</li>
+        <li><strong>Who gets pushed:</strong> Only qualified leads (flagged for follow-up, or filtered by fit × temperature). Not every badge scan.</li>
+        <li><strong>Deduplication:</strong> Search HubSpot by email first → update existing contact if found, create new if not. No 409 errors, no duplicate records.</li>
+        <li><strong>One-way only:</strong> us → HubSpot. The CRM is downstream, not a sync partner.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Technical Implementation</div>
+    <div class="card-body">
+      <ul>
+        <li><code>lib/hubspot</code> — interface with mock labeled clearly (demos without a key)</li>
+        <li>Per-contact push: search → update/create → attach arc-summary note</li>
+        <li>Bulk push: "Push all qualified" from follow-ups tab</li>
+        <li>HubSpot API key = user-configurable via in-app Settings (encrypted, server-side only)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">Defend: "Why not build a two-way sync?"</div>
+    <div class="callout-body">"A two-way sync would mean we're competing with HubSpot for the system-of-record position. We deliberately chose to be upstream feeders. Our job is capture → qualify → push. HubSpot's job is everything after: sequences, deal tracking, reporting. Inbound pull (checking if a prospect is already a customer) is in the parking lot — it's compelling but not necessary for the assignment."</div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('hubspot', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== MODEL STRATEGY ===== -->
+<div class="section" id="section-modelstrategy">
+  <div class="section-header">
+    <div class="section-badge badge-core">Process</div>
+    <div class="section-title">Model Strategy & How You Used AI</div>
+    <div class="section-subtitle">This is part of the interview — the role is explicitly about how you work with AI. The journal is the story.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Opus / Sonnet Split</div>
+    <div class="card-body">
+      <div class="model-split">
+        <div class="model-card">
+          <div class="model-name model-opus">Opus 4 (expensive, best reasoning)</div>
+          <div class="model-use">Open-ended planning · scoring methodology · cross-conference matching design · architecture decisions · the pattern-setting core build (scaffold + lib/ skeleton). Used where a decision is made ONCE but copied many times.</div>
+        </div>
+        <div class="model-card">
+          <div class="model-name model-sonnet">Sonnet (cheaper, fast execution)</div>
+          <div class="model-use">High-volume screens · CRUD · wiring · all three experiences built end-to-end · QA · conference DB research · design polish. Everything after the plan is locked.</div>
+        </div>
+      </div>
+      <div class="callout callout-why" style="margin-top:12px;">
+        <div class="callout-title">Why this matters in the interview</div>
+        <div class="callout-body">This is the same cost/quality tradeoff a BD team makes when deciding which conferences senior reps attend. Spend the premium resource where the decision multiplies; automate the rest. That framing shows you think in ROI, not just tools.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Where AI Helped Most</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Catching my own contradictions:</strong> I wanted suggestions to be "read-only" but also "reloadable by URL" — AI spotted that those two requirements conflict (you need persistence for reload). Sharp question before planning → better design.</li>
+        <li><strong>Double-booking constraint:</strong> AI caught that "smart clustering" is meaningless without no-double-booking enforcement. I hadn't stated it as a hard constraint — AI surfaced it.</li>
+        <li><strong>Parallel fan-out:</strong> Researching 190 conferences by hand = full day. With 6 parallel research agents by region × vertical = ~4 minutes wall-clock. Same adversarial verification fan-out confirmed 0 fabrications.</li>
+        <li><strong>The scoring formula:</strong> Opus helped design the 5-factor methodology with defensible rationale per weight. The business logic, not the code.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Where AI Got In the Way</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Too conservative on scope:</strong> Initially proposed one AI feature. I pushed back; we designed all five.</li>
+        <li><strong>Hybrid matching (too cautious):</strong> Proposed "hybrid" retrieval+rules. I pushed for LLM-first; it correctly added "but retrieval in front to keep it cheap and scalable." The back-and-forth landed on a better design than either starting position.</li>
+        <li><strong>Stale API knowledge:</strong> AI SDK v6 deprecated <code>generateObject</code>. I had to read the docs to find the correct pattern (<code>generateText + Output.object</code>). Training data is always behind. Lesson: verify APIs in current docs, not LLM memory.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Journal (the "how I used AI" story)</div>
+    <div class="card-body">
+      <p>I maintained a running decision log (<code>.claude/JOURNAL.md</code>) for every meaningful choice — the alternatives considered, why we chose one over another, where I overrode the AI, where it corrected me. It's append-only, roughly 1000+ lines across 27+ entries.</p>
+      <p style="margin-top:8px;">Two reasons this is part of the story:</p>
+      <ul>
+        <li><strong>The journal is itself an AI workflow:</strong> reading it at session start to recover context across model/session switches is exactly the kind of lightweight process artifact the role builds for sales teams</li>
+        <li><strong>The "where the human redirected the AI" moments are the most interesting part:</strong> where I pushed back, where I took corrections, where I had to verify library APIs myself</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('modelstrategy', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== NUMBERS ===== -->
+<div class="section" id="section-numbers">
+  <div class="section-header">
+    <div class="section-badge badge-core">Quick Reference</div>
+    <div class="section-title">Key Numbers & Facts</div>
+    <div class="section-subtitle">Everything you need to cite confidently in the interview.</div>
+  </div>
+
+  <div class="numbers-grid">
+    <div class="number-card"><div class="number-value">190</div><div class="number-label">Real, web-researched conferences in the DB</div></div>
+    <div class="number-card"><div class="number-value">44</div><div class="number-label">Conferences originally seeded (was 10 → 44 → 190)</div></div>
+    <div class="number-card"><div class="number-value">89</div><div class="number-label">Money20/20 Europe ICP score (highest)</div></div>
+    <div class="number-card"><div class="number-value">48</div><div class="number-label">Web Summit ICP score (T3 — scale ≠ fit)</div></div>
+    <div class="number-card"><div class="number-value">40%</div><div class="number-label">ICP Density weight (most important factor)</div></div>
+    <div class="number-card"><div class="number-value">T1: 24</div><div class="number-label">Must-attend conferences (score ≥ 75)</div></div>
+    <div class="number-card"><div class="number-value">6</div><div class="number-label">Demo team members (you + Maya/Tom/Priya/Liam/Sofia)</div></div>
+    <div class="number-card"><div class="number-value">20</div><div class="number-label">Demo contacts / 38 encounters / 10 cross-conf arcs</div></div>
+    <div class="number-card"><div class="number-value">5</div><div class="number-label">Temperature levels (Hot/Warm/Lukewarm/Cool/Cold)</div></div>
+    <div class="number-card"><div class="number-value">5</div><div class="number-label">AI features built</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Key Tech Decisions (if asked)</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>AI SDK v6</strong> — <code>generateText + Output.object</code> (NOT <code>generateObject</code> — deprecated in v6)</li>
+        <li><strong>Haiku</strong> for matching/parsing (cheap, short prompts, high volume)</li>
+        <li><strong>Sonnet</strong> for briefings/scoring/discovery (quality matters)</li>
+        <li><strong>pg_trgm</strong> — Postgres fuzzy search for candidate retrieval (before LLM)</li>
+        <li><strong>react-leaflet + Carto OSM</strong> — map with zero API keys needed</li>
+        <li><strong>IndexedDB (idb)</strong> — offline capture queue</li>
+        <li><strong>Supabase</strong> — Postgres + Auth + Storage + RLS in one service</li>
+        <li><strong>AES-256-GCM</strong> — service key encryption at rest (Settings store)</li>
+        <li><strong>Next.js App Router / Vercel</strong> — one deploy, auto-deploys on main push</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Two Principles (P1 and P2 in one sentence each)</div>
+    <div class="card-body">
+      <div class="callout callout-principle" style="margin-bottom:8px;">
+        <div class="callout-title">P1</div>
+        <div class="callout-body">"Be generous with hints, strict with records — informing the rep on the floor and committing data to the system of record have different blast radii, so they get different confidence bars."</div>
+      </div>
+      <div class="callout callout-principle">
+        <div class="callout-title">P2</div>
+        <div class="callout-body">"Keep the source, not just the derivation — we store raw voice recordings because you can always re-derive from source, but you can never recover source from a lossy derivation."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Three Hardest Questions + Short Answers</div>
+    <div class="card-body">
+      <div class="callout callout-defend" style="margin-bottom:8px;">
+        <div class="callout-title">"How do you prevent false merges?"</div>
+        <div class="callout-body">Auto-match only at high confidence + your own firsthand repeat. Everything else prompts or queues to Reconcile as pending. Pending = not yet in the system of record. Human with full context (audio playback, LinkedIn, Sonnet re-run) makes the call.</div>
+      </div>
+      <div class="callout callout-defend" style="margin-bottom:8px;">
+        <div class="callout-title">"Why is Web Summit a T3?"</div>
+        <div class="callout-body">70k attendees but ~95% are non-ICP (general tech/startup). ICP Density at 40% of the score correctly overrides scale. A 600-person treasury summit beats it. Scale without fit is noise, not signal.</div>
+      </div>
+      <div class="callout callout-defend">
+        <div class="callout-title">"Why separate Reconcile from Field?"</div>
+        <div class="callout-body">Different contexts demand different UX and different confidence bars. On the floor: 30 seconds, noisy, context-limited. At the hotel: full context, audio playback, Sonnet quality. Forcing both into one experience either slows capture or rushes commits.</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('numbers', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== NEXT STEPS ===== -->
+<div class="section" id="section-nextsteps">
+  <div class="section-header">
+    <div class="section-badge badge-core">Interview Prep</div>
+    <div class="section-title">What I'd Build Next</div>
+    <div class="section-subtitle">Gaps I know about, features I didn't have time for, and honest improvements. The brief explicitly asks this — have a crisp, prioritized answer.</div>
+  </div>
+
+  <div class="callout callout-principle">
+    <div class="callout-title">How to frame this in the interview</div>
+    <div class="callout-body">Don't just list features. Show <strong>prioritization logic</strong> — which gaps hurt the most, which have the biggest leverage on the rubric, which are quick wins vs. big bets. That's the thinking Ben cares about.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎙️ Audio Playback in Reconcile — Known Gap, High Value</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> P2 (keep the source) says we store every voice recording in Supabase Storage. The Reconcile card shows the transcript and match candidates — but there's no way to actually play back the recording. The UI was never built.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> The recording is the rep's own memory of the conversation. In Reconcile, hours after the show floor, a rep staring at two possible "Sarah" matches can hit play and hear their own voice say <em>"she mentioned she just moved to Mollie last month"</em> — that 15 seconds resolves the uncertainty instantly. No AI prompt can substitute for that.</p>
+      <p style="margin-top:8px;"><strong>How to build it:</strong> Fetch a signed URL for <code>encounter.audio_path</code> from Supabase Storage, render a native <code>&lt;audio&gt;</code> element in the Reconcile card. Small addition, high payoff.</p>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">Why this is the first thing I'd ship</div>
+        <div class="callout-body">It's the gap between P2 as a principle and P2 as a product feature. The data is already there — the storage, the path, the principle. The UI is one component away. High leverage, low effort.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">↩️ HubSpot Inbound Pull — "Is This Already a Customer?"</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The integration is one-way (us → HubSpot). There's no check on the way IN: when a rep captures someone in the field, we don't know if that person is already a Grain customer, an open deal, or a churned account.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> A rep pitching the Grain product to someone who's already a customer is an embarrassing failure mode. A rep who gets a briefing saying "⚠️ Open deal — Sarah is already in a trial with the payments team" walks into that conversation completely differently.</p>
+      <p style="margin-top:8px;"><strong>What it would look like:</strong> On capture (or pre-brief in F7), query HubSpot by email → surface a banner if the contact already exists as a customer, open deal, or churned account. Read-only lookup, no sync complexity.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✉️ Follow-Up Email → Gmail / HubSpot Sequences</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The follow-up drafting AI (arc summary → email copy) exists as a concept but the last mile isn't connected. Right now a rep would have to copy-paste the draft into Gmail or HubSpot manually.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> One-click "Send via Gmail" (Gmail API, OAuth) or "Enroll in sequence" (HubSpot Sequences API). The content is already generated — connecting the pipe is what unlocks the time saving.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> The job description literally says "automated follow-ups" as a core responsibility. This closes that loop end-to-end.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔄 Live Conference Enrichment — Continuous, Not Point-in-Time</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The 190-conference database was built with a one-time research pass. Dates, venues, and speaker lineups change. New events are announced constantly. Right now it's a static seed.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> A background agent (cron job) that periodically re-runs the discovery flow, flags new ICP-relevant events, and surfaces estimated-date events for confirmation when organizers publish real dates. Keep the database fresh automatically.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> A sales intelligence tool that goes stale after deployment isn't a tool — it's a spreadsheet. The brief asks for something the team actually uses daily. Continuous intelligence is what makes that possible.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">👥 Multi-Person Capture</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> Currently one recording = one person. In reality, reps often walk out of a group conversation having met 2–3 people at once.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> When the parse step detects multiple names in the transcript, offer to split into separate Encounters automatically, or flag for the rep to log a second person. The AI already extracts names — routing them to separate captures is the addition.</p>
+      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> The MVP assumption (1 recording = 1 person) was deliberate — don't half-build a complex flow. Get the single-person path perfect first. This is the natural next step once that's stable.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📱 Push Notifications for End-of-Day Reconcile Nudge</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The F8 "N unresolved" nudge is currently only visible inside the app. A rep who closes the tab after a long conference day won't see it.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> Web Push notification (PWA supports this) at a configurable time — "You have 8 unresolved contacts from Money20/20. Reconcile before you forget?" — with a deep link directly to the Reconcile inbox. One tap, they're there.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> The whole capture-vs-commit architecture depends on reps actually doing the Reconcile pass. A push notification closes the behavioral loop.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗑️ Delete / Undo a Lead</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> There is currently no way to delete or undo a capture. If a rep accidentally logs the wrong person, or taps record twice, the encounter stays in the system with no removal path.</p>
+      <p style="margin-top:8px;"><strong>What the plan says:</strong> The field edge cases spec covers this — soft-delete the Encounter, and if it created an orphan Contact (no other encounters) clean that up too. The design is clear; it just wasn't built.</p>
+      <p style="margin-top:8px;"><strong>What it would look like:</strong> A swipe-to-delete or trash icon on the My Leads list (F4) and the contact card (F5), available for a short window after capture ("undo" within the same session). After that, a deliberate delete action in the contact card requiring confirmation.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔀 Manual Contact Merge — "I Know These Are the Same Person"</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> If the system created two separate Contact records for the same person — and didn't offer to connect them — there is currently no way for the rep to manually merge them. This is explicitly in the foundation's parking lot: "merging existing contacts" was deferred from v1.</p>
+      <p style="margin-top:8px;"><strong>Why it happens:</strong> The matcher runs at capture time. If the rep captured someone twice at different conferences with slightly different spellings, and both times the match confidence was low (so both went to New Contact), you now have a split identity. The rep knows they're the same person. The system doesn't.</p>
+      <p style="margin-top:8px;"><strong>What it would look like:</strong> A "Merge with…" action in the contact card — search for the duplicate, preview the combined encounter history, confirm. All encounters from both records get reattached to a single Contact. Lives naturally in the Reconcile experience as a proactive integrity tool, not just a pending-captures inbox.</p>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">Why it's in the parking lot and not a gap</div>
+        <div class="callout-body">It was a deliberate scope cut, not an oversight. The Reconcile experience handles <em>uncertain captures before they're committed</em>. Merging already-confirmed records is a different, heavier operation — it touches committed data, which is P1's strict side. Getting the pending→confirmed flow right first was the right call. This is the natural v2 extension of Reconcile.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 Live LinkedIn Enrichment — The Identity Anchor Gap</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> LinkedIn is described as the primary identity anchor — the one thing that makes cross-conference matching near-certain. But the enrichment provider that surfaces LinkedIn candidate profiles during capture is currently a <strong>mock</strong>. The flow (rep taps a LinkedIn card → photo+title confirm identity → fields overwrite ASR mangling) is fully built in the UI. The live data feed isn't wired.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> Configure a real Clay or Apollo key in Settings. The <code>EnrichmentProvider</code> interface is already the abstraction layer — switching from mock to real is a settings change, not a code change. The architecture was designed for this from day one specifically so the build wasn't blocked on a third-party integration.</p>
+      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> LinkedIn ToS complexity, Clay/Apollo API cost, and auth were flagged as the T1 highest shipping risk before a line of code was written. The deliberate choice was: build the interface, ship the mock, unblock on a key. It's the right sequencing call — not a shortcut.</p>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('nextsteps', this)">✓ I know this section</button>
+</div>
+
+</main>
+</div>
+
+<script>
+const sections = ['overview','principles','datamodel','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','nextsteps'];
+const done = new Set();
+
+function goTo(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  document.querySelector('[data-section="' + id + '"]').classList.add('active');
+  document.querySelector('.main').scrollTo(0, 0);
+}
+
+function markDone(id, btn) {
+  done.add(id);
+  btn.classList.add('done');
+  btn.textContent = '✓ Got it!';
+  const navItem = document.querySelector('[data-section="' + id + '"]');
+  navItem.classList.add('done');
+  updateProgress();
+  // auto-advance to next
+  const idx = sections.indexOf(id);
+  if (idx < sections.length - 1) {
+    setTimeout(() => goTo(sections[idx + 1]), 400);
+  }
+}
+
+function updateProgress() {
+  const pct = (done.size / sections.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = done.size + ' / ' + sections.length;
+}
+
+// keyboard nav
+document.addEventListener('keydown', e => {
+  const current = sections.findIndex(s => document.getElementById('section-' + s).classList.contains('active'));
+  if (e.key === 'ArrowRight' && current < sections.length - 1) goTo(sections[current + 1]);
+  if (e.key === 'ArrowLeft' && current > 0) goTo(sections[current - 1]);
+});
+</script>
+</body>
+</html>
