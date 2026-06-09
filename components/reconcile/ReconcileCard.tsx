@@ -40,7 +40,9 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
 
   const snap = encounter.identitySnapshot;
   const displayName = snap?.name ?? existingContact?.contact.canonicalName ?? 'Unknown';
-  const best = liveCandidates.find((c) => c.decision === 'same');
+  // Reconcile is the human-review stage — surface both confident matches AND uncertain ones.
+  // Field uses strict 'same'-only; Reconcile uses high recall so nothing slips past.
+  const best = liveCandidates.find((c) => c.decision === 'same' || c.decision === 'unsure');
 
   function handleAction(action: 'link' | 'new' | 'skip') {
     setError(null);
@@ -133,7 +135,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
                 <RefreshCw size={12} className="text-accent" />
               </div>
               <p className="text-sm font-semibold text-text1">
-                Possible repeat · {Math.round(best.confidence * 100)}% confident
+                {best.decision === 'unsure' ? 'Possible match — verify' : 'Possible repeat'} · {Math.round(best.confidence * 100)}% confident
               </p>
             </div>
             {best.jobChange && (
@@ -212,7 +214,7 @@ export function ReconcileCard({ encounter, candidates, bestContact, existingCont
             {isPending ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
-              '✓ Same person — link records'
+              best?.decision === 'unsure' ? '✓ Same person — link records (verify)' : '✓ Same person — link records'
             )}
           </button>
         )}

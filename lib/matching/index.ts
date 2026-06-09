@@ -32,11 +32,19 @@ export async function retrieveCandidates(identity: IdentitySnapshot): Promise<Ca
   return (data as CandidateContact[]) ?? [];
 }
 
-const SYSTEM = `Decide, for each candidate, whether they are the SAME person as the newly captured
-contact. Handle name variations (typos, ASR errors, nicknames, maiden/married) and JOB CHANGES
-(same person, different company/title) — a confirmed LinkedIn/email match is near-certain. Lean
-toward catching real repeats, but be honest: use "unsure" when you can't tell, and set a calibrated
-confidence (0..1). Explain briefly. Set jobChange=true when it's the same person who moved roles.`;
+const SYSTEM = `Decide, for each candidate, whether they are the SAME person as the newly captured contact.
+
+Rules:
+- "same": you believe it is the same person. Use this even for minor name differences when company
+  and/or title strongly corroborate (e.g. "Elena Fisher @ ayden, VP Treasury" vs
+  "Elena Fischer @ Adyen, VP Treasury" → same; one-letter typo + matching role = same person).
+  Also use for confirmed email or LinkedIn match.
+- "unsure": real ambiguity across multiple signals — same name but very different company/title
+  with no other corroboration.
+- "different": clearly distinct people.
+
+Bias toward "same" when a name typo is the only difference and company/title match well.
+Set confidence 0–1. Set jobChange=true when the same person moved roles. Explain briefly.`;
 
 /** Step 2 — LLM adjudicates the shortlist. model: Haiku (field) or Sonnet (reconcile, richer). */
 export async function adjudicateMatch(
