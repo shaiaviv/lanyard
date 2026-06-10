@@ -421,9 +421,8 @@ value against its cost:
 
 Type a natural-language brief ("cross-border payments & treasury events in APAC") and it returns
 real events **not already in your database**, each **auto-scored with the same ICP engine** and a
-one-line rationale tied to Grain's ICP ("a direct match for Grain's embedded FX risk product"); it
-even flags events you already track ("Already excluded - skip"). One click adds an event, fully
-scored.
+one-line rationale tied to Grain's ICP ("a direct match for Grain's embedded FX risk product").
+One click adds an event, fully scored.
 
 > **Graceful degradation everywhere.** Every AI feature has a labeled mock/heuristic fallback so
 > the app stays fully demoable with **no API keys configured** - discovery returns real sample

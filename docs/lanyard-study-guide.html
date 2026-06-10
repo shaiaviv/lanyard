@@ -1256,6 +1256,7 @@
         <li>Rep filter + ordered numbered travel itinerary (Stop 1 of 5…)</li>
         <li>Heuristic fallback: greedy allocator works with no Anthropic key</li>
         <li>This is <strong>P1 made literal</strong>: generous suggestion hint, never touches the committed record</li>
+        <li><strong>ICP weights are baked in at generation time</strong> — the suggestion is a static snapshot. If you change the scoring weights afterwards, the existing suggestion doesn't update. You'd need to generate a fresh one to reflect the new weights.</li>
       </ul>
     </div>
   </div>
