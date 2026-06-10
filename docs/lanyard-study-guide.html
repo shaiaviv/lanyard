@@ -1146,6 +1146,62 @@
     <div class="callout-body">"ICP Density at 40% because quality of audience completely dominates quantity for Grain's sales cycle — a relationship-heavy B2B FX sale needs the RIGHT people in the room, not just many people. Scale at 15% because a 70k generic tech conference at 15% still outsizes a 500-person FX summit at scale — but density at 40% correctly overrides it. These are defensible starting defaults; the whole point of tunable sliders is that a sales leader can adjust them based on what's worked historically."</div>
   </div>
 
+  <div class="card">
+    <div class="card-title">Where AI runs vs. where the formula runs</div>
+    <div class="card-body">
+      <p><strong>AI (Sonnet) runs once per conference</strong> — triggered in two places:</p>
+      <ul>
+        <li><strong>Conference list (C2)</strong> — each card has a "Re-score with AI" button in the expanded view</li>
+        <li><strong>Conference detail (C3)</strong> — "Re-score with AI" button next to the score breakdown</li>
+      </ul>
+      <p style="margin-top:8px;">Both call the same <code>rescoreConference</code> server action → <code>scoreConference()</code> → updates <code>score_breakdown</code> in the DB. When to use it: you added more detail to a conference, this year's edition changed focus, or you updated the ICP definition and want fresh estimates.</p>
+      <p style="margin-top:8px;"><strong>Formula runs everywhere else</strong> — slider drag, page load, any weight change. No AI call, pure client-side math over the stored <code>score_breakdown</code>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Formula (know this cold)</div>
+    <div class="card-body">
+      <p><code>score = Σ(factor_score × weight) / Σ(active_weights)</code></p>
+      <p style="margin-top:8px;"><strong>Key detail — null redistribution:</strong> <code>historicalPerf</code> is <code>null</code> for brand-new events (AI is told not to invent a track record). Its 10% weight is dropped and the remaining factors are normalized against 90 — so a first-time event competes on 4 factors without being penalized for having no history. The formula auto-adjusts; no special case needed in the code.</p>
+      <p style="margin-top:8px;"><strong>Two separate functions, deliberately:</strong></p>
+      <ul>
+        <li><code>scoreConference()</code> — server-only, Sonnet, runs ONCE when a conference is added or re-scored. Estimates the fuzzy factor inputs and stores them in <code>score_breakdown</code> JSONB.</li>
+        <li><code>computeIcpScore(breakdown, weights)</code> — pure, isomorphic JS (no server-only), no AI. Runs on every slider drag, client-side. Takes the stored breakdown + current weights → 0–100 score + tier badge. Instant, free.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Shared ICP Definition — one file, two uses</div>
+    <div class="card-body">
+      <p>The ICP criteria live in <code>lib/ai/icp.ts</code> as a single exported string (<code>GRAIN_ICP</code>). It's injected into the system prompt for <strong>two completely different AI calls:</strong></p>
+      <ul>
+        <li><strong>Conference scoring (C4)</strong> — <code>scoreConference</code> uses it to judge: "does this event attract Grain's ICP?"</li>
+        <li><strong>Lead qualification (Field #4)</strong> — <code>parseCapture</code> uses it to judge: "is this person Grain's ICP?"</li>
+      </ul>
+      <p style="margin-top:8px;">The result: a conference scored T1 and a contact scored 85 are using the same yardstick. "We met this person at a T1 conference" is a coherent signal — both judgments came from the same ICP definition.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Per-factor AI rationale + user overrides</div>
+    <div class="card-body">
+      <p>Every AI factor estimate comes with a <strong>one-line rationale</strong> stored alongside the score in <code>score_breakdown</code>. On the conference detail screen (C3), you see the breakdown panel — not just "ICP Density: 82" but also the AI's reasoning: <em>"Strong PSP/treasury density; Money20/20 is known for decision-maker concentration in payments."</em></p>
+      <p style="margin-top:8px;"><strong>Factor overrides (P1 in action):</strong> A rep who attended the event last year can override any factor input — e.g. "AI estimated ICP density at 80 but the floor felt more like fintech generalists, I'd say 55." The override recomputes the score immediately. The AI's estimate is labeled as a guess; the human's override is labeled as firsthand. This is P1 (<em>generous with hints, strict with records</em>) applied to the scoring layer.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">Defend: "Why not just use AI end-to-end for scoring?"</div>
+    <div class="callout-body">"Pure AI is a black box — you can't explain WHY conference X scored higher than Y, you can't tune it, and you can't run it live as a user drags a slider. Pure manual scoring is unscalable and subjective for 190 events. The hybrid is honest about the division of labor: AI handles the inputs it's genuinely better at (fuzzy judgment about event character), a transparent formula handles the aggregation. The breakdown is fully auditable — every number has a rationale."</div>
+  </div>
+
+  <div class="callout callout-defend">
+    <div class="callout-title">Defend: "Why is cost not in the score?"</div>
+    <div class="callout-body">"Fit and cost are orthogonal axes — a high-fit expensive conference and a high-fit cheap one both deserve T1 status. If you mix cost into the fit score, you corrupt the signal. The right model is a 2×2: ICP fit on one axis, cost/effort on the other. High-fit + expensive = invest selectively. High-fit + cheap = no-brainer. Low-fit + cheap = still a waste of time. Keeping them separate means the prioritization logic stays clean."</div>
+  </div>
+
   <button class="know-it-btn" onclick="markDone('scoring', this)">✓ I know this section</button>
 </div>
 
@@ -1463,6 +1519,16 @@
   </div>
 
   <div class="card">
+    <div class="card-title">⚡ Page Caching — Quick Win, Big Perceived Speed Gain</div>
+    <div class="card-body">
+      <p><strong>What's slow:</strong> Every page navigation hits Supabase fresh — no caching. The planning page fires 8 parallel DB queries on every render (conferences, coverage, follow-ups, relationships, gap analysis, reps, weights, suggestions). Combined with Vercel cold starts on the free tier, simple page transitions feel slow.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Add <code>'use cache'</code> (Next.js 15 directive) to the heavy read queries in <code>lib/db/queries.ts</code>. Wrap <code>getConferences()</code>, <code>getReps()</code>, <code>getScoringWeights()</code> — data that changes rarely — with a 60-second cache. Subsequent navigations return instantly from memory; no DB round-trip.</p>
+      <p style="margin-top:8px;"><strong>Why it wasn't done from the start:</strong> Deliberate tradeoff. Caching adds complexity around invalidation — if you cache the conference list but someone adds a conference, the cache must bust correctly or you show stale data. Getting that wrong silently is worse than slow. During a time-constrained build, correctness first was the right call. This is a 30-minute task now that the data model is stable.</p>
+      <p style="margin-top:8px;"><strong>On paid Vercel:</strong> Warmed function instances eliminate cold starts entirely — that alone would fix most of the perceived slowness without any code change.</p>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">🎙️ Audio Playback in Reconcile — Known Gap, High Value</div>
     <div class="card-body">
       <p><strong>What's missing:</strong> P2 (keep the source) says we store every voice recording in Supabase Storage. The Reconcile card shows the transcript and match candidates — but there's no way to actually play back the recording. The UI was never built.</p>
@@ -1516,6 +1582,25 @@
       <p><strong>What's missing:</strong> The F8 "N unresolved" nudge is currently only visible inside the app. A rep who closes the tab after a long conference day won't see it.</p>
       <p style="margin-top:8px;"><strong>What's next:</strong> Web Push notification (PWA supports this) at a configurable time — "You have 8 unresolved contacts from Money20/20. Reconcile before you forget?" — with a deep link directly to the Reconcile inbox. One tap, they're there.</p>
       <p style="margin-top:8px;"><strong>Why it matters:</strong> The whole capture-vs-commit architecture depends on reps actually doing the Reconcile pass. A push notification closes the behavioral loop.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📝 Coverage Suggestion Rationale — Zod Validation Gap</div>
+    <div class="card-body">
+      <p><strong>What happens:</strong> Occasionally Sonnet returns an empty string for the <code>rationale</code> and an empty array for <code>perRepNotes</code> — the assignments come back fine but the narrative is blank. The suggestion gets saved and displayed with no explanation.</p>
+      <p style="margin-top:8px;"><strong>Why it slips through:</strong> Zod's <code>z.string()</code> only checks that the value is a string — it doesn't care if it's empty. <code>""</code> passes validation silently. The fix is <code>z.string().min(1)</code>, which would force a retry instead of saving a blank rationale.</p>
+      <p style="margin-top:8px;"><strong>How common:</strong> 2 out of 5 suggestions in the DB had this — both from early test runs with very few assignments. The full-scale suggestions all produced good narratives. Likely happens when the input is minimal and Sonnet doesn't bother filling in the narrative fields.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Tighten the Zod schema to <code>z.string().min(50)</code> for <code>rationale</code> and <code>z.array(...).min(1)</code> for <code>perRepNotes</code>. That forces a retry on any run that returns empty narrative fields.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">❌ Dismiss from Follow-Up Queue — Missing Inline Action</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The follow-up queue only has one action: push to HubSpot. There's no way to say "not worth chasing" and clear a contact from the queue inline. To remove someone a rep has to navigate to the encounter record and manually uncheck "Flag for follow-up" — which nobody will do mid-queue review.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> A queue you can't clear is a queue reps stop trusting. If dismissing a low-quality lead takes 4 clicks and a page navigation, reps will just leave them there — and the queue becomes noise, not signal.</p>
+      <p style="margin-top:8px;"><strong>What it would look like:</strong> A "Not worth it" or "Dismiss" button next to each follow-up card — one click, sets <code>follow_up = false</code> on the encounter, removes it from the list instantly. Optionally a quick "why" tag (wrong person, already a customer, no budget) for later analysis.</p>
     </div>
   </div>
 
