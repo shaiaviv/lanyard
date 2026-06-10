@@ -1577,6 +1577,16 @@
   </div>
 
   <div class="card">
+    <div class="card-title">📊 Outcome Tracking — Close the Measurement Loop</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> Right now <code>historicalPerf</code> is almost always <code>null</code> — the AI is told not to invent a track record, so it gets dropped and the other 4 factors absorb its weight. There's no way to feed real results back into the scoring model.</p>
+      <p style="margin-top:8px;"><strong>What it would look like:</strong> After a conference ends, the rep (or a HubSpot sync) logs meetings booked and pipeline generated. That data writes back to <code>historicalPerf</code> for that conference. Next time it's scored, the factor is real — based on actual Grain results, not the AI's world knowledge guess.</p>
+      <p style="margin-top:8px;"><strong>Why it matters for this role:</strong> The job description measures impact by "meetings booked, pipeline generated, and time saved." This feature closes that loop — you can prove EuroFinance generated 3 pipeline opportunities last year, so it scores higher next year. The tool learns from real results instead of estimating indefinitely.</p>
+      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> You need at least one full conference cycle of data before it's meaningful. The infrastructure is already designed for it — <code>historicalPerf</code> is a first-class factor in the schema, just waiting for real inputs. The input mechanism is the missing piece.</p>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">🔄 Live Conference Enrichment — Continuous, Not Point-in-Time</div>
     <div class="card-body">
       <p><strong>What's missing:</strong> The 190-conference database was built with a one-time research pass. Dates, venues, and speaker lineups change. New events are announced constantly. Right now it's a static seed.</p>
