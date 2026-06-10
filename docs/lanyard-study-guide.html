@@ -386,6 +386,10 @@
     <div class="card-title">One App · Three Experiences · One Data Core</div>
     <div class="card-body">
       <p>Think of it like Gmail: Inbox, Search, Settings are three modes on the same database. Same here.</p>
+      <div class="callout callout-defend" style="margin-top:10px; margin-bottom:4px;">
+        <div class="callout-title">Defend: "Why one app instead of three separate tools?"</div>
+        <div class="callout-body">Three separate apps would require sync — a Field capture would need to poll or push before Planning could see it. One shared DB means a capture is instantly visible in Planning with zero sync logic. The rep doesn't manage multiple systems, the ops lead doesn't wait for a sync job, and the relationship arc builds in real time. Coherence is only possible when all three experiences read and write the same tables.</div>
+      </div>
       <div class="feature-grid" style="margin-top:12px;">
         <div class="feature-card" onclick="this.classList.toggle('expanded')">
           <div class="feature-card-header">
@@ -612,6 +616,10 @@
         <div class="callout-title">The identity snapshot trick</div>
         <div class="callout-body">Each Encounter stores who they said they were <em>at that moment</em>. "VP Treasury @Adyen '24 → Head of Payments @Stripe '25" is captured by diffing snapshots — it becomes a job-change signal, surfaced in the relationship briefing.</div>
       </div>
+      <div class="callout callout-defend" style="margin-top:8px;">
+        <div class="callout-title">Defend: "Why not just overwrite with the latest title?"</div>
+        <div class="callout-body">If we only stored the latest title, a job change would erase the history — you'd never know they'd moved roles. Keeping the snapshot per encounter gives you a time series: diff the snapshots across encounters and a job change surfaces automatically as a relationship signal. "She was VP @Adyen when you first met; now she's at Stripe — she brought the problem with her" is only possible if you kept both snapshots.</div>
+      </div>
     </div>
   </div>
 
@@ -703,7 +711,9 @@
         </div>
         <div class="feature-card" onclick="this.classList.toggle('expanded')">
           <div class="feature-card-header"><span class="feature-card-name">F2 · Fast Capture — Hero</span><span class="expand-icon">▾</span></div>
-          <div class="feature-card-desc">Voice-first: big record button, rep talks, AI fills the form. Three magic behaviors: (1) confidence-flagged review (eye goes to ONE risky field, not a re-read), (2) names lean on the matcher (ASR mangles "Adyen" → matcher normalizes it), (3) optimistic/async (never block). Manual form always one tap away.</div>
+          <div class="feature-card-desc">Voice-first: big record button, rep talks, AI fills the form. Three magic behaviors: (1) confidence-flagged review (eye goes to ONE risky field, not a re-read), (2) names lean on the matcher (ASR mangles "Adyen" → matcher normalizes it), (3) optimistic/async (never block). Manual form always one tap away.
+          <br><br><strong>Why voice-first:</strong> The show floor is conversation-first — the rep is face-to-face with someone. Looking down at a form means breaking eye contact and losing the moment. Voice is the only input that works without looking at the screen. <strong>Why manual form as fallback, not primary:</strong> Built manual-first so the app was demoable at every build step; voice layered on after. If voice breaks, the form still works — no feature leaves the app non-functional.
+          </div>
         </div>
         <div class="feature-card" onclick="this.classList.toggle('expanded')">
           <div class="feature-card-header"><span class="feature-card-name">F3 · "Met Before?" Hint</span><span class="expand-icon">▾</span></div>
@@ -789,7 +799,7 @@
         <div class="pipeline-step">
           <div class="pipeline-left"><div class="pipeline-num active">2</div><div class="pipeline-line"></div></div>
           <div class="pipeline-content">
-            <div class="pipeline-title">LLM Adjudication (Haiku)</div>
+            <div class="pipeline-title">LLM Adjudication (Haiku on floor · Sonnet in Reconcile)</div>
             <div class="pipeline-detail">Sends new capture + shortlist (NOT the full DB) to a cheap model. Returns per-candidate: verdict (same/different/unsure), confidence score, reasoning text, jobChange boolean, crossRep boolean. Judgment rules can't easily encode job changes or nickname variations.</div>
           </div>
         </div>
@@ -1013,6 +1023,11 @@
         <li><strong>Candidate(s):</strong> existing contact(s) with their full prior encounter history</li>
         <li><strong>LinkedIn side-by-side:</strong> visual comparison</li>
         <li><strong>"Re-analyze with Sonnet"</strong> — re-runs the matcher at full quality (Sonnet vs. Haiku on the floor). The richer model for a deliberate moment.</li>
+      </ul>
+      <div class="callout callout-defend" style="margin-top:8px;">
+        <div class="callout-title">Defend: "Why Haiku on the floor and Sonnet in Reconcile?"</div>
+        <div class="callout-body">Field has two constraints Reconcile doesn't: time pressure (rep is waiting) and volume (20+ captures per conference). Haiku is fast and cheap — the right tradeoff when you need a quick hint, not a definitive answer. Reconcile has zero time pressure and low volume (10–30 pending items). Sonnet costs 5× more but gets the match right more often — and here, getting it right is the whole point. Same matcher function, different model argument.</div>
+      </div>
       </ul>
       <p style="margin-top:10px;"><strong>Four outcomes:</strong></p>
       <ul>
@@ -1303,6 +1318,7 @@
     <div class="card-title">4 · Conference Discovery</div>
     <div class="card-body">
       <p><strong>Why AI is right:</strong> Finding conferences you don't already know about — the brief's named example feature. "What payments/fintech/FX events should Grain's BD team know about in APAC in H2 2026?" requires world knowledge + synthesis. A search engine gives you links; the LLM gives you structured, pre-scored candidates.</p>
+      <p><strong>Why not a hand-curated list:</strong> A manual list is subjective, stale after one quarter, and can't find events you didn't think to search for. The LLM surfaces unknowns based on your ICP definition — events that match Grain's criteria but aren't on anyone's radar yet. Then the C4 formula auto-scores them, so discovered events arrive already tiered. The counterfactual (a person spending a day researching APAC treasury conferences) doesn't scale to 190 events across 12 regions.</p>
       <p><strong>Workflow:</strong> AI generates candidates → each is auto-scored via the C4 formula → user reviews and adds. Same hybrid pipeline, consistent methodology.</p>
       <p><strong>Mock fallback:</strong> 4 real pre-baked candidates when no API key. Feature demos offline.</p>
     </div>
@@ -1578,6 +1594,14 @@
   </div>
 
   <div class="card">
+    <div class="card-title">🔍 Arc Verdict Icons Have No Legend</div>
+    <div class="card-body">
+      <p><strong>What happens:</strong> The conference detail page shows verdict icons next to contact names — <code>↑</code> warming, <code>↓</code> cooling, <code>—</code> tire-kicker, <code>◎</code> nurturing, <code>○</code> too early. There is no tooltip, legend, or explanation anywhere in the app. A new user has no way to know what they mean.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Either a hover tooltip on the icon ("↑ Warming — engagement rising across meetings") or a small legend at the top of the leads list. One-line fix, high discoverability impact.</p>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">📱 Push Notifications for End-of-Day Reconcile Nudge</div>
     <div class="card-body">
       <p><strong>What's missing:</strong> The F8 "N unresolved" nudge is currently only visible inside the app. A rep who closes the tab after a long conference day won't see it.</p>
@@ -1593,6 +1617,16 @@
       <p style="margin-top:8px;"><strong>Why it slips through:</strong> Zod's <code>z.string()</code> only checks that the value is a string — it doesn't care if it's empty. <code>""</code> passes validation silently. The fix is <code>z.string().min(1)</code>, which would force a retry instead of saving a blank rationale.</p>
       <p style="margin-top:8px;"><strong>How common:</strong> 2 out of 5 suggestions in the DB had this — both from early test runs with very few assignments. The full-scale suggestions all produced good narratives. Likely happens when the input is minimal and Sonnet doesn't bother filling in the narrative fields.</p>
       <p style="margin-top:8px;"><strong>The fix:</strong> Tighten the Zod schema to <code>z.string().min(50)</code> for <code>rationale</code> and <code>z.array(...).min(1)</code> for <code>perRepNotes</code>. That forces a retry on any run that returns empty narrative fields.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔁 HubSpot Push Doesn't Clear the Follow-Up Queue</div>
+    <div class="card-body">
+      <p><strong>What happens:</strong> Pushing a contact to HubSpot doesn't remove them from the follow-up list. The <code>follow_up</code> flag stays <code>true</code> on the encounter, so the contact keeps sitting in the queue after being pushed. The "In HubSpot" button state is local React state only — on refresh it resets to "Push to HubSpot."</p>
+      <p style="margin-top:8px;"><strong>With a real API key:</strong> The push does stamp <code>provenance.hubspot.pushed_at</code> in the DB — so the button could read that on mount and show "In HubSpot" persistently. That logic isn't built yet.</p>
+      <p style="margin-top:8px;"><strong>The mock:</strong> No API key → mock fallback simulates a push, shows "Pushed (demo)" — intentionally changes nothing in the DB. That's correct behavior for a demo.</p>
+      <p style="margin-top:8px;"><strong>What it should do:</strong> After a successful real push, either auto-unflag the follow-up (<code>follow_up = false</code>) or show a persistent "Pushed ✓" state by reading <code>provenance.hubspot</code> on load. Both are small additions.</p>
     </div>
   </div>
 
