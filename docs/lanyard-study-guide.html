@@ -820,6 +820,10 @@
           <div class="callout-title">Defend: "Why not React Native?"</div>
           <div class="callout-body">Brief constraint: "a non-developer should be able to host and update this." Native apps require Xcode/Android Studio builds, app store submissions, and review cycles for every update. A PWA is a URL — update by pushing to Vercel. Zero deploy friction for a non-dev.</div>
         </div>
+        <div class="callout callout-why" style="margin-top:10px;">
+          <div class="callout-title">Why the PWA only installs as the Field app — intentional</div>
+          <div class="callout-body">The manifest sets <code>"start_url": "/capture"</code> deliberately. No matter what URL a rep installs from, the home screen shortcut always opens Field. Planning and Reconcile are desktop-first experiences — there's no reason to pin them to a phone. One PWA, one job: fast show-floor capture.</div>
+        </div>
       </div>
     </div>
 
@@ -1084,8 +1088,8 @@
         <tbody>
           <tr>
             <td><strong style="color:#059669">✓ PWA</strong></td>
-            <td>Offline-first, installable via "Add to Home Screen," deployed as a URL, updates instantly with <code>git push</code>.</td>
-            <td>— <strong>Chosen</strong>. "Non-dev can host/update" + offline-first are both solved in one choice.</td>
+            <td>Offline-first, installable via "Add to Home Screen," deployed as a URL, updates instantly with <code>git push</code>. <code>start_url: "/capture"</code> — always opens Field, by design.</td>
+            <td>— <strong>Chosen</strong>. "Non-dev can host/update" + offline-first both solved. PWA is Field-only intentionally — Planning is desktop-first.</td>
           </tr>
           <tr>
             <td>React Native</td>
