@@ -317,6 +317,10 @@
     <span class="dot" style="background:#F4A825"></span> Tech Stack
     <span class="check">✓</span>
   </div>
+  <div class="nav-item" onclick="goTo('techdeepive')" data-section="techdeepive">
+    <span class="dot" style="background:#F4A825"></span> Framework Deep Dive
+    <span class="check">✓</span>
+  </div>
 
   <div class="sidebar-section-label">Field Experience</div>
   <div class="nav-item" onclick="goTo('field')" data-section="field">
@@ -758,6 +762,27 @@
 
     <div class="tech-card">
       <div class="tech-card-header">
+        <span class="tech-layer-badge tlb-framework">Framework</span>
+        <span class="tech-card-name">Next.js App Router</span>
+        <span class="tech-card-subtitle">Full-stack in one repo, no manual endpoints</span>
+      </div>
+      <div class="tech-card-body">
+        <p>Next.js sits on top of React and Node.js. It's what turns a React UI into a full-stack application with a built-in server — no separate Express backend needed.</p>
+        <ul>
+          <li><strong>Server Actions — no manual HTTP endpoints:</strong> With Vite + Express you'd write every endpoint by hand (<code>app.post('/api/capture', ...)</code>), write a matching <code>fetch()</code> in the frontend, keep the URL strings in sync, and deploy two separate services. With Next.js you write one function marked <code>'use server'</code> and call it like a normal function from the UI. Next.js generates the endpoint, handles serialization, and wires the connection automatically. Lanyard has ~8 server operations — that's 8 endpoints you never had to write.</li>
+          <li><strong>Route groups — 3 experiences, 1 repo:</strong> <code>(field)</code>, <code>(reconcile)</code>, <code>(planning)</code> are separate layout trees (mobile vs desktop optimized) that share the same DB and <code>lib/</code> without being separate apps or deployments.</li>
+          <li><strong>Server Components by default:</strong> Every component runs on the server unless you add <code>'use client'</code>. API keys and Claude calls never reach the browser — not by convention, by default.</li>
+          <li><strong>One deployment:</strong> <code>git push</code> → Vercel builds and ships both the UI and the server together. No coordinating two separate deploys.</li>
+        </ul>
+        <div class="callout callout-defend" style="margin-top:10px;">
+          <div class="callout-title">Defend: "Why not Vite + Express?"</div>
+          <div class="callout-body">Vite is frontend-only. You'd need a full Express server alongside it — separate repo, separate deployment, separate config. Every server operation in Lanyard would require: define the route in Express, write a fetch() in React, match the URL string, handle CORS, keep both in sync. With Next.js Server Actions all of that disappears. For a 4–6 hour project, that boilerplate saving is the difference between shipping and not shipping.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
         <span class="tech-layer-badge tlb-data">DB / Auth</span>
         <span class="tech-card-name">Supabase</span>
         <span class="tech-card-subtitle">One service, four requirements</span>
@@ -881,6 +906,292 @@
   </div>
 
   <button class="know-it-btn" onclick="markDone('techstack', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== TECH DEEP DIVE ===== -->
+<div class="section" id="section-techdeepive">
+  <div class="section-header">
+    <div class="section-badge badge-core">🔬 Deep Dive</div>
+    <div class="section-title">Framework Deep Dive</div>
+    <div class="section-subtitle">Every tech choice — what else was considered, what was rejected, and the single deciding reason. Use this when an interviewer asks "why X and not Y?"</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Next.js vs the alternatives</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ Next.js</strong></td>
+            <td>React UI + Node.js server in one repo. Server Actions = no manual endpoints. Route groups = 3 experiences in 1 deployment.</td>
+            <td>— <strong>Chosen</strong></td>
+          </tr>
+          <tr>
+            <td>Vite + Express</td>
+            <td>Fast React dev server (frontend) + manual Node.js server (backend)</td>
+            <td>Two separate codebases, two deployments, every API call needs a manually written endpoint + matching fetch(). ~8 endpoints in Lanyard = 8× the boilerplate.</td>
+          </tr>
+          <tr>
+            <td>Remix</td>
+            <td>Similar to Next.js, full-stack, good data loading</td>
+            <td>Smaller ecosystem, less native Vercel integration, App Router is more mature. No meaningful advantage for this project.</td>
+          </tr>
+          <tr>
+            <td>Plain React (CRA)</td>
+            <td>Just the UI layer</td>
+            <td>No server at all. Would need Express built alongside it. Same problem as Vite.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Vercel vs the alternatives</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ Vercel</strong></td>
+            <td><code>git push</code> → live. Preview URL per PR. Global CDN. Built by the Next.js team — deepest integration.</td>
+            <td>— <strong>Chosen</strong>. Brief requirement: "non-dev can host/update." This is the only platform that meets it.</td>
+          </tr>
+          <tr>
+            <td>AWS (EC2 / ECS)</td>
+            <td>Full infrastructure control</td>
+            <td>Non-dev cannot operate it. Requires IAM, VPCs, load balancers, Docker. Completely violates the brief constraint.</td>
+          </tr>
+          <tr>
+            <td>Railway / Render</td>
+            <td>Simple deploys, good DX</td>
+            <td>Solid alternatives — but less native Next.js support, no global edge network, smaller ecosystem.</td>
+          </tr>
+          <tr>
+            <td>Netlify</td>
+            <td>Similar to Vercel, good static hosting</td>
+            <td>Next.js support is secondary. Vercel built Next.js — the integration is first-class by definition.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Supabase vs the alternatives</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ Supabase</strong></td>
+            <td>Postgres + Auth + Storage + Realtime + RLS in one service. Real SQL.</td>
+            <td>— <strong>Chosen</strong>. Closes 4 requirements in 1 service.</td>
+          </tr>
+          <tr>
+            <td>Firebase (Firestore)</td>
+            <td>Document DB, Auth, Storage, Realtime</td>
+            <td>Document store — can't do the fuzzy SQL queries the matching engine needs (<code>pg_trgm</code>, trigram similarity, multi-table JOINs). Rejected on day one.</td>
+          </tr>
+          <tr>
+            <td>PlanetScale</td>
+            <td>Scalable MySQL-compatible Postgres</td>
+            <td>DB only — no auth, no storage, no realtime. Would need separate services for all three. More moving parts, more to configure.</td>
+          </tr>
+          <tr>
+            <td>Raw Postgres + Prisma + Auth.js</td>
+            <td>Full control over everything</td>
+            <td>Assemble it yourself: Postgres host + ORM + auth library + storage service + realtime. Multiple services, multiple configs. Too much setup for a 4–6 hour project.</td>
+          </tr>
+          <tr>
+            <td>MongoDB Atlas</td>
+            <td>Document DB, managed cloud</td>
+            <td>Same problem as Firebase — NoSQL can't express complex relational matching queries cleanly.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Claude vs the alternatives</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected / why chosen</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ Claude (Haiku + Sonnet)</strong></td>
+            <td>Strong instruction-following for structured output. Two-tier cost model.</td>
+            <td>— <strong>Chosen</strong>. Best structured-output reliability. The role is at Grain — using Anthropic's API is contextually appropriate for a Grain interview.</td>
+          </tr>
+          <tr>
+            <td>OpenAI GPT-4o / GPT-4o-mini</td>
+            <td>Strong general capability, large ecosystem</td>
+            <td>Reasonable alternative. GPT-4o-mini ≈ Haiku, GPT-4o ≈ Sonnet. Could swap in via Vercel AI SDK with one line. Not chosen because Claude has better structured-output reliability for this use case.</td>
+          </tr>
+          <tr>
+            <td>Gemini (Google)</td>
+            <td>Strong multimodal, Google ecosystem</td>
+            <td>Less mature API ecosystem at time of build. No compelling advantage for this use case.</td>
+          </tr>
+          <tr>
+            <td>Local models (Ollama)</td>
+            <td>No API cost, runs locally</td>
+            <td>Quality gap on structured output tasks. Requires local infrastructure — violates "non-dev can host" constraint.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Vercel AI SDK vs the alternatives</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ Vercel AI SDK</strong></td>
+            <td>Unified interface across all LLM providers. Streaming helpers. Zod structured output built in. One import, swap providers by changing one line.</td>
+            <td>— <strong>Chosen</strong></td>
+          </tr>
+          <tr>
+            <td>Raw Anthropic SDK (<code>@anthropic-ai/sdk</code>)</td>
+            <td>Direct API access, no abstraction</td>
+            <td>Provider-specific code. If you want to swap Claude for GPT-4 you rewrite every call site. No built-in structured output helpers.</td>
+          </tr>
+          <tr>
+            <td>LangChain</td>
+            <td>Chains, agents, lots of abstractions</td>
+            <td>Heavy library, complex API, frequently changing. Overkill for Lanyard's structured, well-defined AI calls. Adds cognitive overhead without benefit.</td>
+          </tr>
+          <tr>
+            <td>LlamaIndex</td>
+            <td>Strong for RAG and document retrieval</td>
+            <td>Lanyard doesn't do RAG. Wrong tool for the job.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">PWA vs the alternatives (field delivery)</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ PWA</strong></td>
+            <td>Offline-first, installable via "Add to Home Screen," deployed as a URL, updates instantly with <code>git push</code>.</td>
+            <td>— <strong>Chosen</strong>. "Non-dev can host/update" + offline-first are both solved in one choice.</td>
+          </tr>
+          <tr>
+            <td>React Native</td>
+            <td>Native iOS + Android apps, full device access</td>
+            <td>Requires Xcode / Android Studio builds. App store submission + review for every update (days of delay). A non-dev cannot update it. Completely violates the brief.</td>
+          </tr>
+          <tr>
+            <td>Expo</td>
+            <td>Easier React Native, OTA updates</td>
+            <td>OTA updates help but the app still needs an initial App Store submission. Complex build process. Still not "non-dev" friendly.</td>
+          </tr>
+          <tr>
+            <td>Mobile web (no PWA)</td>
+            <td>Just a responsive website</td>
+            <td>No offline support. Browser chrome is always visible. No "Add to Home Screen" shortcut. Worse UX on the show floor.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Zod vs the alternatives (validation)</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ Zod</strong></td>
+            <td>TypeScript-first schema validation. Dual use: runtime guard AND AI structured-output contract. First-class support in Vercel AI SDK.</td>
+            <td>— <strong>Chosen</strong></td>
+          </tr>
+          <tr>
+            <td>Yup</td>
+            <td>Similar validation library, popular</td>
+            <td>Weaker TypeScript inference. Not natively supported in Vercel AI SDK's structured output system.</td>
+          </tr>
+          <tr>
+            <td>io-ts</td>
+            <td>Strong functional-programming style validation</td>
+            <td>Steep learning curve, verbose API. Zod is simpler and equally powerful for this use case.</td>
+          </tr>
+          <tr>
+            <td>No validation (trust AI output)</td>
+            <td>Less code</td>
+            <td>LLMs hallucinate. Without a Zod contract, a temperature field might return "very enthusiastic" instead of "hot" — unqueryable, unmergeable over time. Silent data corruption.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Whisper vs the alternatives (speech-to-text)</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Option</th><th>What it gives you</th><th>Why rejected</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#059669">✓ OpenAI Whisper</strong></td>
+            <td>Best-in-class STT especially for proper nouns (names, companies, titles). Simple API.</td>
+            <td>— <strong>Chosen</strong></td>
+          </tr>
+          <tr>
+            <td>Claude</td>
+            <td>—</td>
+            <td>Claude has no audio/speech API. Text-in, text-out only. Not an option.</td>
+          </tr>
+          <tr>
+            <td>Deepgram</td>
+            <td>Fast, streaming-capable STT</td>
+            <td>Good quality but Whisper is more accurate on proper nouns — exactly what a sales rep is saying. Another API key to manage for no clear benefit.</td>
+          </tr>
+          <tr>
+            <td>Google STT</td>
+            <td>High quality, Google ecosystem</td>
+            <td>Another vendor relationship. Whisper via the existing OpenAI key is simpler. No advantage for this use case.</td>
+          </tr>
+          <tr>
+            <td>Browser Web Speech API</td>
+            <td>Free, no API key, built into Chrome</td>
+            <td>No offline support (defeats the whole PWA offline story). Inconsistent quality across browsers. Safari support is poor.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">TypeScript vs JavaScript</div>
+    <div class="card-body">
+      <p>TypeScript wasn't a "should we?" question — it was assumed from day one. Here's why it matters specifically for Lanyard, not just generally:</p>
+      <ul>
+        <li><strong>Zod schemas infer TypeScript types:</strong> Define a Zod schema once → TypeScript type is auto-generated. No duplicated type definitions.</li>
+        <li><strong>AI SDK output is typed end-to-end:</strong> The Zod schema passed to the AI call becomes the TypeScript return type. The compiler knows what shape Claude will return.</li>
+        <li><strong>Type gate on every build:</strong> <code>npx tsc --noEmit</code> runs before deployment. Type errors block the build — you can't accidentally ship broken AI output handling.</li>
+        <li><strong>DB types flow through the app:</strong> Supabase generates TypeScript types from the schema. A column rename in the DB is a compile error in the app — the type system catches the mismatch before production.</li>
+      </ul>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">The chain: DB → Zod → TypeScript → AI → React</div>
+        <div class="callout-body">Supabase schema generates DB types → Zod schemas define AI contracts → TypeScript connects them → React components receive typed props. Break any link in this chain and the compiler tells you immediately. This is what "end-to-end type safety" means in practice.</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('techdeepive', this)">✓ I know this section</button>
 </div>
 
 <!-- ===== FIELD ===== -->
@@ -1925,7 +2236,7 @@
 </div>
 
 <script>
-const sections = ['overview','principles','datamodel','techstack','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','nextsteps'];
+const sections = ['overview','principles','datamodel','techstack','techdeepive','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','nextsteps'];
 const done = new Set();
 document.getElementById('progress-text').textContent = '0 / ' + sections.length;
 
