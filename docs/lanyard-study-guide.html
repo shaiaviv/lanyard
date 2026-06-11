@@ -6,31 +6,31 @@
 <title>Lanyard — Interview Study Guide</title>
 <style>
   :root {
-    --bg: #07090F;
-    --surface: #0F1520;
-    --elevated: #161E2E;
-    --border: rgba(255,255,255,0.07);
-    --accent: #F4A825;
-    --accent-dim: rgba(244,168,37,0.15);
-    --text1: #E8EDF5;
-    --text2: #A8B8CC;
-    --text3: #6B82A0;
-    --field: #3B82F6;
-    --field-dim: rgba(59,130,246,0.12);
-    --reconcile: #8B5CF6;
-    --reconcile-dim: rgba(139,92,246,0.12);
-    --planning: #10B981;
-    --planning-dim: rgba(16,185,129,0.12);
-    --t1: #F59E0B;
-    --t1-dim: rgba(245,158,11,0.15);
-    --t2: #6366F1;
-    --t2-dim: rgba(99,102,241,0.12);
-    --t3: rgba(255,255,255,0.3);
-    --principle: rgba(244,168,37,0.08);
-    --principle-border: rgba(244,168,37,0.25);
-    --why-bg: rgba(16,185,129,0.06);
-    --why-border: rgba(16,185,129,0.25);
-    --defend-bg: rgba(239,68,68,0.06);
+    --bg: #F1F5F9;
+    --surface: #FFFFFF;
+    --elevated: #F8FAFC;
+    --border: rgba(0,0,0,0.09);
+    --accent: #D97706;
+    --accent-dim: rgba(217,119,6,0.1);
+    --text1: #0F172A;
+    --text2: #475569;
+    --text3: #94A3B8;
+    --field: #2563EB;
+    --field-dim: rgba(37,99,235,0.08);
+    --reconcile: #7C3AED;
+    --reconcile-dim: rgba(124,58,237,0.08);
+    --planning: #059669;
+    --planning-dim: rgba(5,150,105,0.08);
+    --t1: #D97706;
+    --t1-dim: rgba(217,119,6,0.1);
+    --t2: #4F46E5;
+    --t2-dim: rgba(79,70,229,0.08);
+    --t3: rgba(0,0,0,0.15);
+    --principle: rgba(217,119,6,0.06);
+    --principle-border: rgba(217,119,6,0.3);
+    --why-bg: rgba(5,150,105,0.05);
+    --why-border: rgba(5,150,105,0.3);
+    --defend-bg: rgba(239,68,68,0.05);
     --defend-border: rgba(239,68,68,0.25);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -103,7 +103,7 @@
   .card-body ul { padding-left: 18px; margin: 6px 0; }
   .card-body li { margin-bottom: 4px; }
   .card-body strong { color: var(--text1); font-weight: 600; }
-  .card-body code { font-family: 'SF Mono', monospace; font-size: 12px; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text1); }
+  .card-body code { font-family: 'SF Mono', monospace; font-size: 12px; background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text1); }
 
   /* Callout boxes */
   .callout { border-radius: 10px; padding: 14px 18px; margin: 12px 0; }
@@ -255,6 +255,26 @@
   .home-card-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
   .home-card-count { font-size: 10px; color: var(--text3); margin-top: 8px; }
 
+  /* Tech stack */
+  .tech-layer-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tlb-framework { background: rgba(59,130,246,0.12); color: #3B82F6; }
+  .tlb-infra { background: rgba(16,185,129,0.12); color: #10B981; }
+  .tlb-ai { background: rgba(168,85,247,0.1); color: #C084FC; }
+  .tlb-data { background: rgba(244,168,37,0.12); color: #F4A825; }
+  .tlb-security { background: rgba(239,68,68,0.1); color: #F87171; }
+  .tech-cards { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+  .tech-card { background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+  .tech-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tech-card-name { font-size: 15px; font-weight: 700; color: var(--text1); font-family: 'SF Mono', monospace; }
+  .tech-card-subtitle { font-size: 12px; color: var(--text3); }
+  .tech-card-body { font-size: 13px; color: var(--text2); line-height: 1.75; }
+  .tech-card-body strong { color: var(--text1); font-weight: 600; }
+  .tech-card-body ul { padding-left: 18px; margin: 6px 0; }
+  .tech-card-body li { margin-bottom: 4px; }
+  .arch-block { background: #1E293B; border: 1px solid rgba(0,0,0,0.15); border-radius: 8px; padding: 14px 18px; font-family: 'SF Mono', monospace; font-size: 12px; color: #94A3B8; line-height: 2; margin: 10px 0; }
+  .arch-block .arch-highlight { color: var(--accent); font-weight: 700; }
+  .arch-block .arch-comment { color: var(--text3); }
+
   /* Scrollbar */
   .main::-webkit-scrollbar { width: 4px; }
   .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -273,7 +293,7 @@
   <div class="progress-bar">
     <div class="progress-bar-label">
       <span>Progress</span>
-      <span id="progress-text">0 / 14</span>
+      <span id="progress-text">0 / 16</span>
     </div>
     <div class="progress-bar-track">
       <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
@@ -291,6 +311,10 @@
   </div>
   <div class="nav-item" onclick="goTo('datamodel')" data-section="datamodel">
     <span class="dot" style="background:#F4A825"></span> Data Model
+    <span class="check">✓</span>
+  </div>
+  <div class="nav-item" onclick="goTo('techstack')" data-section="techstack">
+    <span class="dot" style="background:#F4A825"></span> Tech Stack
     <span class="check">✓</span>
   </div>
 
@@ -643,6 +667,220 @@
   </div>
 
   <button class="know-it-btn" onclick="markDone('datamodel', this)">✓ I know this section</button>
+</div>
+
+<!-- ===== TECH STACK ===== -->
+<div class="section" id="section-techstack">
+  <div class="section-header">
+    <div class="section-badge badge-core">⚙️ Core</div>
+    <div class="section-title">Tech Stack</div>
+    <div class="section-subtitle">Every tool in Lanyard and the specific reason it was chosen — not just "it's popular," but what constraint or requirement it solves for this project.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Stack at a Glance</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Choice</th>
+            <th>Why — the specific reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Framework</strong></td>
+            <td><code>Next.js App Router + TypeScript</code></td>
+            <td>One repo, three route groups; server actions colocated with UI screens</td>
+          </tr>
+          <tr>
+            <td><strong>Host</strong></td>
+            <td><code>Vercel</code></td>
+            <td><code>git push</code> = deploy; brief requires "non-dev can host/update"</td>
+          </tr>
+          <tr>
+            <td><strong>Field delivery</strong></td>
+            <td><code>PWA</code></td>
+            <td>Show floor = dead wifi → offline-first; installable, no app store friction</td>
+          </tr>
+          <tr>
+            <td><strong>DB + Auth + Storage</strong></td>
+            <td><code>Supabase</code></td>
+            <td>4 requirements (Postgres, Auth, Storage, Realtime) in one service</td>
+          </tr>
+          <tr>
+            <td><strong>AI — LLM</strong></td>
+            <td><code>Claude via Vercel AI SDK</code></td>
+            <td>Unified SDK across model tiers; swap providers without rewriting call sites</td>
+          </tr>
+          <tr>
+            <td><strong>AI — Speech</strong></td>
+            <td><code>OpenAI Whisper</code></td>
+            <td>Best-in-class STT; Claude has no speech-to-text API</td>
+          </tr>
+          <tr>
+            <td><strong>Validation</strong></td>
+            <td><code>Zod</code></td>
+            <td>Schemas serve dual purpose: runtime validation AND AI structured-output contract</td>
+          </tr>
+          <tr>
+            <td><strong>Keys</strong></td>
+            <td>Two-tier: env + in-app Settings</td>
+            <td>Infra keys in env (chicken-and-egg); service keys user-configurable in UI</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Architecture in 10 Seconds — One App, Three Route Groups</div>
+    <div class="card-body">
+      <p>Next.js route groups let you have three distinct experiences — different layouts, different optimizations (mobile vs desktop), different service workers — while sharing one codebase and one database. The parentheses tell Next.js "these are logical groups, not URL segments."</p>
+      <div class="arch-block">
+<span class="arch-highlight">app/</span>
+  <span class="arch-highlight">(field)/</span>     <span class="arch-comment">← mobile PWA, offline-first, show-floor capture</span>
+  <span class="arch-highlight">(reconcile)/</span>  <span class="arch-comment">← desktop, reviewing and confirming pending captures</span>
+  <span class="arch-highlight">(planning)/</span>   <span class="arch-comment">← desktop, conference strategy and coverage</span>
+  <span class="arch-highlight">api/</span>          <span class="arch-comment">← AI pipeline routes (server-side only)</span>
+<span class="arch-highlight">lib/</span>
+  ai/   db/   matching/   offline/   enrichment/
+      </div>
+      <div class="callout callout-defend" style="margin-top:10px;">
+        <div class="callout-title">Defend: "Why one repo instead of separate apps?"</div>
+        <div class="callout-body">Separate apps require sync: a Field capture would need to push before Planning could see it. Shared DB means a capture is instantly visible everywhere — zero sync logic, zero drift, no eventual consistency to reason about. The rep on the show floor and the ops lead reviewing the plan read the same Encounter row.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tech-cards">
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <span class="tech-layer-badge tlb-data">DB / Auth</span>
+        <span class="tech-card-name">Supabase</span>
+        <span class="tech-card-subtitle">One service, four requirements</span>
+      </div>
+      <div class="tech-card-body">
+        <ul>
+          <li><strong>Postgres</strong> — relational queries for cross-conference matching (fuzzy name search via <code>pg_trgm</code>, complex JOINs). NoSQL alternatives can't express these queries cleanly.</li>
+          <li><strong>Auth</strong> — built-in email/OAuth team login. Each user ↔ a <code>reps</code> row. No custom auth to build or maintain.</li>
+          <li><strong>Storage</strong> — private <code>recordings</code> bucket for audio files. Audio path stored on the encounter, stream-on-demand from the server. P2 principle: keep the raw capture.</li>
+          <li><strong>Realtime</strong> — when a teammate captures a lead, the list updates live without polling. Optional but zero cost to add since Supabase already provides it.</li>
+          <li><strong>RLS (Row-Level Security)</strong> — Postgres policies enforce that authenticated users only read/write their team's rows. Security is in the DB, not just application code.</li>
+        </ul>
+        <div class="callout callout-defend" style="margin-top:10px;">
+          <div class="callout-title">Defend: "Why not Firebase?"</div>
+          <div class="callout-body">Firebase is document-based (Firestore). Our matching engine needs fuzzy full-text search, trigram similarity scoring, and multi-table JOINs. You can't do that well in a document store. Supabase is real Postgres — same queries, same indexes, same pgvector extension for semantic search when we need it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <span class="tech-layer-badge tlb-framework">Field Delivery</span>
+        <span class="tech-card-name">PWA — Progressive Web App</span>
+        <span class="tech-card-subtitle">Offline-first, no app store</span>
+      </div>
+      <div class="tech-card-body">
+        <p>Show floors are the worst network environments imaginable — 5,000 people in a hall, all on shared WiFi. Lanyard's core value proposition (capture leads on the floor) must work with zero connection.</p>
+        <ul>
+          <li><strong>IndexedDB queue</strong> — captures are written locally first, instantly. No network dependency at the moment of capture.</li>
+          <li><strong>Background sync</strong> — when connection returns, the queue drains into <code>lib/capture/processCapture</code> automatically. Rep never has to think about it.</li>
+          <li><strong>Service worker</strong> — caches app shell so the UI loads even without network.</li>
+          <li><strong>Installable</strong> — reps "Add to Home Screen" for full-screen mobile; no App Store / Play Store approval delay.</li>
+        </ul>
+        <div class="callout callout-defend" style="margin-top:10px;">
+          <div class="callout-title">Defend: "Why not React Native?"</div>
+          <div class="callout-body">Brief constraint: "a non-developer should be able to host and update this." Native apps require Xcode/Android Studio builds, app store submissions, and review cycles for every update. A PWA is a URL — update by pushing to Vercel. Zero deploy friction for a non-dev.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <span class="tech-layer-badge tlb-ai">AI Layer</span>
+        <span class="tech-card-name">Claude via Vercel AI SDK + Zod</span>
+        <span class="tech-card-subtitle">Two-tier model strategy with typed output contracts</span>
+      </div>
+      <div class="tech-card-body">
+        <p>All LLM calls go through <code>@ai-sdk/anthropic</code> (the Vercel AI SDK). The SDK normalizes the API surface so you can swap providers without touching call sites.</p>
+        <div class="model-split" style="margin: 10px 0;">
+          <div class="model-card">
+            <div class="model-name model-sonnet">Haiku — high-volume / cheap</div>
+            <div class="model-use">Parse voice captures · Match candidate scoring · Initial ICP fit on every encounter. These run on every save, so cost matters.</div>
+          </div>
+          <div class="model-card">
+            <div class="model-name model-opus">Sonnet — lower-volume / rich</div>
+            <div class="model-use">Relationship arc briefs · Conference discovery · Follow-up email drafts. Run on demand; quality matters more than cost.</div>
+          </div>
+        </div>
+        <p><strong>Zod pattern — the critical detail:</strong> Every AI call returns structured output validated against a Zod schema. The model is forced to produce typed JSON. If it deviates, the SDK retries automatically.</p>
+        <ul>
+          <li>No free-text parsing anywhere in the codebase. AI output is always a typed object.</li>
+          <li>Uses <code>generateText</code> + <code>Output.object()</code> — not <code>generateObject</code> (deprecated in AI SDK v6).</li>
+          <li>EXEMPLAR: <code>lib/ai/parseCapture.ts</code> — every other AI module copies this pattern.</li>
+        </ul>
+        <div class="callout callout-defend" style="margin-top:10px;">
+          <div class="callout-title">Defend: "Why force Zod schemas on every AI call?"</div>
+          <div class="callout-body">LLMs hallucinate. Without a schema contract, a "hot" temperature field might come back as "very warm" in one call and "enthusiastic" in the next — uncategorizable downstream. Zod forces the model to retry until it returns exactly <code>"hot" | "warm" | "lukewarm" | "cool" | "cold"</code>. Reliability at the type boundary is non-negotiable for a tool that aggregates data over months.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <span class="tech-layer-badge tlb-security">Security</span>
+        <span class="tech-card-name">Two-Tier Key Architecture</span>
+        <span class="tech-card-subtitle">Env (infra) vs. in-app Settings (service keys)</span>
+      </div>
+      <div class="tech-card-body">
+        <p>API keys are split into two distinct tiers, each stored differently:</p>
+        <ul>
+          <li><strong>Tier 1 — env vars (infra):</strong> Supabase URL + anon + service-role keys. These bootstrap the database itself — they literally can't be stored in the DB (chicken-and-egg). Set once at deploy by the host. <code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code>, etc.</li>
+          <li><strong>Tier 2 — in-app Settings (service keys):</strong> Anthropic, OpenAI/Whisper, HubSpot, enrichment provider. Pasted into the UI by an admin, stored encrypted in Supabase, read server-side via <code>getServiceKey(name)</code>. Never exposed to the browser. Schema: <code>app_settings(team_id, key_name, key_ciphertext, updated_by)</code>.</li>
+        </ul>
+        <p style="margin-top:8px;"><strong>Why it matters:</strong> The brief says "non-developer should be able to host/update this." A non-dev can paste an Anthropic key into the settings UI without touching a .env file or a Vercel dashboard. This is the whole point — operational independence from engineering.</p>
+        <div class="callout callout-why" style="margin-top:10px;">
+          <div class="callout-title">First-run experience</div>
+          <div class="callout-body">Until service keys are configured, AI features show "Configure API keys in Settings" — the app degrades gracefully to manual mode. No crash, no blank screen, no confusing empty state. The enrichment provider also has a <code>MockEnrichmentProvider</code> fallback so the full flow demos without a live Clay/Apollo key.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-card">
+      <div class="tech-card-header">
+        <span class="tech-layer-badge tlb-ai">AI Speech</span>
+        <span class="tech-card-name">OpenAI Whisper</span>
+        <span class="tech-card-subtitle">Speech-to-text for voice capture</span>
+      </div>
+      <div class="tech-card-body">
+        <p>The voice capture path (rep hits Record, speaks a quick note about the person they just met) routes audio through Whisper before any Claude processing.</p>
+        <ul>
+          <li><strong>Why Whisper:</strong> Best-in-class STT quality, especially for proper nouns (company names, titles) which are exactly what a sales rep is saying: "Sarah Chen, VP of Payments, Stripe."</li>
+          <li><strong>Why not Claude:</strong> Claude has no audio/speech API. It's text-in, text-out only.</li>
+          <li><strong>Pipeline:</strong> audio → Whisper → transcript → Claude Haiku's <code>parseCapture</code> → structured encounter fields.</li>
+          <li><strong>Fallback:</strong> The voice path is layered on top of the manual text path. If Whisper fails or the key isn't set, the rep types. The UI degrades gracefully.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <div class="card-title">What to Remember for the Interview</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Every tool choice maps to a specific constraint</strong> — Vercel = brief requirement, PWA = show-floor wifi, Supabase = 4 requirements in 1 service, two-tier keys = non-dev ops.</li>
+        <li><strong>The route group architecture</strong> (<code>(field)</code> / <code>(reconcile)</code> / <code>(planning)</code>) is the answer to "how do you serve mobile and desktop without two apps."</li>
+        <li><strong>Zod is not just validation</strong> — it's the AI reliability contract. No Zod = free-text AI output = unmergeable data over time.</li>
+        <li><strong>Service keys in Settings, not env</strong> — this is the non-dev hosting story. Say it explicitly if asked about deployment.</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('techstack', this)">✓ I know this section</button>
 </div>
 
 <!-- ===== FIELD ===== -->
@@ -1687,15 +1925,16 @@
 </div>
 
 <script>
-const sections = ['overview','principles','datamodel','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','nextsteps'];
+const sections = ['overview','principles','datamodel','techstack','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','nextsteps'];
 const done = new Set();
+document.getElementById('progress-text').textContent = '0 / ' + sections.length;
 
 function goTo(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('section-' + id).classList.add('active');
   document.querySelector('[data-section="' + id + '"]').classList.add('active');
-  document.querySelector('.main').scrollTo(0, 0);
+  window.scrollTo(0, 0);
 }
 
 function markDone(id, btn) {
