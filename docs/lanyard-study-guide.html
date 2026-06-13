@@ -1963,7 +1963,8 @@
 
   <div class="callout callout-defend">
     <div class="callout-title">Defend: "Why not build a two-way sync?"</div>
-    <div class="callout-body">"A two-way sync would mean we're competing with HubSpot for the system-of-record position. We deliberately chose to be upstream feeders. Our job is capture → qualify → push. HubSpot's job is everything after: sequences, deal tracking, reporting. Inbound pull (checking if a prospect is already a customer) is in the parking lot — it's compelling but not necessary for the assignment."</div>
+    <div class="callout-body">"A two-way sync would mean both systems constantly write to each other — Lanyard pushing captures out, HubSpot pushing deal updates back in, fighting for system-of-record position. We deliberately chose to be upstream feeders. Our job is capture → qualify → push. HubSpot's job is everything after: sequences, deal tracking, reporting.<br><br>
+    <strong>This is different from inbound pull</strong>, which I did put in the 'what I'd build next' list — and it's worth distinguishing. A pull is a single read-only query: 'before I log this person, does HubSpot already know them?' No writes, no drift, no conflict. I'd add that. What I'm saying no to is the full bidirectional sync where Lanyard has to stay in step with HubSpot's deal stages, contact updates, and sequence enrollments. That's a different beast."</div>
   </div>
 
   <button class="know-it-btn" onclick="markDone('hubspot', this)">✓ I know this section</button>
@@ -2484,6 +2485,10 @@
       <p><strong>What's missing:</strong> The integration is one-way (us → HubSpot). There's no check on the way IN: when a rep captures someone in the field, we don't know if that person is already a Grain customer, an open deal, or a churned account.</p>
       <p style="margin-top:8px;"><strong>Why it matters:</strong> A rep pitching the Grain product to someone who's already a customer is an embarrassing failure mode. A rep who gets a briefing saying "⚠️ Open deal — Sarah is already in a trial with the payments team" walks into that conversation completely differently.</p>
       <p style="margin-top:8px;"><strong>What it would look like:</strong> On capture (or pre-brief in F7), query HubSpot by email → surface a banner if the contact already exists as a customer, open deal, or churned account. Read-only lookup, no sync complexity.</p>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">Why this doesn't contradict "no two-way sync"</div>
+        <div class="callout-body">In the HubSpot section I said we deliberately avoided two-way sync. This is NOT that. Two-way sync = both systems constantly writing to each other, fighting for system-of-record. Inbound pull = one read query at capture time: "does HubSpot already know this email?" Read-only, no writes, no drift. The distinction matters and is worth saying out loud in the interview if asked.</div>
+      </div>
     </div>
   </div>
 
