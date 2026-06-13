@@ -2457,35 +2457,19 @@
     <strong>Part 1 is what you talk about.</strong> Part 2 exists so you know the bugs — but lead with product features in the interview, not implementation fixes.</div>
   </div>
 
+  <div class="callout callout-defend" style="margin-top:16px;">
+    <div class="callout-title">Open with this — before listing anything</div>
+    <div class="callout-body">"Most importantly, I'd put it in front of the actual Grain sales team and listen. Everything I'm about to say is my hypothesis about what reps need. Before building more, I'd sit with the people who live on show floors, watch them use it, and collect real feedback on what works, what gets in the way, and what they'd actually find useful — then let <em>that</em> reprioritize this whole list. A product is only as valuable as the value it delivers to its real users; the roadmap should be driven by them, not by me."<br><br>
+    This is the strongest thing you can say. It shows you're a product thinker, not a feature builder — and it's exactly what Ben wants to hear from someone who'll be sitting between the commercial team and the tools they use.</div>
+  </div>
+
   <!-- ===== PART 1 ===== -->
   <div style="display:flex;align-items:center;gap:12px;margin:28px 0 12px;">
     <div style="flex:1;height:2px;background:var(--border)"></div>
     <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;white-space:nowrap;">Part 1 — New Features & Improvements</div>
     <div style="flex:1;height:2px;background:var(--border)"></div>
   </div>
-  <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted);font-style:italic;">Talk about these in the interview. Each one shows product thinking, sales empathy, or both.</p>
-
-  <div class="card">
-    <div class="card-title">🎙️ Audio Playback in Reconcile — Known Gap, High Value</div>
-    <div class="card-body">
-      <p><strong>What's missing:</strong> P2 (keep the source) says we store every voice recording in Supabase Storage. The Reconcile card shows the transcript and match candidates — but there's no way to actually play back the recording. The UI was never built.</p>
-      <p style="margin-top:8px;"><strong>Why it matters:</strong> The recording is the rep's own memory of the conversation. In Reconcile, hours after the show floor, a rep staring at two possible "Sarah" matches can hit play and hear their own voice say <em>"she mentioned she just moved to Mollie last month"</em> — that 15 seconds resolves the uncertainty instantly. No AI prompt can substitute for that.</p>
-      <p style="margin-top:8px;"><strong>How to build it:</strong> Fetch a signed URL for <code>encounter.audio_path</code> from Supabase Storage, render a native <code>&lt;audio&gt;</code> element in the Reconcile card. Small addition, high payoff.</p>
-      <div class="callout callout-why" style="margin-top:10px;">
-        <div class="callout-title">Why this is the first thing I'd ship</div>
-        <div class="callout-body">It's the gap between P2 as a principle and P2 as a product feature. The data is already there — the storage, the path, the principle. The UI is one component away. High leverage, low effort.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🔗 Live LinkedIn Enrichment — The Identity Anchor Gap</div>
-    <div class="card-body">
-      <p><strong>What's missing:</strong> LinkedIn is described as the primary identity anchor — the one thing that makes cross-conference matching near-certain. But the enrichment provider that surfaces LinkedIn candidate profiles during capture is currently a <strong>mock</strong>. The flow (rep taps a LinkedIn card → photo+title confirm identity → fields overwrite ASR mangling) is fully built in the UI. The live data feed isn't wired.</p>
-      <p style="margin-top:8px;"><strong>What's next:</strong> Configure a real Clay or Apollo key in Settings. The <code>EnrichmentProvider</code> interface is already the abstraction layer — switching from mock to real is a settings change, not a code change. The architecture was designed for this from day one specifically so the build wasn't blocked on a third-party integration.</p>
-      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> LinkedIn ToS complexity, Clay/Apollo API cost, and auth were flagged as the T1 highest shipping risk before a line of code was written. The deliberate choice was: build the interface, ship the mock, unblock on a key. It's the right sequencing call — not a shortcut.</p>
-    </div>
-  </div>
+  <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted);font-style:italic;">Listed in priority order. Talk about these in the interview — each shows product thinking, sales empathy, or both.</p>
 
   <div class="card">
     <div class="card-title">↩️ HubSpot Inbound Pull — "Is This Already a Customer?"</div>
@@ -2501,11 +2485,30 @@
   </div>
 
   <div class="card">
-    <div class="card-title">✉️ Follow-Up Email → Gmail / HubSpot Sequences</div>
+    <div class="card-title">🔗 Live LinkedIn Enrichment — The Identity Anchor Gap</div>
     <div class="card-body">
-      <p><strong>What's missing:</strong> The follow-up drafting AI (arc summary → email copy) exists as a concept but the last mile isn't connected. Right now a rep would have to copy-paste the draft into Gmail or HubSpot manually.</p>
-      <p style="margin-top:8px;"><strong>What's next:</strong> One-click "Send via Gmail" (Gmail API, OAuth) or "Enroll in sequence" (HubSpot Sequences API). The content is already generated — connecting the pipe is what unlocks the time saving.</p>
-      <p style="margin-top:8px;"><strong>Why it matters:</strong> The job description literally says "automated follow-ups" as a core responsibility. This closes that loop end-to-end.</p>
+      <p><strong>What's missing:</strong> LinkedIn is described as the primary identity anchor — the one thing that makes cross-conference matching near-certain. But the enrichment provider that surfaces LinkedIn candidate profiles during capture is currently a <strong>mock</strong>. The flow (rep taps a LinkedIn card → photo+title confirm identity → fields overwrite ASR mangling) is fully built in the UI. The live data feed isn't wired.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> Configure a real Clay, Apollo, or PDL key in Settings. The <code>EnrichmentProvider</code> interface is already the abstraction layer — switching from mock to real is a settings change, not a code change. The architecture was designed for this from day one specifically so the build wasn't blocked on a third-party integration.</p>
+      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> LinkedIn ToS complexity, Clay/Apollo API cost, and auth were flagged as the T1 highest shipping risk before a line of code was written. The deliberate choice was: build the interface, ship the mock, unblock on a key. It's the right sequencing call — not a shortcut.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✅ "Apply Suggestion" — Make Coverage Planning Writable</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> Coverage planning is currently read-only. The AI generates draft assignments — who goes to which conference, which rep has the most relevant relationships — but there's no way to accept a suggestion and write it to real coverage in one click. A rep can look at the plan and... nothing. They have to implement it manually elsewhere.</p>
+      <p style="margin-top:8px;"><strong>What it would look like:</strong> An "Accept" button on each suggestion card that commits the draft assignment to the actual coverage records — with an inline Undo for 10 seconds after. The plan moves from advisory to operational in one tap.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> A planning tool that only shows you a plan but can't act on it is just a dashboard. The gap between "here's a suggestion" and "accepted — you're confirmed for Money20/20" is where the tool actually saves time. Without this, reps still have to go somewhere else to confirm coverage.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✉️ Auto-Drafted Follow-Up Emails — From Arc to Send</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The relationship arc summary (the AI narrative of the multi-conference journey) is built. What's missing is the last mile: a rep still has to copy-paste the AI-drafted email into Gmail or HubSpot manually.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> AI drafts the follow-up in Grain's voice, using the arc as context — specific to what was discussed, referencing past touchpoints, opening with relevance. Then a one-click "Send via Gmail" (Gmail API + OAuth) or "Enroll in sequence" (HubSpot Sequences API). <strong>Never auto-fired</strong> — the rep always reviews and approves before anything leaves their account.</p>
+      <p style="margin-top:8px;"><strong>Why the "never auto-sent" rule matters:</strong> In B2B fintech, a wrong email to the wrong person at the wrong company is an account-damaging mistake. AI generates, rep signs off. That's the only safe model at this stage.</p>
+      <p style="margin-top:8px;"><strong>Why it matters for this role:</strong> The job description literally says "automated follow-ups" as a core responsibility. This closes that loop end-to-end — and it's the one AI feature I deliberately cut for scope.</p>
     </div>
   </div>
 
@@ -2516,6 +2519,15 @@
       <p style="margin-top:8px;"><strong>What it would look like:</strong> After a conference ends, the rep (or a HubSpot sync) logs meetings booked and pipeline generated. That data writes back to <code>historicalPerf</code> for that conference. Next time it's scored, the factor is real — based on actual Grain results, not the AI's world knowledge guess.</p>
       <p style="margin-top:8px;"><strong>Why it matters for this role:</strong> The job description measures impact by "meetings booked, pipeline generated, and time saved." This feature closes that loop — you can prove EuroFinance generated 3 pipeline opportunities last year, so it scores higher next year. The tool learns from real results instead of estimating indefinitely.</p>
       <p style="margin-top:8px;"><strong>Why it's deferred:</strong> You need at least one full conference cycle of data before it's meaningful. The infrastructure is already designed for it — <code>historicalPerf</code> is a first-class factor in the schema, just waiting for real inputs. The input mechanism is the missing piece.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎙️ Audio Playback in Reconcile — Known Gap, High Value</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> P2 (keep the source) says we store every voice recording in Supabase Storage. The Reconcile card shows the transcript and match candidates — but there's no way to actually play back the recording. The UI was never built.</p>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> The recording is the rep's own memory of the conversation. In Reconcile, hours after the show floor, a rep staring at two possible "Sarah" matches can hit play and hear their own voice say <em>"she mentioned she just moved to Mollie last month"</em> — that 15 seconds resolves the uncertainty instantly. No AI prompt can substitute for that.</p>
+      <p style="margin-top:8px;"><strong>How to build it:</strong> Fetch a signed URL for <code>encounter.audio_path</code> from Supabase Storage, render a native <code>&lt;audio&gt;</code> element in the Reconcile card. Small addition, high payoff. The data is already there — the UI is one component away.</p>
     </div>
   </div>
 
