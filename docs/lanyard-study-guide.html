@@ -2453,18 +2453,17 @@
 
   <div class="callout callout-principle">
     <div class="callout-title">How to frame this in the interview</div>
-    <div class="callout-body">Don't just list features. Show <strong>prioritization logic</strong> — which gaps hurt the most, which have the biggest leverage on the rubric, which are quick wins vs. big bets. That's the thinking Ben cares about.</div>
+    <div class="callout-body">Don't just list features. Show <strong>prioritization logic</strong> — which gaps hurt the most, which have the biggest leverage on the rubric, which are quick wins vs. big bets. That's the thinking Ben cares about.<br><br>
+    <strong>Part 1 is what you talk about.</strong> Part 2 exists so you know the bugs — but lead with product features in the interview, not implementation fixes.</div>
   </div>
 
-  <div class="card">
-    <div class="card-title">⚡ Page Caching — Quick Win, Big Perceived Speed Gain</div>
-    <div class="card-body">
-      <p><strong>What's slow:</strong> Every page navigation hits Supabase fresh — no caching. The planning page fires 8 parallel DB queries on every render (conferences, coverage, follow-ups, relationships, gap analysis, reps, weights, suggestions). Combined with Vercel cold starts on the free tier, simple page transitions feel slow.</p>
-      <p style="margin-top:8px;"><strong>The fix:</strong> Add <code>'use cache'</code> (Next.js 15 directive) to the heavy read queries in <code>lib/db/queries.ts</code>. Wrap <code>getConferences()</code>, <code>getReps()</code>, <code>getScoringWeights()</code> — data that changes rarely — with a 60-second cache. Subsequent navigations return instantly from memory; no DB round-trip.</p>
-      <p style="margin-top:8px;"><strong>Why it wasn't done from the start:</strong> Deliberate tradeoff. Caching adds complexity around invalidation — if you cache the conference list but someone adds a conference, the cache must bust correctly or you show stale data. Getting that wrong silently is worse than slow. During a time-constrained build, correctness first was the right call. This is a 30-minute task now that the data model is stable.</p>
-      <p style="margin-top:8px;"><strong>On paid Vercel:</strong> Warmed function instances eliminate cold starts entirely — that alone would fix most of the perceived slowness without any code change.</p>
-    </div>
+  <!-- ===== PART 1 ===== -->
+  <div style="display:flex;align-items:center;gap:12px;margin:28px 0 12px;">
+    <div style="flex:1;height:2px;background:var(--border)"></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;white-space:nowrap;">Part 1 — New Features & Improvements</div>
+    <div style="flex:1;height:2px;background:var(--border)"></div>
   </div>
+  <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted);font-style:italic;">Talk about these in the interview. Each one shows product thinking, sales empathy, or both.</p>
 
   <div class="card">
     <div class="card-title">🎙️ Audio Playback in Reconcile — Known Gap, High Value</div>
@@ -2476,6 +2475,15 @@
         <div class="callout-title">Why this is the first thing I'd ship</div>
         <div class="callout-body">It's the gap between P2 as a principle and P2 as a product feature. The data is already there — the storage, the path, the principle. The UI is one component away. High leverage, low effort.</div>
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 Live LinkedIn Enrichment — The Identity Anchor Gap</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> LinkedIn is described as the primary identity anchor — the one thing that makes cross-conference matching near-certain. But the enrichment provider that surfaces LinkedIn candidate profiles during capture is currently a <strong>mock</strong>. The flow (rep taps a LinkedIn card → photo+title confirm identity → fields overwrite ASR mangling) is fully built in the UI. The live data feed isn't wired.</p>
+      <p style="margin-top:8px;"><strong>What's next:</strong> Configure a real Clay or Apollo key in Settings. The <code>EnrichmentProvider</code> interface is already the abstraction layer — switching from mock to real is a settings change, not a code change. The architecture was designed for this from day one specifically so the build wasn't blocked on a third-party integration.</p>
+      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> LinkedIn ToS complexity, Clay/Apollo API cost, and auth were flagged as the T1 highest shipping risk before a line of code was written. The deliberate choice was: build the interface, ship the mock, unblock on a key. It's the right sequencing call — not a shortcut.</p>
     </div>
   </div>
 
@@ -2516,7 +2524,8 @@
     <div class="card-body">
       <p><strong>What's missing:</strong> The 190-conference database was built with a one-time research pass. Dates, venues, and speaker lineups change. New events are announced constantly. Right now it's a static seed.</p>
       <p style="margin-top:8px;"><strong>What's next:</strong> A background agent (cron job) that periodically re-runs the discovery flow, flags new ICP-relevant events, and surfaces estimated-date events for confirmation when organizers publish real dates. Keep the database fresh automatically.</p>
-      <p style="margin-top:8px;"><strong>Why it matters:</strong> A sales intelligence tool that goes stale after deployment isn't a tool — it's a spreadsheet. The brief asks for something the team actually uses daily. Continuous intelligence is what makes that possible.</div>
+      <p style="margin-top:8px;"><strong>Why it matters:</strong> A sales intelligence tool that goes stale after deployment isn't a tool — it's a spreadsheet. The brief asks for something the team actually uses daily. Continuous intelligence is what makes that possible.</p>
+    </div>
   </div>
 
   <div class="card">
@@ -2529,57 +2538,11 @@
   </div>
 
   <div class="card">
-    <div class="card-title">🔍 Arc Verdict Icons Have No Legend</div>
-    <div class="card-body">
-      <p><strong>What happens:</strong> The conference detail page shows verdict icons next to contact names — <code>↑</code> warming, <code>↓</code> cooling, <code>—</code> tire-kicker, <code>◎</code> nurturing, <code>○</code> too early. There is no tooltip, legend, or explanation anywhere in the app. A new user has no way to know what they mean.</p>
-      <p style="margin-top:8px;"><strong>The fix:</strong> Either a hover tooltip on the icon ("↑ Warming — engagement rising across meetings") or a small legend at the top of the leads list. One-line fix, high discoverability impact.</p>
-    </div>
-  </div>
-
-  <div class="card">
     <div class="card-title">📱 Push Notifications for End-of-Day Reconcile Nudge</div>
     <div class="card-body">
       <p><strong>What's missing:</strong> The F8 "N unresolved" nudge is currently only visible inside the app. A rep who closes the tab after a long conference day won't see it.</p>
       <p style="margin-top:8px;"><strong>What's next:</strong> Web Push notification (PWA supports this) at a configurable time — "You have 8 unresolved contacts from Money20/20. Reconcile before you forget?" — with a deep link directly to the Reconcile inbox. One tap, they're there.</p>
       <p style="margin-top:8px;"><strong>Why it matters:</strong> The whole capture-vs-commit architecture depends on reps actually doing the Reconcile pass. A push notification closes the behavioral loop.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📝 Coverage Suggestion Rationale — Zod Validation Gap</div>
-    <div class="card-body">
-      <p><strong>What happens:</strong> Occasionally Sonnet returns an empty string for the <code>rationale</code> and an empty array for <code>perRepNotes</code> — the assignments come back fine but the narrative is blank. The suggestion gets saved and displayed with no explanation.</p>
-      <p style="margin-top:8px;"><strong>Why it slips through:</strong> Zod's <code>z.string()</code> only checks that the value is a string — it doesn't care if it's empty. <code>""</code> passes validation silently. The fix is <code>z.string().min(1)</code>, which would force a retry instead of saving a blank rationale.</p>
-      <p style="margin-top:8px;"><strong>How common:</strong> 2 out of 5 suggestions in the DB had this — both from early test runs with very few assignments. The full-scale suggestions all produced good narratives. Likely happens when the input is minimal and Sonnet doesn't bother filling in the narrative fields.</p>
-      <p style="margin-top:8px;"><strong>The fix:</strong> Tighten the Zod schema to <code>z.string().min(50)</code> for <code>rationale</code> and <code>z.array(...).min(1)</code> for <code>perRepNotes</code>. That forces a retry on any run that returns empty narrative fields.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🔁 HubSpot Push Doesn't Clear the Follow-Up Queue</div>
-    <div class="card-body">
-      <p><strong>What happens:</strong> Pushing a contact to HubSpot doesn't remove them from the follow-up list. The <code>follow_up</code> flag stays <code>true</code> on the encounter, so the contact keeps sitting in the queue after being pushed. The "In HubSpot" button state is local React state only — on refresh it resets to "Push to HubSpot."</p>
-      <p style="margin-top:8px;"><strong>With a real API key:</strong> The push does stamp <code>provenance.hubspot.pushed_at</code> in the DB — so the button could read that on mount and show "In HubSpot" persistently. That logic isn't built yet.</p>
-      <p style="margin-top:8px;"><strong>The mock:</strong> No API key → mock fallback simulates a push, shows "Pushed (demo)" — intentionally changes nothing in the DB. That's correct behavior for a demo.</p>
-      <p style="margin-top:8px;"><strong>What it should do:</strong> After a successful real push, either auto-unflag the follow-up (<code>follow_up = false</code>) or show a persistent "Pushed ✓" state by reading <code>provenance.hubspot</code> on load. Both are small additions.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">❌ Dismiss from Follow-Up Queue — Missing Inline Action</div>
-    <div class="card-body">
-      <p><strong>What's missing:</strong> The follow-up queue only has one action: push to HubSpot. There's no way to say "not worth chasing" and clear a contact from the queue inline. To remove someone a rep has to navigate to the encounter record and manually uncheck "Flag for follow-up" — which nobody will do mid-queue review.</p>
-      <p style="margin-top:8px;"><strong>Why it matters:</strong> A queue you can't clear is a queue reps stop trusting. If dismissing a low-quality lead takes 4 clicks and a page navigation, reps will just leave them there — and the queue becomes noise, not signal.</p>
-      <p style="margin-top:8px;"><strong>What it would look like:</strong> A "Not worth it" or "Dismiss" button next to each follow-up card — one click, sets <code>follow_up = false</code> on the encounter, removes it from the list instantly. Optionally a quick "why" tag (wrong person, already a customer, no budget) for later analysis.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🗑️ Delete / Undo a Lead</div>
-    <div class="card-body">
-      <p><strong>What's missing:</strong> There is currently no way to delete or undo a capture. If a rep accidentally logs the wrong person, or taps record twice, the encounter stays in the system with no removal path.</p>
-      <p style="margin-top:8px;"><strong>What the plan says:</strong> The field edge cases spec covers this — soft-delete the Encounter, and if it created an orphan Contact (no other encounters) clean that up too. The design is clear; it just wasn't built.</p>
-      <p style="margin-top:8px;"><strong>What it would look like:</strong> A swipe-to-delete or trash icon on the My Leads list (F4) and the contact card (F5), available for a short window after capture ("undo" within the same session). After that, a deliberate delete action in the contact card requiring confirmation.</p>
     </div>
   </div>
 
@@ -2596,12 +2559,59 @@
     </div>
   </div>
 
+  <!-- ===== PART 2 ===== -->
+  <div style="display:flex;align-items:center;gap:12px;margin:36px 0 12px;">
+    <div style="flex:1;height:2px;background:var(--border)"></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;white-space:nowrap;">Part 2 — Known Bugs & Technical Fixes</div>
+    <div style="flex:1;height:2px;background:var(--border)"></div>
+  </div>
+  <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted);font-style:italic;">Know these exist — but don't lead with them in the interview. These are implementation gaps, not product ideas.</p>
+
   <div class="card">
-    <div class="card-title">🔗 Live LinkedIn Enrichment — The Identity Anchor Gap</div>
+    <div class="card-title">🔍 Arc Verdict Icons Have No Legend</div>
     <div class="card-body">
-      <p><strong>What's missing:</strong> LinkedIn is described as the primary identity anchor — the one thing that makes cross-conference matching near-certain. But the enrichment provider that surfaces LinkedIn candidate profiles during capture is currently a <strong>mock</strong>. The flow (rep taps a LinkedIn card → photo+title confirm identity → fields overwrite ASR mangling) is fully built in the UI. The live data feed isn't wired.</p>
-      <p style="margin-top:8px;"><strong>What's next:</strong> Configure a real Clay or Apollo key in Settings. The <code>EnrichmentProvider</code> interface is already the abstraction layer — switching from mock to real is a settings change, not a code change. The architecture was designed for this from day one specifically so the build wasn't blocked on a third-party integration.</p>
-      <p style="margin-top:8px;"><strong>Why it's deferred:</strong> LinkedIn ToS complexity, Clay/Apollo API cost, and auth were flagged as the T1 highest shipping risk before a line of code was written. The deliberate choice was: build the interface, ship the mock, unblock on a key. It's the right sequencing call — not a shortcut.</p>
+      <p><strong>What happens:</strong> The conference detail page shows verdict icons next to contact names — <code>↑</code> warming, <code>↓</code> cooling, <code>—</code> tire-kicker, <code>◎</code> nurturing, <code>○</code> too early. There is no tooltip, legend, or explanation anywhere in the app. A new user has no way to know what they mean.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Either a hover tooltip on the icon ("↑ Warming — engagement rising across meetings") or a small legend at the top of the leads list. One-line fix, high discoverability impact.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔁 HubSpot Push Doesn't Clear the Follow-Up Queue</div>
+    <div class="card-body">
+      <p><strong>What happens:</strong> Pushing a contact to HubSpot doesn't remove them from the follow-up list. The <code>follow_up</code> flag stays <code>true</code> on the encounter, so the contact keeps sitting in the queue after being pushed. The "In HubSpot" button state is local React state only — on refresh it resets to "Push to HubSpot."</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> After a successful real push, read <code>provenance.hubspot.pushed_at</code> on mount and show a persistent "Pushed ✓" state. Small addition.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">❌ Dismiss from Follow-Up Queue — Missing Inline Action</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> The follow-up queue only has one action: push to HubSpot. There's no way to say "not worth chasing" inline. To remove someone a rep has to navigate to the encounter record and manually uncheck "Flag for follow-up."</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> A "Dismiss" button next to each follow-up card — one click, sets <code>follow_up = false</code>, removes it from the list instantly.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗑️ Delete / Undo a Lead</div>
+    <div class="card-body">
+      <p><strong>What's missing:</strong> There is currently no way to delete or undo a capture. If a rep accidentally logs the wrong person, or taps record twice, the encounter stays in the system with no removal path.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Soft-delete the Encounter (swipe-to-delete on the My Leads list). If it created an orphan Contact (no other encounters) clean that up too. Design is clear — just wasn't built in the time budget.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Page Caching — Slow Cold Starts</div>
+    <div class="card-body">
+      <p><strong>What's slow:</strong> Every page navigation hits Supabase fresh. The planning page fires 8 parallel DB queries on every render. Combined with Vercel cold starts on the free tier, page transitions feel slow.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Add <code>'use cache'</code> (Next.js 15 directive) to heavy read queries for data that changes rarely. 30-minute task now that the data model is stable. On paid Vercel, warmed instances eliminate cold starts without any code change.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📝 Coverage Suggestion Rationale — Zod Validation Gap</div>
+    <div class="card-body">
+      <p><strong>What happens:</strong> Occasionally Sonnet returns an empty string for the <code>rationale</code> field — the assignments come back fine but the narrative is blank. Zod's <code>z.string()</code> passes <code>""</code> silently.</p>
+      <p style="margin-top:8px;"><strong>The fix:</strong> Tighten to <code>z.string().min(50)</code> for <code>rationale</code> — forces a retry instead of saving a blank explanation. 2 out of 5 early test records had this; full-scale suggestions were fine.</p>
     </div>
   </div>
 
