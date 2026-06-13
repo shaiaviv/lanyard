@@ -767,7 +767,15 @@
         <span class="tech-card-subtitle">Full-stack in one repo, no manual endpoints</span>
       </div>
       <div class="tech-card-body">
-        <p>Next.js sits on top of React and Node.js. It's what turns a React UI into a full-stack application with a built-in server — no separate Express backend needed.</p>
+        <p>Next.js is a <strong>framework</strong> — it's what turns React (just a UI library) into a complete web application with a server, routing, and deployment story. Think of it in layers:</p>
+        <div class="arch-block" style="line-height:2.2; margin-bottom:12px;">
+<span style="color:#94A3B8;">JavaScript</span>   <span style="color:#64748B;">← the language</span>
+<span style="color:#94A3B8;">React</span>        <span style="color:#64748B;">← UI library (components, state)</span>
+<span class="arch-highlight">Next.js</span>      <span class="arch-comment">← framework (routing, server, build) ← this is what Lanyard uses</span>
+<span style="color:#94A3B8;">Vercel</span>       <span style="color:#64748B;">← hosting platform</span>
+        </div>
+        <p>Say <strong>"I built it with the Next.js framework"</strong> — that single sentence implies React, Node.js, App Router, and Vercel. You don't need to list the layers unless they ask.</p>
+        <p style="margin-top:8px;"><strong>App Router</strong> is the modern routing system inside Next.js (introduced 2023). Lanyard uses it. The older system was called Pages Router — still works but legacy. When you say "Next.js App Router" you mean: Next.js, using the current routing system.</p>
         <ul>
           <li><strong>Server Actions — no manual HTTP endpoints:</strong> With Vite + Express you'd write every endpoint by hand (<code>app.post('/api/capture', ...)</code>), write a matching <code>fetch()</code> in the frontend, keep the URL strings in sync, and deploy two separate services. With Next.js you write one function marked <code>'use server'</code> and call it like a normal function from the UI. Next.js generates the endpoint, handles serialization, and wires the connection automatically. Lanyard has ~8 server operations — that's 8 endpoints you never had to write.</li>
           <li><strong>Route groups — 3 experiences, 1 repo:</strong> <code>(field)</code>, <code>(reconcile)</code>, <code>(planning)</code> are separate layout trees (mobile vs desktop optimized) that share the same DB and <code>lib/</code> without being separate apps or deployments.</li>
