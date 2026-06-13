@@ -255,6 +255,25 @@
   .home-card-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
   .home-card-count { font-size: 10px; color: var(--text3); margin-top: 8px; }
 
+  /* Grain company */
+  .person-card { display: flex; gap: 16px; background: var(--elevated); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; }
+  .person-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-dim); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+  .person-info { flex: 1; }
+  .person-name { font-size: 14px; font-weight: 700; color: var(--text1); }
+  .person-title { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .person-bio { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.65; }
+  .person-card.interviewer { border-color: var(--accent); background: var(--accent-dim); }
+  .person-card.interviewer .person-name { color: var(--accent); }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+  .stat-box { background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+  .stat-lbl { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .vertical-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .vertical-card { background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .vertical-name { font-size: 13px; font-weight: 700; color: var(--text1); margin-bottom: 4px; }
+  .vertical-pain { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .vertical-pitch { font-size: 11px; color: var(--accent); margin-top: 6px; font-style: italic; }
+
   /* Tech stack */
   .tech-layer-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
   .tlb-framework { background: rgba(59,130,246,0.12); color: #3B82F6; }
@@ -361,6 +380,12 @@
   </div>
   <div class="nav-item" onclick="goTo('hubspot')" data-section="hubspot">
     <span class="dot" style="background:#F4A825"></span> HubSpot Integration
+    <span class="check">✓</span>
+  </div>
+
+  <div class="sidebar-section-label">The Company</div>
+  <div class="nav-item" onclick="goTo('grain')" data-section="grain">
+    <span class="dot" style="background:#F4A825"></span> Grain Deep Dive
     <span class="check">✓</span>
   </div>
 
@@ -2083,6 +2108,212 @@
   <button class="know-it-btn" onclick="markDone('numbers', this)">✓ I know this section</button>
 </div>
 
+<!-- ===== GRAIN COMPANY ===== -->
+<div class="section" id="section-grain">
+  <div class="section-header">
+    <div class="section-badge badge-core">🏢 Company</div>
+    <div class="section-title">Grain Deep Dive</div>
+    <div class="section-subtitle">Who they are, what they've built, who you're meeting, and what they care about. Know this cold.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">One-liner (memorize this)</div>
+    <div class="card-body">
+      <div class="quote">"Grain is an Israeli B2B fintech that provides an <strong>embedded, API-first FX hedging solution</strong> for software platforms and marketplaces — so their end customers can lock exchange rates and settle cross-border transactions without FX risk. Think of it as <strong>Stripe for derivatives</strong>: infrastructure that makes institutional currency hedging accessible via API."</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Key Numbers</div>
+    <div class="card-body">
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val">$50M+</div><div class="stat-lbl">Total funding ($18M seed + $33M Series A)</div></div>
+        <div class="stat-box"><div class="stat-val">$1B+</div><div class="stat-lbl">Annual transaction volume processed in stealth</div></div>
+        <div class="stat-box"><div class="stat-val">~25</div><div class="stat-lbl">Employees (Mar 2025), doubling to ~50 by end 2025</div></div>
+        <div class="stat-box"><div class="stat-val">2022</div><div class="stat-lbl">Founded in Tel Aviv</div></div>
+        <div class="stat-box"><div class="stat-val">Mar 2025</div><div class="stat-lbl">Emerged from stealth (Series A announcement)</div></div>
+        <div class="stat-box"><div class="stat-val">$150T+</div><div class="stat-lbl">Annual cross-border transaction market they target</div></div>
+      </div>
+      <div class="callout callout-defend" style="margin-top:8px;">
+        <div class="callout-title">Careful — unverified claim</div>
+        <div class="callout-body">"80% cost reduction vs existing solutions" appears on their own website with no independent verification. Don't cite it as fact — say "they claim up to 80% cost reduction."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">How the Product Works</div>
+    <div class="card-body">
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">1</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Platform integrates via API</div><div class="pipeline-detail">Reports transactions to Grain (REST API or file upload)</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">2</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Grain quotes in local currency</div><div class="pipeline-detail">End-user sees price locked in their currency, in real time</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">3</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Grain assumes 100% of FX risk</div><div class="pipeline-detail">The platform bears zero currency exposure on guaranteed quotes</div></div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-left"><div class="pipeline-num active">4</div><div class="pipeline-line"></div></div>
+          <div class="pipeline-content"><div class="pipeline-title">Automatic settlement</div><div class="pipeline-detail">Grain executes FX at the locked rate on the settlement date. No manual FX desk.</div></div>
+        </div>
+      </div>
+      <div class="callout callout-why" style="margin-top:4px;">
+        <div class="callout-title">The AI/ML angle</div>
+        <div class="callout-body">Grain uses AI/ML to analyze historical transaction patterns — including customer behavior like cancellations and payment delays — and dynamically price hedging costs per customer profile. Traditional banks can't do this at sub-enterprise scale. This is the technical moat.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ICP — The Four Verticals</div>
+    <div class="card-body">
+      <div class="vertical-grid">
+        <div class="vertical-card">
+          <div class="vertical-name">💳 Payment Service Providers (PSPs)</div>
+          <div class="vertical-pain">Route cross-border payments, absorb FX volatility risk</div>
+          <div class="vertical-pitch">Turn FX cost center → revenue line (earn revenue share on rate lock fee)</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">✈️ Travel Platforms</div>
+          <div class="vertical-pain">Booking-to-payment windows + cancellations create FX exposure</div>
+          <div class="vertical-pitch">Grain handles cancellation risk in hedges — unusual capability. Won Hotelbeds innovation challenge.</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">🏪 B2B Marketplaces</div>
+          <div class="vertical-pain">Buyers and sellers in different currencies, complex cross-border settlement</div>
+          <div class="vertical-pitch">Embeds into payables/receivables workflow via API</div>
+        </div>
+        <div class="vertical-card">
+          <div class="vertical-name">🚢 Supply Chain / Freight</div>
+          <div class="vertical-pain">Tight margins + multi-currency invoicing (USD freight, local payment)</div>
+          <div class="vertical-pitch">Dedicated VP (Ofir Bronhaim) hired specifically for this vertical</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Competitive Landscape</div>
+    <div class="card-body">
+      <table class="score-table">
+        <thead><tr><th>Competitor</th><th>What they do</th><th>Grain's edge</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Kantox</strong> (acquired by BNP Paribas)</td><td>Dynamic FX hedging for corporates. Enterprise-focused.</td><td>Grain is more API-native and mid-market friendly. BNP acquisition slowed Kantox's agility.</td></tr>
+          <tr><td><strong>Currencycloud</strong> (acquired by Visa)</td><td>Embedded cross-border payments APIs for fintechs</td><td>Currencycloud is primarily payments execution — not a hedging/risk product. Different job to be done.</td></tr>
+          <tr><td><strong>Bound</strong></td><td>AI-powered automated FX hedging, SMB/mid-market</td><td>Closest analog. Less embedded infrastructure play, less funding.</td></tr>
+          <tr><td><strong>Wise Platform</strong></td><td>B2B2C embedded transfers, speed and price transparency</td><td>Wise is transfers, not derivatives/hedging. Different product category.</td></tr>
+          <tr><td><strong>Ebury</strong></td><td>Cross-border payments and FX risk for SMBs</td><td>More direct sales/advisory model vs. Grain's pure API-embedded approach.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-why" style="margin-top:8px;">
+        <div class="callout-title">Grain's stated differentiation (their words)</div>
+        <div class="callout-body">Only end-to-end embedded solution (their claim) · AI/ML that prices at individual transaction + customer behavior level · Platform earns revenue share · Works at smaller transaction sizes than institutional desks · Fully automated settlement</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Leadership Team</div>
+    <div class="card-body">
+      <div class="person-card">
+        <div class="person-avatar">DG</div>
+        <div class="person-info">
+          <div class="person-name">Dor Golan — Co-Founder & CEO</div>
+          <div class="person-title">18+ years in finance · former managing partner Blue Orca Capital · co-founded Horizon (crypto liquidity)</div>
+        </div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">MB</div>
+        <div class="person-info">
+          <div class="person-name">Michal Beinisch — Co-Founder & COO</div>
+          <div class="person-title">Former COO Barclays Israel · Global Head of Barclays' Rise fintech innovation platform</div>
+          <div class="person-bio">Coined "What Stripe did for payments, we have done for derivatives." The key external spokesperson.</div>
+        </div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">AN</div>
+        <div class="person-info">
+          <div class="person-name">Aharon Navon — Co-Founder & CBO</div>
+          <div class="person-title">20+ years FX & risk management · formerly headed Barclays CEEMEA FX and rates trading · co-founded Israel's largest FX hedging non-bank</div>
+        </div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">NG</div>
+        <div class="person-info">
+          <div class="person-name">Nir Galon — CPO</div>
+          <div class="person-title">Former product lead at Melio, BlueVine, and Intuit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Your Interviewer — Ben Strugo, VP Business Development</div>
+    <div class="card-body">
+      <div class="person-card interviewer">
+        <div class="person-avatar" style="background: var(--accent-dim); border-color: var(--accent);">BS</div>
+        <div class="person-info">
+          <div class="person-name">Ben Strugo — VP BD (Founding Team)</div>
+          <div class="person-title">Tel Aviv · Lawyer by training → BD executive · Founding team member</div>
+          <div class="person-bio">Career: PointGrab → ironSource (BD) → SOSA corporate innovation → Barclays VP Open Innovation → Wix Head of Developer Advocates → Techstars mentor → Columbia + TAU professor → Grain founding team VP BD. MBA from TAU (MoTIE — Management of Technology, Innovation & Entrepreneurship). Law degree from Reichman University (IDC Herzliya).</div>
+        </div>
+      </div>
+      <div class="callout callout-principle" style="margin-top:12px;">
+        <div class="callout-title">What this tells you about how to talk to him</div>
+        <div class="callout-body">
+          <strong>Ecosystem thinker:</strong> SOSA (corporate-startup connector), Barclays Open Innovation, Wix Developer Advocates — his whole career is about platforms, partnerships, and ecosystems. Don't pitch yourself as a transactional salesperson. Talk about building workflows and tools that create leverage.<br><br>
+          <strong>Analytically rigorous:</strong> Law degree + MBA in tech innovation. He will probe your reasoning, not just your energy. Be ready to defend your choices with logic.<br><br>
+          <strong>Founding team:</strong> He helped build Grain's commercial foundation from zero. He cares about builders who take ownership, not people who wait for instructions.<br><br>
+          <strong>Barclays connection:</strong> The Barclays thread (COO Beinisch + Strugo both had Barclays stints) is likely how the founding team formed. Showing you understand the institutional FX world they came from signals domain credibility.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Culture & What They're Looking For</div>
+    <div class="card-body">
+      <p>Official values: <strong>You Come First</strong> (customer focus) · <strong>We Get Things Done</strong> (execution) · <strong>You're In Good Hands</strong> (expertise) · <strong>We Do the Right Thing</strong> (challenge status quo)</p>
+      <p style="margin-top:8px;">Careers page signals: flat structure, transparent decisions, good ideas beat hierarchy, initiative encouraged, "learn fast, take responsibility." They are explicitly hiring people who are <strong>"hungry, curious, AI-native, and highly execution-oriented"</strong> — that's verbatim from the job posting.</p>
+      <div class="callout callout-why" style="margin-top:10px;">
+        <div class="callout-title">What to emphasize in your answers</div>
+        <div class="callout-body">They don't want someone who uses AI tools — they want someone who <em>builds</em> AI workflows. Emphasize: tools you've built (Lanyard), workflows you've designed, things you've shipped. "I built a conference intelligence tool with a cross-conference matching engine and AI briefings" is the story. Don't just say "I use Claude" — say what you built with it and what problem it solved.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Investors Worth Knowing</div>
+    <div class="card-body">
+      <ul style="padding-left:18px; font-size:14px; color: var(--text2); line-height:2;">
+        <li><strong>Bain Capital Ventures</strong> (Series A lead, $33M) — Mark Fiorentino and Matt Harris. BCV framed Grain as "the de-facto FX super suit" — analogous to Stripe and RevenueCat for their verticals.</li>
+        <li><strong>Aleph</strong> (seed) — Israeli/US VC. Early backer of Wix, Lemonade, monday.com. Strong signal of quality.</li>
+        <li><strong>Vesey Ventures</strong> (seed) — Closed $78M debut fund in 2023; named Grain as flagship portfolio company.</li>
+        <li><strong>Hanaco Ventures</strong> (seed) — Israeli VC.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Content Worth Reading Before the Interview</div>
+    <div class="card-body">
+      <ul style="padding-left:18px; font-size:14px; color: var(--text2); line-height:2.2;">
+        <li><strong>BCV Investment Thesis</strong> — "Currency Exchange in an Era of Globalization" at baincapitalventures.com. Clearest articulation of the market and why Grain wins. Read this.</li>
+        <li><strong>TechCrunch announcement</strong> — "Grain emerges from stealth with $50M" (Mar 2025). Good for headline facts and quotes.</li>
+        <li><strong>Grain Supply Chain blog post</strong> — "How Cross-Currency Volatility Exposes Supply Chains." Shows how they sell into the freight vertical.</li>
+        <li><strong>Grain PSP page</strong> at grainfinance.com/payment-providers — The revenue-share angle for PSPs. One of their strongest pitches.</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="know-it-btn" onclick="markDone('grain', this)">✓ I know this section</button>
+</div>
+
 <!-- ===== NEXT STEPS ===== -->
 <div class="section" id="section-nextsteps">
   <div class="section-header">
@@ -2248,7 +2479,7 @@
 </div>
 
 <script>
-const sections = ['overview','principles','datamodel','techstack','techdeepive','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','nextsteps'];
+const sections = ['overview','principles','datamodel','techstack','techdeepive','field','matching','briefing','reconcile','planning','scoring','coverage','aifeatures','hubspot','modelstrategy','numbers','grain','nextsteps'];
 const done = new Set();
 document.getElementById('progress-text').textContent = '0 / ' + sections.length;
 
