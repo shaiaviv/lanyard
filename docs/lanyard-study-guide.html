@@ -2350,9 +2350,17 @@
       <div class="card" style="margin-bottom:10px; border-color: rgba(139,92,246,0.3);">
         <div class="card-title" style="color: var(--reconcile);">Story 2 — The ICP scoring methodology</div>
         <div class="card-body">
-          <p><strong>Lead with:</strong> "I had to decide which conferences Grain should prioritize. I built a scoring system based on vertical fit, audience size, deal density, geographic clustering, and conference tier — then used Claude to score each factor against Grain's ICP."</p>
-          <p><strong>Why it matters to Ben:</strong> He does exactly this in his job. He'll engage with the methodology and probe it. Have a number ready — "T1 conferences score 80+, T2 score 60–79."</p>
-          <p><strong>Key defend:</strong> "Is this the right scoring?" → There's no single right answer. The value is having a principled system that can be adjusted. I built it so the weights are configurable — if Grain decides geographic clustering matters more than audience size, one parameter changes.</p>
+          <p><strong>Lead with:</strong> "The first real product decision was how to rank 190 conferences. I built a weighted scoring system across five factors — ICP density, topic fit, scale, geo relevance, and historical performance — and used Claude to score each one. The output is a tier: T1 is where Grain should send someone every year, T3 is monitor-only."</p>
+          <p><strong>If Ben asks what each factor means — one line each:</strong></p>
+          <ul style="margin-top:6px;">
+            <li><strong>ICP density</strong> — how many PSPs, treasury teams, and FX desks are actually in the room. A 600-person treasury summit beats a 40,000-person generic expo.</li>
+            <li><strong>Topic fit</strong> — is FX / cross-border payments the main agenda, or a 20-minute side track?</li>
+            <li><strong>Scale</strong> — raw audience size, but capped. Scale amplifies density — it can't replace it.</li>
+            <li><strong>Geo relevance</strong> — EU is Grain's primary market, so European events score higher. Reflects real travel ROI.</li>
+            <li><strong>Historical performance</strong> — past Grain results at this event. Redistributed to ICP density when null so new events aren't penalized.</li>
+          </ul>
+          <p style="margin-top:8px;"><strong>Why it matters to Ben:</strong> He does exactly this prioritization in his job. He'll engage with the methodology and probe it. Have the tier thresholds ready: T1 = 80+, T2 = 60–79, T3 = below 60.</p>
+          <p style="margin-top:8px;"><strong>Key defend:</strong> "Is this the right scoring?" → "There's no single right answer — the value is having a principled system that can be adjusted. The weights are configurable. If Grain decides geo relevance matters more than scale, one parameter changes and everything re-ranks instantly."</p>
         </div>
       </div>
 
